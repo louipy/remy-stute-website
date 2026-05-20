@@ -1,0 +1,220 @@
+---
+/* Nosotros — página /nosotros. Réplica de design-reference
+   (06 Nosotros desktop 1440 — tema oscuro, cards expandibles). */
+const cards = [
+  {
+    icon: "hourglass",
+    title: "30 años de trayectoria continua",
+    desc: "Tres décadas operando sin interrupción en el mercado venezolano de materia prima industrial.",
+    extra: "Fundada en 1995, Remy & Stute ha sostenido el suministro a planta a través de cada ciclo del mercado venezolano.",
+  },
+  {
+    icon: "award",
+    title: "Representación exclusiva internacional",
+    desc: "Únicos canalizadores autorizados de Addcon, Yipin Pigmentos y Minerales Industriales en territorio venezolano.",
+    extra: "Sin intermediarios entre la fábrica y su planta: precio, lote y trazabilidad directos de origen.",
+  },
+  {
+    icon: "package",
+    title: "Stock local · despacho inmediato",
+    desc: "Inventario rotativo en almacén propio en Caracas. Despacho a planta nacional en 24–72 horas.",
+    extra: "142 toneladas rotativas en Las Mercedes — sin esperas de importación que detengan su producción.",
+  },
+  {
+    icon: "flask-conical",
+    title: "Muestras gratis · asesoría incluida",
+    desc: "Hasta 1 kg gratuito por producto para piloto productivo, con análisis técnico previo a la orden.",
+    extra: "Cada muestra llega con certificado de análisis del lote y acompañamiento de un ingeniero formulador.",
+  },
+];
+---
+
+<section class="ab-hero">
+  <div class="ab-hero__grid" aria-hidden="true"></div>
+  <div class="wrap ab-hero__inner reveal">
+    <p class="eyebrow eyebrow--lime">
+      <span class="line"></span>
+      <span>Nosotros · quiénes somos</span>
+    </p>
+    <h1 class="ab-hero__title">
+      NO SOMOS UN <span class="lime">DISTRIBUIDOR</span><br />DE CATÁLOGO.
+    </h1>
+    <p class="ab-hero__lead">
+      Somos el proveedor que garantiza que su producción
+      <strong>no se detiene.</strong>
+    </p>
+  </div>
+</section>
+
+<section class="ab-cards">
+  <div class="wrap">
+    <div class="ab-grid">
+      {cards.map((c) => (
+        <article class="ab-card">
+          <div class="ab-card__icon">
+            <i data-lucide={c.icon}></i>
+          </div>
+          <div class="ab-card__head">
+            <h3 class="ab-card__title">{c.title}</h3>
+            <button type="button" class="ab-card__toggle" aria-expanded="false" aria-label="Expandir">
+              <i data-lucide="plus"></i>
+            </button>
+          </div>
+          <p class="ab-card__desc">{c.desc}</p>
+          <p class="ab-card__extra">{c.extra}</p>
+        </article>
+      ))}
+    </div>
+
+    <div class="ab-cta">
+      <div>
+        <p class="eyebrow eyebrow--lime" style="margin-bottom:8px;">
+          <span>Siguiente paso</span>
+        </p>
+        <p class="ab-cta__title">¿Listo para que su planta no dependa de catálogos?</p>
+      </div>
+      <a href="/contacto" class="btn btn--lime">
+        Solicitar diagnóstico técnico
+        <i data-lucide="arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Hero oscuro */
+  .ab-hero { position: relative; overflow: hidden; padding: 120px 0 96px; }
+  .ab-hero__grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.4;
+    background-image:
+      linear-gradient(rgba(203, 255, 0, 0.16) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(203, 255, 0, 0.16) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .ab-hero__inner { position: relative; max-width: 1080px; }
+  .ab-hero__title {
+    margin-top: 24px;
+    font-family: var(--display);
+    font-size: clamp(48px, 6.5vw, 84px);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    color: var(--dark-text);
+  }
+  .ab-hero__title .lime { color: var(--lime); }
+  .ab-hero__lead {
+    margin-top: 32px;
+    max-width: 760px;
+    font-size: clamp(18px, 2.2vw, 22px);
+    line-height: 1.45;
+    color: rgba(240, 237, 230, 0.7);
+  }
+  .ab-hero__lead strong { color: var(--dark-text); font-weight: 600; }
+
+  /* Cards */
+  .ab-cards { padding: 0 0 120px; }
+  .ab-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .ab-card {
+    background: var(--dark-panel);
+    border: 1px solid rgba(203, 255, 0, 0.16);
+    padding: 36px;
+    cursor: pointer;
+    transition: border-color 180ms, background 180ms;
+  }
+  .ab-card:hover { border-color: rgba(203, 255, 0, 0.4); }
+  .ab-card__icon {
+    width: 64px;
+    height: 64px;
+    border: 1px solid var(--lime);
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 32px;
+    color: var(--dark-text);
+  }
+  .ab-card__icon i { width: 26px; height: 26px; }
+  .ab-card__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .ab-card__title {
+    font-family: var(--display);
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--dark-text);
+  }
+  .ab-card__toggle {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(203, 255, 0, 0.16);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--lime);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: transform 200ms, background 160ms;
+  }
+  .ab-card__toggle i { width: 14px; height: 14px; }
+  .ab-card__toggle[aria-expanded="true"] { transform: rotate(45deg); background: rgba(203, 255, 0, 0.1); }
+  .ab-card__desc {
+    margin-top: 16px;
+    font-size: 14.5px;
+    line-height: 1.65;
+    color: rgba(240, 237, 230, 0.55);
+  }
+  .ab-card__extra {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(203, 255, 0, 0.16);
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: rgba(240, 237, 230, 0.75);
+    display: none;
+  }
+  .ab-card.is-open .ab-card__extra { display: block; }
+
+  /* CTA band */
+  .ab-cta {
+    margin-top: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    background: var(--dark-panel-2);
+    border: 1px solid rgba(203, 255, 0, 0.16);
+    padding: 28px 32px;
+  }
+  .ab-cta__title {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--dark-text);
+  }
+
+  @media (max-width: 860px) {
+    .ab-grid { grid-template-columns: 1fr; }
+    .ab-cta { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<script is:inline>
+  document.querySelectorAll(".ab-card").forEach((card) => {
+    const toggle = card.querySelector(".ab-card__toggle");
+    if (!toggle) return;
+    function flip(e) {
+      e.preventDefault();
+      const open = card.classList.toggle("is-open");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    card.addEventListener("click", flip);
+  });
+</script>

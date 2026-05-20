@@ -1,0 +1,431 @@
+---
+/* Catálogo de productos — página /productos. Réplica de design-reference
+   (04 Productos desktop 1440): cabecera + filtros (sector/marca) + tabla
+   + vista detalle de ejemplo.
+   "Ficha técnica" y "Solicitar muestra" dirigen al brief técnico (/contacto). */
+
+const sectores = ["Todos", "Cerámicas", "Construcción", "Pinturas", "Feed", "Industrial", "Aminoácidos"];
+const marcas = ["Todas", "Addcon", "Yipin Pigmentos", "Minerales Industriales"];
+
+const productos = [
+  {
+    n: "01",
+    name: "Óxido de Hierro Naranja S960",
+    desc: "Coloración de alta resistencia para pinturas industriales, concreto pigmentado y recubrimientos.",
+    marca: "Yipin Pigmentos",
+    sector: "Pinturas",
+    sectorLabel: "Pinturas",
+    swatch: "#4c7ef8",
+  },
+  {
+    n: "02",
+    name: "RDP TY503",
+    desc: "Polvo redispersable de alta cohesión para pego, morteros secos e impermeabilizantes.",
+    marca: "Addcon",
+    sector: "Construcción",
+    sectorLabel: "Construcción",
+    swatch: "#6d7c42",
+  },
+  {
+    n: "03",
+    name: "HPMC KPM 150000C",
+    desc: "Hidroxipropilmetilcelulosa de alta viscosidad. Retención de agua y trabajabilidad en morteros.",
+    marca: "Addcon",
+    sector: "Construcción",
+    sectorLabel: "Construcción",
+    swatch: "#6d7c42",
+  },
+  {
+    n: "04",
+    name: "Grafito 285 Silvershine",
+    desc: "Grafito micronizado para frenos, lubricantes sólidos y manufactura de lápices.",
+    marca: "Minerales Industriales",
+    sector: "Industrial",
+    sectorLabel: "Ind. Pesada",
+    swatch: "#703300",
+  },
+  {
+    n: "05",
+    name: "Óxido de Magnesio",
+    desc: "Suplemento mineral grado alimenticio para nutrición animal y alimento balanceado.",
+    marca: "Minerales Industriales",
+    sector: "Feed",
+    sectorLabel: "Agro",
+    swatch: "#8cc63f",
+  },
+];
+
+const especificacion = [
+  ["Contenido Fe₂O₃", "≥ 96.0 %"],
+  ["Humedad", "≤ 1.0 %"],
+  ["Materia soluble en agua", "≤ 0.3 %"],
+  ["Residuo en malla 325", "≤ 0.3 %"],
+  ["pH (suspensión 5%)", "4.0 – 8.0"],
+  ["Presentación", "Saco 25 kg / palé 1 000 kg"],
+];
+---
+
+<section class="pc-head">
+  <div class="wrap">
+    <p class="pc-eyebrow">Productos · Catálogo Fase 1 · 5 SKU</p>
+    <h1 class="pc-title">
+      Materias primas industriales
+      <span class="g">filtrables por sector y marca.</span>
+    </h1>
+  </div>
+</section>
+
+<section class="pc-filters">
+  <div class="wrap">
+    <div class="pc-filter-grid">
+      <span class="pc-filter-label">Filtro · Sector</span>
+      <div class="pc-chips" data-group="sector">
+        {sectores.map((s, i) => (
+          <button type="button" class="chip" data-value={s} aria-pressed={i === 0 ? "true" : "false"}>{s}</button>
+        ))}
+      </div>
+      <span class="pc-filter-label">Filtro · Marca</span>
+      <div class="pc-chips" data-group="marca">
+        {marcas.map((m, i) => (
+          <button type="button" class="chip" data-value={m} aria-pressed={i === 0 ? "true" : "false"}>{m}</button>
+        ))}
+      </div>
+      <span class="pc-count" id="pcCount">5 de 5 resultados</span>
+    </div>
+  </div>
+</section>
+
+<section class="pc-table-wrap">
+  <div class="wrap">
+    <div class="pc-table">
+      <div class="pc-row pc-row--head">
+        <span>#</span>
+        <span>Producto / Aplicación</span>
+        <span>Marca</span>
+        <span>Sector</span>
+        <span></span>
+      </div>
+      <div id="pcRows">
+        {productos.map((p) => (
+          <article class="pc-row pc-prod" data-sector={p.sector} data-marca={p.marca}>
+            <span class="pc-num">{p.n}</span>
+            <div class="pc-prod-main">
+              <h3 class="pc-prod-name">{p.name}</h3>
+              <p class="pc-prod-desc">{p.desc}</p>
+            </div>
+            <div class="pc-prod-marca">{p.marca}</div>
+            <div class="pc-prod-sector">
+              <span class="pc-dot" style={`background:${p.swatch}`}></span>
+              {p.sectorLabel}
+            </div>
+            <div class="pc-prod-actions">
+              <a href="/contacto" class="btn btn--primary btn--sm btn--block">
+                Ficha técnica
+                <i data-lucide="download"></i>
+              </a>
+              <a href="/contacto" class="btn btn--outline btn--sm btn--block">Solicitar muestra</a>
+            </div>
+          </article>
+        ))}
+      </div>
+      <p class="pc-empty" id="pcEmpty" hidden>
+        Ningún producto coincide con el filtro. Escríbanos y le conseguimos la
+        materia prima que necesita.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="pc-detail">
+  <div class="wrap">
+    <div class="pc-detail-label">
+      <span>Vista detalle · ejemplo</span>
+      <span class="pc-detail-line"></span>
+    </div>
+    <div class="pc-detail-card">
+      <div class="pc-detail-media" aria-hidden="true">
+        <span class="pc-detail-tag">01 / 02 / 03</span>
+        <span class="pc-detail-badge">[ PIG-S960 · ÓXIDO HIERRO NARANJA ]</span>
+      </div>
+      <div class="pc-detail-body">
+        <p class="pc-detail-brand">Yipin Pigmentos</p>
+        <h2 class="pc-detail-name">Óxido de Hierro Naranja S960</h2>
+        <p class="pc-detail-sku">SKU · PIG-S960 · CAS 1309-37-1</p>
+        <p class="pc-detail-desc">
+          Pigmento sintético de alta resistencia a la luz UV y a la intemperie.
+          Coloración estable en sistemas acuosos, alquídicos y epóxicos.
+          Densidad aparente 0.9–1.1 g/cm³.
+        </p>
+        <div class="pc-spec">
+          <p class="pc-spec-title">Especificación técnica</p>
+          <table>
+            <tbody>
+              {especificacion.map(([k, v]) => (
+                <tr>
+                  <td>{k}</td>
+                  <td>{v}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div class="pc-detail-actions">
+          <a href="/contacto" class="btn btn--primary">
+            Solicitar cotización
+            <i data-lucide="arrow-right"></i>
+          </a>
+          <a href="/contacto" class="btn btn--outline">Descargar ficha (PDF · 320 KB)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Cabecera */
+  .pc-head { background: var(--white); border-bottom: 1px solid var(--border); padding: 56px 0 32px; }
+  .pc-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .pc-title {
+    margin-top: 12px;
+    max-width: 980px;
+    font-family: var(--display);
+    font-size: clamp(34px, 4vw, 56px);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .pc-title .g { color: var(--green); }
+
+  /* Filtros */
+  .pc-filters { background: var(--cream-2); border-bottom: 1px solid var(--border); padding: 20px 0; }
+  .pc-filter-grid {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+  }
+  .pc-filter-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .pc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: var(--body);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background 140ms, color 140ms, border-color 140ms;
+  }
+  .chip:hover { border-color: var(--ink); }
+  .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .pc-count {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text);
+  }
+
+  /* Tabla */
+  .pc-table-wrap { background: var(--cream); padding: 32px 0 64px; }
+  .pc-table { background: var(--white); border: 1px solid var(--border); }
+  .pc-row {
+    display: grid;
+    grid-template-columns: 60px minmax(0, 1.7fr) 1fr 1fr 210px;
+    gap: 24px;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .pc-row:last-child { border-bottom: 0; }
+  .pc-row--head {
+    padding: 14px 24px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .pc-prod.is-hidden { display: none; }
+  .pc-num { font-family: var(--num); font-size: 32px; color: var(--yellow); line-height: 1; }
+  .pc-prod-name {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+  }
+  .pc-prod-desc { margin-top: 4px; font-size: 12.5px; line-height: 1.5; color: var(--text); }
+  .pc-prod-marca { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .pc-prod-sector { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
+  .pc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .pc-prod-actions { display: flex; flex-direction: column; gap: 8px; }
+  .pc-empty {
+    padding: 56px 24px;
+    text-align: center;
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  /* Vista detalle */
+  .pc-detail { background: var(--cream); padding: 32px 0 96px; }
+  .pc-detail-label { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .pc-detail-label span:first-child {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .pc-detail-line { flex: 1; height: 1px; background: var(--border-2); }
+  .pc-detail-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    background: var(--white);
+    border: 1px solid var(--border-2);
+  }
+  .pc-detail-media {
+    position: relative;
+    min-height: 420px;
+    border-right: 1px solid var(--border);
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--ink) 0,
+      var(--ink) 12px,
+      rgba(255, 255, 255, 0.05) 12px,
+      rgba(255, 255, 255, 0.05) 24px
+    );
+    display: grid;
+    place-items: center;
+  }
+  .pc-detail-tag {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  .pc-detail-badge {
+    padding: 6px 10px;
+    background: rgba(10, 36, 24, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .pc-detail-body { padding: 40px; }
+  .pc-detail-brand {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 8px;
+  }
+  .pc-detail-name {
+    font-family: var(--display);
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .pc-detail-sku {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .pc-detail-desc { font-size: 14.5px; line-height: 1.7; color: var(--text); margin-bottom: 28px; }
+  .pc-spec { padding-top: 20px; border-top: 1px solid var(--border); }
+  .pc-spec-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .pc-spec table { width: 100%; border-collapse: collapse; }
+  .pc-spec td {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .pc-spec td:first-child {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .pc-spec td:last-child { text-align: right; font-weight: 600; color: var(--ink); }
+  .pc-detail-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 28px; }
+
+  @media (max-width: 920px) {
+    .pc-row, .pc-row--head { grid-template-columns: 1fr; gap: 10px; }
+    .pc-row--head { display: none; }
+    .pc-num { font-size: 24px; }
+    .pc-prod-actions { flex-direction: row; }
+    .pc-detail-card { grid-template-columns: 1fr; }
+    .pc-detail-media { min-height: 260px; border-right: 0; border-bottom: 1px solid var(--border); }
+    .pc-detail-body { padding: 28px; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const rowsWrap = document.getElementById("pcRows");
+    const empty = document.getElementById("pcEmpty");
+    const count = document.getElementById("pcCount");
+    if (!rowsWrap || !empty || !count) return;
+
+    const rows = Array.from(rowsWrap.querySelectorAll(".pc-prod"));
+    const state = { sector: "Todos", marca: "Todas" };
+
+    function apply() {
+      let visible = 0;
+      rows.forEach((row) => {
+        const okSector = state.sector === "Todos" || row.dataset.sector === state.sector;
+        const okMarca = state.marca === "Todas" || row.dataset.marca === state.marca;
+        const show = okSector && okMarca;
+        row.classList.toggle("is-hidden", !show);
+        if (show) visible++;
+      });
+      empty.hidden = visible > 0;
+      count.textContent = visible + " de " + rows.length + " resultados";
+    }
+
+    document.querySelectorAll(".pc-chips").forEach((group) => {
+      const key = group.dataset.group;
+      group.addEventListener("click", (e) => {
+        const btn = e.target.closest(".chip");
+        if (!btn) return;
+        group.querySelectorAll(".chip").forEach((c) => {
+          c.setAttribute("aria-pressed", c === btn ? "true" : "false");
+        });
+        state[key] = btn.dataset.value;
+        apply();
+      });
+    });
+  })();
+</script>

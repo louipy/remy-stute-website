@@ -1,0 +1,448 @@
+---
+/* Contacto — página /contacto. Réplica de design-reference
+   (08 Contacto desktop 1440 — brief técnico + estados de campo).
+
+   Contrato de Fase 2 (preservado):
+     - id="contactoForm", id="formSuccess", id="contactoSubmit", id="idempotencyKey"
+     - inputs: nombre, empresa, email, whatsapp, cargo, producto, volumen, notas
+     - <input name="idempotency_key"> (R3) · .cf-turnstile (Turnstile) · data-error
+     - Orden de validación lo aplica /api/contacto: Turnstile → Zod → n8n (R4). */
+
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+
+const productos = [
+  "Óxido de Hierro Naranja S960",
+  "RDP TY503",
+  "HPMC KPM 150000C",
+  "Grafito 285 Silvershine",
+  "Óxido de Magnesio",
+  "Varios / No estoy seguro",
+];
+---
+
+<section class="ct-head">
+  <div class="wrap">
+    <p class="ct-eyebrow">Contacto · Diagnóstico técnico · Brief calificador</p>
+    <h1 class="ct-title">
+      Cuéntenos qué necesita su planta.
+      <span class="g">Respuesta en &lt;4 h hábiles.</span>
+    </h1>
+  </div>
+</section>
+
+<section class="ct-body">
+  <div class="wrap ct-grid">
+    <aside class="ct-aside">
+      <div class="ct-office">
+        <p class="ct-office-title">Oficina · Caracas</p>
+        <p class="ct-office-addr">
+          Av. Orinoco, Edif. Nalania<br />
+          Las Mercedes, Caracas 1060<br />
+          Distrito Capital · Venezuela
+        </p>
+        <div class="ct-office-row ct-office-row--top">
+          <span>L–V</span><span class="b">08:00 – 17:00 VET</span>
+        </div>
+        <div class="ct-office-row">
+          <span>RIF</span><span class="b">J-00123456-7</span>
+        </div>
+      </div>
+      <div class="ct-map" aria-hidden="true">
+        <span class="ct-map-pin"></span>
+        <span class="ct-map-badge">[ MAPA · LAS MERCEDES ]</span>
+      </div>
+    </aside>
+
+    <div class="ct-formcard">
+      <p class="ct-form-label">Brief técnico · campos obligatorios marcados *</p>
+
+      <form id="contactoForm" novalidate>
+        <input type="hidden" name="idempotency_key" id="idempotencyKey" value="" />
+
+        <div class="ct-form-grid">
+          <div class="field">
+            <label class="field__label" for="nombre">Nombre completo *</label>
+            <input type="text" id="nombre" name="nombre" class="field__control" required autocomplete="name" placeholder="Carlos Méndez" />
+            <p class="field__err" data-error="nombre"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="email">Correo electrónico *</label>
+            <input type="email" id="email" name="email" class="field__control" required autocomplete="email" placeholder="cmendez@empresa.com" />
+            <p class="field__err" data-error="email"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="empresa">Empresa *</label>
+            <input type="text" id="empresa" name="empresa" class="field__control" required autocomplete="organization" placeholder="Pinturas Aragua C.A." />
+            <p class="field__err" data-error="empresa"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="whatsapp">Número de contacto (WhatsApp) *</label>
+            <div class="field__wa">
+              <span class="field__flag" aria-hidden="true">🇻🇪</span>
+              <input type="tel" id="whatsapp" name="whatsapp" class="field__control" required autocomplete="tel" placeholder="+58 412 555 7788" />
+            </div>
+            <p class="field__err" data-error="whatsapp"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="cargo">Cargo *</label>
+            <input type="text" id="cargo" name="cargo" class="field__control" required autocomplete="organization-title" placeholder="Gerente de Compras" />
+            <p class="field__err" data-error="cargo"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="producto">Producto de interés *</label>
+            <select id="producto" name="producto" class="field__control" required>
+              <option value="" disabled selected>Seleccione un producto</option>
+              {productos.map((p) => <option value={p}>{p}</option>)}
+            </select>
+            <p class="field__err" data-error="producto"></p>
+          </div>
+          <div class="field field--full">
+            <label class="field__label" for="volumen">Volumen estimado mensual</label>
+            <input type="text" id="volumen" name="volumen" class="field__control" placeholder="ej. 6 toneladas / mes" />
+            <p class="field__err" data-error="volumen"></p>
+          </div>
+          <div class="field field--full">
+            <label class="field__label" for="notas">Notas técnicas · especificación buscada</label>
+            <textarea id="notas" name="notas" class="field__control" rows="3" placeholder="Detalle la aplicación, formulación actual, propiedades requeridas (granulometría, pureza, pH, etc.). Mientras más específico, mejor cotización."></textarea>
+            <p class="field__err" data-error="notas"></p>
+          </div>
+        </div>
+
+        <div class="ct-turnstile">
+          <div class="cf-turnstile" data-sitekey={siteKey} data-theme="light"></div>
+          <p class="field__err" data-error="turnstile"></p>
+        </div>
+
+        <div class="ct-submit">
+          <p class="ct-submit-note">
+            Sin compromiso. Toda la información es confidencial.
+          </p>
+          <button type="submit" class="btn btn--primary" id="contactoSubmit">
+            <span class="btn-label">Enviar diagnóstico técnico</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </div>
+        <p class="field__err field__err--global" data-error="__global__"></p>
+      </form>
+
+      <div class="ct-success" id="formSuccess">
+        <div class="ct-success-icon"><i data-lucide="check"></i></div>
+        <h3>Solicitud recibida</h3>
+        <p>
+          Mathias o Karelys se comunicarán con usted en menos de 24 horas
+          hábiles. Revise su correo y WhatsApp.
+        </p>
+        <a href="/productos" class="btn btn--outline">Ver catálogo de productos</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ct-head { background: var(--white); border-bottom: 1px solid var(--border); padding: 56px 0 32px; }
+  .ct-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ct-title {
+    margin-top: 12px;
+    max-width: 980px;
+    font-family: var(--display);
+    font-size: clamp(34px, 4vw, 56px);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .ct-title .g { color: var(--green); }
+
+  .ct-body { background: var(--cream); padding: 40px 0 96px; }
+  .ct-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.74fr) minmax(0, 1fr);
+    gap: 0;
+    align-items: start;
+  }
+
+  /* Aside */
+  .ct-aside { display: flex; flex-direction: column; gap: 2px; }
+  .ct-office { background: var(--white); border: 1px solid var(--border); padding: 28px; }
+  .ct-office-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .ct-office-addr { font-size: 14px; line-height: 1.7; color: var(--text); }
+  .ct-office-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 12px;
+    margin-top: 6px;
+  }
+  .ct-office-row--top { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .ct-office-row span:first-child { color: var(--muted); letter-spacing: 0.1em; }
+  .ct-office-row .b { color: var(--ink); font-weight: 600; }
+  .ct-map {
+    position: relative;
+    min-height: 220px;
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--cream-2) 0,
+      var(--cream-2) 12px,
+      rgba(0, 102, 51, 0.06) 12px,
+      rgba(0, 102, 51, 0.06) 24px
+    );
+  }
+  .ct-map-badge {
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ct-map-pin {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--brown);
+    border: 3px solid #fff;
+  }
+
+  /* Form card */
+  .ct-formcard { background: var(--white); border: 1px solid var(--border-2); padding: 32px; }
+  .ct-form-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+  .ct-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 16px;
+  }
+  .field { display: flex; flex-direction: column; }
+  .field--full { grid-column: 1 / -1; }
+  .field__label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .field__control {
+    width: 100%;
+    height: 42px;
+    padding: 10px 14px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-family: var(--body);
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 140ms, background 140ms, box-shadow 140ms;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  textarea.field__control { height: auto; min-height: 96px; resize: vertical; line-height: 1.55; }
+  .field__control::placeholder { color: var(--faint); }
+  .field__control:focus {
+    background: var(--white);
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(0, 102, 51, 0.15);
+  }
+  select.field__control {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7770' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 38px;
+  }
+  .field__wa { position: relative; }
+  .field__flag {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 15px;
+    pointer-events: none;
+  }
+  .field__wa .field__control { padding-left: 36px; }
+  .field__err {
+    margin-top: 6px;
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--err);
+    min-height: 1em;
+  }
+  .field__err--global { text-align: center; font-weight: 500; margin-top: 12px; }
+  .field.has-error .field__control {
+    background: #fff6f4;
+    border-color: var(--err);
+    box-shadow: 0 0 0 3px rgba(165, 58, 46, 0.12);
+  }
+
+  .ct-turnstile {
+    margin-top: 24px;
+    padding: 16px 18px;
+    background: var(--cream);
+    border: 1px dashed var(--border);
+  }
+  .ct-submit {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 24px;
+  }
+  .ct-submit-note { font-size: 12px; font-style: italic; color: var(--muted); }
+  #contactoSubmit[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+  /* Éxito */
+  .ct-success { display: none; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 48px 24px; }
+  .ct-success.show { display: flex; }
+  .ct-success-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    display: grid;
+    place-items: center;
+  }
+  .ct-success-icon i { width: 26px; height: 26px; }
+  .ct-success h3 { font-family: var(--display); font-size: 26px; font-weight: 800; color: var(--ink); }
+  .ct-success p { max-width: 380px; font-size: 14px; color: var(--text); }
+
+  @media (max-width: 920px) {
+    .ct-grid { grid-template-columns: 1fr; gap: 24px; }
+  }
+  @media (max-width: 560px) {
+    .ct-form-grid { grid-template-columns: 1fr; }
+    .ct-submit { flex-direction: column; align-items: stretch; }
+    .ct-formcard { padding: 24px; }
+  }
+</style>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline></script>
+
+<script is:inline>
+  (function () {
+    const form = document.getElementById("contactoForm");
+    const success = document.getElementById("formSuccess");
+    const submitBtn = document.getElementById("contactoSubmit");
+    const idempotencyInput = document.getElementById("idempotencyKey");
+    if (!form || !success || !submitBtn || !idempotencyInput) return;
+
+    // R3: idempotency_key se genera UNA SOLA VEZ al montar.
+    idempotencyInput.value = crypto.randomUUID();
+
+    function clearErrors() {
+      form.querySelectorAll(".field__err").forEach((el) => (el.textContent = ""));
+      form.querySelectorAll(".field.has-error").forEach((el) => el.classList.remove("has-error"));
+    }
+    function setFieldError(field, message) {
+      const el = form.querySelector('[data-error="' + field + '"]');
+      if (el) {
+        el.textContent = message;
+        const wrap = el.closest(".field");
+        if (wrap) wrap.classList.add("has-error");
+      }
+    }
+    function setGlobalError(message) { setFieldError("__global__", message); }
+    function setLoading(on) {
+      submitBtn.disabled = on;
+      const label = submitBtn.querySelector(".btn-label");
+      if (label) label.textContent = on ? "Enviando…" : "Enviar diagnóstico técnico";
+    }
+    function resetTurnstile() {
+      if (window.turnstile && typeof window.turnstile.reset === "function") {
+        try { window.turnstile.reset(); } catch (_) {}
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearErrors();
+      setLoading(true);
+
+      const fd = new FormData(form);
+      const turnstileToken = (fd.get("cf-turnstile-response") || "").toString();
+      if (!turnstileToken) {
+        setFieldError("turnstile", "Complete la verificación anti-bot.");
+        setLoading(false);
+        return;
+      }
+
+      const payload = {
+        nombre: (fd.get("nombre") || "").toString(),
+        empresa: (fd.get("empresa") || "").toString(),
+        email: (fd.get("email") || "").toString(),
+        whatsapp: (fd.get("whatsapp") || "").toString(),
+        cargo: (fd.get("cargo") || "").toString(),
+        producto: (fd.get("producto") || "").toString(),
+        volumen: (fd.get("volumen") || "").toString(),
+        notas: (fd.get("notas") || "").toString(),
+        idempotency_key: idempotencyInput.value,
+        turnstile_token: turnstileToken,
+      };
+
+      try {
+        const res = await fetch("/api/contacto", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.status === 200) {
+          form.style.display = "none";
+          success.classList.add("show");
+          return;
+        }
+
+        const data = await res.json().catch(() => ({}));
+        if (res.status === 403) {
+          setFieldError("turnstile", "Verificación anti-bot rechazada. Intente de nuevo.");
+          resetTurnstile();
+        } else if (res.status === 422 && data && data.fieldErrors) {
+          Object.keys(data.fieldErrors).forEach((field) => {
+            const messages = data.fieldErrors[field];
+            if (Array.isArray(messages) && messages.length > 0) setFieldError(field, messages[0]);
+          });
+          setGlobalError("Revise los campos marcados.");
+          resetTurnstile();
+        } else if (res.status === 502) {
+          setGlobalError("No pudimos enviar su solicitud. Intente de nuevo en unos minutos.");
+          resetTurnstile();
+        } else {
+          setGlobalError("Ocurrió un error inesperado. Intente de nuevo.");
+          resetTurnstile();
+        }
+      } catch (err) {
+        console.error("[contacto] Error de red", err);
+        setGlobalError("Error de conexión. Verifique su internet e intente de nuevo.");
+        resetTurnstile();
+      } finally {
+        setLoading(false);
+      }
+    });
+  })();
+</script>

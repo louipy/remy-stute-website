@@ -1,0 +1,29 @@
+---
+interface Props {
+  pageName: string;
+  description?: string;
+}
+const { pageName, description } = Astro.props;
+---
+
+<section class="pic">
+  <div class="wrap">
+    <p class="eyebrow" style="justify-content:center;">
+      <span class="line"></span>
+      <span>Próximamente</span>
+      <span class="line"></span>
+    </p>
+    <h1>{pageName}</h1>
+    {description && <p>{description}</p>}
+    <div class="pic-actions">
+      <a href="/" class="btn btn--primary">
+        <i data-lucide="arrow-left"></i>
+        Volver al inicio
+      </a>
+      <a href="/contacto" class="btn btn--outline">
+        Contáctanos
+        <i data-lucide="arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>

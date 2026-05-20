@@ -1,0 +1,211 @@
+---
+/* Hero — Home. Réplica de design-reference (02 Home desktop 1440). */
+const stats = [
+  { value: "30", unit: "Años", label: "Operando en Venezuela" },
+  { value: "3", unit: "Marcas", label: "Representación exclusiva regional" },
+  { value: "<4", unit: "H", label: "Tiempo de primera respuesta", brown: true },
+  { value: "∞", unit: "", label: "Muestras gratis · asesoría técnica incluida" },
+];
+
+/* Slideshow del hero — fotos provisionales de Unsplash (uso libre). */
+const heroSlides = [
+  {
+    src: "https://images.unsplash.com/photo-1587293852726-70cdb56c2866?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW5kdXN0cmlhbCUyMHdhcmVob3VzZXxlbnwwfHwwfHx8MA%3D%3D",
+    alt: "Almacén industrial de materia prima",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1693996046865-19217d179161?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWluZXJhbCUyMHBvd2RlcnxlbnwwfHwwfHx8MA%3D%3D",
+    alt: "Materia prima mineral en polvo",
+  },
+  {
+    src: "https://images.unsplash.com/photo-1516937941344-00b4e0337589?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2hlbWljYWwlMjBpbmR1c3RyeXxlbnwwfHwwfHx8MA%3D%3D",
+    alt: "Planta química industrial",
+  },
+];
+---
+
+<section class="hero">
+  <div class="hero__main">
+    <div class="hero__top reveal">
+      <p class="eyebrow">
+        <span class="num">EST. 1995</span>
+        <span class="line"></span>
+        <span>Importador · Caracas, Venezuela</span>
+      </p>
+      <h1 class="hero__title">
+        La materia prima que su planta necesita,
+        <span class="g">lista para despacho.</span>
+      </h1>
+      <p class="hero__lead">
+        Representante exclusivo de <b>Addcon</b>, <b>Yipin Pigmentos</b> y
+        <b>Minerales Industriales</b> en Venezuela. Cubrimos los sectores de
+        construcción, pinturas, petróleo, cerámica, vidrio y agroalimentos.
+      </p>
+    </div>
+
+    <div class="hero__cta reveal">
+      <a href="/contacto" class="btn btn--primary">
+        Solicitar cotización
+        <i data-lucide="arrow-right"></i>
+      </a>
+      <a href="/productos" class="btn btn--outline">Descargar catálogo (PDF · 1.4 MB)</a>
+    </div>
+
+    <div class="hero__stats reveal">
+      {stats.map((s) => (
+        <div class="hstat">
+          <div class="hstat__num" data-brown={s.brown}>
+            {s.value}{s.unit && <span>{s.unit}</span>}
+          </div>
+          <div class="hstat__label">{s.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="hero__media">
+    <div class="hero__slides" id="heroSlides">
+      {heroSlides.map((slide, i) => (
+        <img
+          class:list={["hero__slide", { "is-active": i === 0 }]}
+          src={slide.src}
+          alt={slide.alt}
+          loading={i === 0 ? "eager" : "lazy"}
+          decoding="async"
+        />
+      ))}
+    </div>
+    <span class="hero__media-tag" id="heroCounter">01 / 03</span>
+  </div>
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.16fr) minmax(0, 1fr);
+    background: var(--white);
+    /* Ocupa toda la altura de la pantalla: la sección siguiente queda
+       por debajo del fold inicial. Las columnas se estiran (align-items
+       por defecto = stretch), así la imagen cubre el alto completo. */
+    min-height: 100vh;
+  }
+  .hero__main {
+    padding: 104px var(--pad) 56px;
+    border-right: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 56px;
+  }
+  .hero__top { margin-top: auto; }
+  .hero__title {
+    margin: 24px 0;
+    font-family: var(--display);
+    font-size: clamp(40px, 4.6vw, 64px);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+    max-width: 620px;
+  }
+  .hero__title .g { color: var(--green); }
+  .hero__lead {
+    max-width: 560px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .hero__lead b { font-weight: 700; }
+  .hero__cta { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero__stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+    padding: 36px var(--pad);
+    margin-top: auto;
+    margin-left: calc(-1 * var(--pad));
+    margin-right: calc(-1 * var(--pad));
+    margin-bottom: -56px;
+    background: var(--ink);
+  }
+  .hstat { min-width: 0; }
+  .hstat__num {
+    font-family: var(--num);
+    font-size: 56px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .hstat__num[data-brown="true"] { color: var(--yellow); }
+  .hstat__num span {
+    margin-left: 4px;
+    font-size: 22px;
+    color: rgb(255, 255, 255);
+    text-transform: uppercase;
+  }
+  .hstat__num[data-brown="true"] span {
+    color: var(--yellow);
+  }
+  .hstat__label {
+    margin-top: 8px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.5;
+  }
+  .hero__media {
+    position: relative;
+    min-height: 620px;
+    background: var(--ink);
+    overflow: hidden;
+  }
+  .hero__slides { position: absolute; inset: 0; }
+  .hero__slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .hero__slide.is-active { opacity: 1; }
+  .hero__media-tag {
+    position: absolute;
+    top: 88px;
+    left: 16px;
+    z-index: 2;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  @media (max-width: 980px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero__main { border-right: 0; }
+    .hero__media { min-height: 320px; }
+    .hero__stats { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 520px) {
+    .hstat__num { font-size: 44px; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const slides = document.querySelectorAll(".hero__slide");
+    const counter = document.getElementById("heroCounter");
+    if (slides.length < 2) return;
+    let i = 0;
+    setInterval(function () {
+      slides[i].classList.remove("is-active");
+      i = (i + 1) % slides.length;
+      slides[i].classList.add("is-active");
+      if (counter) counter.textContent = "0" + (i + 1) + " / 0" + slides.length;
+    }, 3000);
+  })();
+</script>

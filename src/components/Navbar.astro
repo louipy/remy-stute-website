@@ -1,0 +1,88 @@
+---
+/* Header — fijo, con fondo oscuro + blur desde el primer paint en todas las
+   páginas. La página activa lleva subrayado amarillo.
+
+   variant="home": icono de WhatsApp junto al número y CTA "Solicitar
+   cotización". variant="default": icono de teléfono y CTA "Solicitar
+   diagnóstico técnico". */
+interface Props {
+  active?: "inicio" | "productos" | "nosotros" | "contacto";
+  variant?: "default" | "home";
+}
+const { active, variant = "default" } = Astro.props;
+const isHome = variant === "home";
+
+const links = [
+  { key: "inicio", label: "Inicio", href: "/" },
+  { key: "productos", label: "Productos", href: "/productos" },
+  { key: "nosotros", label: "Nosotros", href: "/nosotros" },
+  { key: "contacto", label: "Contacto", href: "/contacto" },
+];
+
+const ctaLabel = isHome ? "Solicitar cotización" : "Solicitar diagnóstico técnico";
+const phoneIcon = isHome ? "message-circle" : "phone";
+---
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap">
+    <a href="/" class="brand" aria-label="Remy & Stute — inicio">
+      <span class="brand-mark">RS</span>
+      <span class="brand-name">REMY &amp; STUTE</span>
+    </a>
+
+    <nav class="nav" aria-label="Principal">
+      {links.map((l) => (
+        <a href={l.href} aria-current={active === l.key ? "page" : undefined}>{l.label}</a>
+      ))}
+    </nav>
+
+    <div class="header-right">
+      <a href="tel:+582129936508" class="header-phone">
+        <i data-lucide={phoneIcon}></i>
+        +58 212 993·65·08
+      </a>
+      <a href="/contacto" class="btn btn--primary">
+        {ctaLabel}
+        <i data-lucide="arrow-right"></i>
+      </a>
+      <button class="burger" id="burger" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="drawer" aria-label="Menú">
+  <button class="drawer-close" id="drawerClose" aria-label="Cerrar menú">×</button>
+  {links.map((l) => (
+    <a href={l.href} class="drawer-link" aria-current={active === l.key ? "page" : undefined}>{l.label}</a>
+  ))}
+  <a href="tel:+582129936508" class="drawer-link">+58 212 993·65·08</a>
+  <a href="/contacto" class="btn btn--primary btn--block drawer-link">{ctaLabel}</a>
+</aside>
+
+<script is:inline>
+  (function () {
+    const burger = document.getElementById("burger");
+    const drawer = document.getElementById("drawer");
+    const overlay = document.getElementById("drawerOverlay");
+    const close = document.getElementById("drawerClose");
+    if (burger && drawer && overlay && close) {
+      const open = () => {
+        drawer.classList.add("open");
+        overlay.classList.add("open");
+        document.body.style.overflow = "hidden";
+      };
+      const shut = () => {
+        drawer.classList.remove("open");
+        overlay.classList.remove("open");
+        document.body.style.overflow = "";
+      };
+      burger.addEventListener("click", open);
+      close.addEventListener("click", shut);
+      overlay.addEventListener("click", shut);
+      document.querySelectorAll(".drawer-link").forEach((a) => a.addEventListener("click", shut));
+    }
+  })();
+</script>

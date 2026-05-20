@@ -1,0 +1,17 @@
+---
+/**
+ * Página de contacto — brief técnico.
+ * ContactSection genera idempotencyKey al montar (R3), monta Turnstile y
+ * hace submit a /api/contacto (orden Turnstile → Zod → n8n, R4).
+ */
+import BaseLayout from "@layouts/BaseLayout.astro";
+import ContactSection from "@components/ContactSection.astro";
+---
+
+<BaseLayout
+  title="Contacto — Remy & Stute C.A."
+  description="Solicite un diagnóstico técnico y cotización de materia prima industrial. Respuesta en menos de 4 horas hábiles por WhatsApp, email y teléfono."
+  active="contacto"
+>
+  <ContactSection />
+</BaseLayout>

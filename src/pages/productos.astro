@@ -1,0 +1,12 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import ProductosCatalogo from "@components/ProductosCatalogo.astro";
+
+const title = "Productos — Remy & Stute C.A.";
+const description =
+  "Catálogo Fase 1 de materia prima industrial: pigmentos, aditivos para construcción, grafito y minerales. Representación exclusiva en Venezuela, stock local.";
+---
+
+<BaseLayout title={title} description={description} active="productos">
+  <ProductosCatalogo />
+</BaseLayout>

@@ -1,0 +1,145 @@
+---
+/* Servicios que ofrecemos — Home sección 02.
+   Cada recuadro muestra el sector cubierto + foto provisional.
+   Fotos: Unsplash (uso libre) obtenidas vía búsqueda — provisionales. */
+const sectores = [
+  {
+    name: "Cerámicas",
+    photo: "https://images.unsplash.com/photo-1651983795694-4b4b1f860f58?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2VyYW1pYyUyMHRpbGUlMjBmYWN0b3J5fGVufDB8fDB8fHww",
+    alt: "Producción de cerámica industrial",
+  },
+  {
+    name: "Construcción",
+    photo: "https://images.unsplash.com/photo-1637241612956-b7309005288b?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y29uc3RydWN0aW9uJTIwbWF0ZXJpYWxzfGVufDB8fDB8fHww",
+    alt: "Materiales para el sector construcción",
+  },
+  {
+    name: "Pinturas",
+    photo: "https://images.unsplash.com/photo-1553905697-54aa58ea394d?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGFpbnQlMjBwaWdtZW50fGVufDB8fDB8fHww",
+    alt: "Pigmentos para pintura industrial",
+  },
+  {
+    name: "Feed",
+    photo: "https://images.unsplash.com/photo-1594057373043-a7081332d6eb?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Z3JhaW4lMjBzaWxvJTIwYWdyaWN1bHR1cmV8ZW58MHx8MHx8fDA%3D%3D",
+    alt: "Producción de alimento balanceado y grano",
+  },
+  {
+    name: "Industrial",
+    photo: "https://images.unsplash.com/photo-1660448059127-c332105d7a29?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y2hlbWljYWwlMjBpbmR1c3RyeXxlbnwwfHwwfHx8MA%3D%3D",
+    alt: "Planta química industrial",
+  },
+  {
+    name: "Aminoácidos",
+    photo: "https://images.unsplash.com/photo-1707944745860-4615eb585a41?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGFib3JhdG9yeSUyMHJlc2VhcmNofGVufDB8fDB8fHww",
+    alt: "Laboratorio de análisis industrial",
+  },
+];
+---
+
+<section class="sectores">
+  <div class="wrap">
+    <header class="sectores__head reveal">
+      <p class="eyebrow">
+        <span class="line"></span>
+        <span>Servicios que ofrecemos · cobertura nacional</span>
+      </p>
+      <h2 class="sectores__title">
+        Seis sectores donde nuestra materia prima
+        <span class="g">ya está en planta.</span>
+      </h2>
+    </header>
+
+    <div class="sectores__grid reveal">
+      {sectores.map((s) => (
+        <article class="sector">
+          <div class="sector__photo">
+            <img src={s.photo} alt={s.alt} loading="lazy" />
+          </div>
+          <h3 class="sector__name">{s.name}</h3>
+        </article>
+      ))}
+    </div>
+
+    <div style="text-align: center; margin-top: 48px;">
+      <a href="/productos" class="btn btn--outline">Ver catálogo completo</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .sectores {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 0 96px;
+  }
+  .sectores__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    margin-bottom: 48px;
+    background: var(--ink);
+    padding: 56px var(--pad) 48px;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    padding-left: calc(50vw - 50% + var(--pad));
+    padding-right: calc(50vw - 50% + var(--pad));
+  }
+  .sectores__head .eyebrow { color: var(--yellow); }
+  .sectores__head .eyebrow .line { background: var(--yellow); }
+  .sectores__title {
+    margin-top: 20px;
+    max-width: 760px;
+    font-family: var(--display);
+    font-size: clamp(32px, 3.4vw, 44px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .sectores__title .g { color: var(--yellow); }
+  .sectores__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .sector {
+    background: var(--white);
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
+  }
+  .sector__photo {
+    flex: 1;
+    min-height: 200px;
+    overflow: hidden;
+    background: var(--ink);
+  }
+  .sector__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 400ms ease;
+  }
+  .sector:hover .sector__photo img { transform: scale(1.04); }
+  .sector__name {
+    padding: 24px 28px;
+    font-family: var(--display);
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  @media (max-width: 980px) {
+    .sectores__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sectores__head { flex-direction: column; align-items: flex-start; }
+  }
+  @media (max-width: 560px) {
+    .sectores__grid { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,121 @@
+---
+import "@styles/global.css";
+import FlagRibbon from "@components/FlagRibbon.astro";
+import Navbar from "@components/Navbar.astro";
+import Footer from "@components/Footer.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  theme?: "light" | "dark";
+  active?: "inicio" | "productos" | "nosotros" | "contacto";
+  navVariant?: "default" | "home";
+}
+
+const {
+  title = "Remy & Stute C.A. — Materia Prima Industrial Venezuela",
+  description = "Importador venezolano de materia prima industrial con 30 años de trayectoria. Representante exclusivo de Addcon, Yipin Pigmentos y Minerales Industriales en Venezuela.",
+  canonical,
+  ogImage,
+  noindex = false,
+  theme = "light",
+  active,
+  navVariant = "default",
+} = Astro.props;
+
+const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString();
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:locale" content="es_VE" />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Oswald:wght@400;500&family=Plus+Jakarta+Sans:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://unpkg.com/lucide@latest" is:inline></script>
+
+    {/* GTM PLACEHOLDER — Main Thread (R5). Activar en Fase 5. NO Partytown. */}
+    <!-- GTM_HEAD_PLACEHOLDER -->
+
+    <slot name="head" />
+  </head>
+
+  <body data-theme={theme}>
+    {/* GTM noscript fallback — activar en Fase 5 */}
+    <!-- GTM_BODY_PLACEHOLDER -->
+
+    <FlagRibbon />
+    <Navbar active={active} variant={navVariant} />
+
+    <main class:list={[{ "main--offset": navVariant !== "home" }]}>
+      <slot />
+    </main>
+
+    <Footer />
+
+    <a
+      href="https://wa.me/584122600043"
+      class="wa-float"
+      target="_blank"
+      rel="noopener"
+      aria-label="Escribir por WhatsApp"
+    >
+      <i data-lucide="message-circle"></i>
+    </a>
+
+    <script is:inline>
+      function initLucide() {
+        if (typeof lucide !== "undefined") lucide.createIcons();
+      }
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initLucide);
+      } else {
+        initLucide();
+      }
+
+      // Scroll reveal
+      const revealEls = document.querySelectorAll(".reveal");
+      if (revealEls.length && "IntersectionObserver" in window) {
+        const obs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("visible");
+                obs.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+        );
+        revealEls.forEach((el) => obs.observe(el));
+      }
+    </script>
+  </body>
+</html>

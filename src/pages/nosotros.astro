@@ -1,0 +1,12 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import NosotrosSection from "@components/NosotrosSection.astro";
+
+const title = "Nosotros — Remy & Stute C.A.";
+const description =
+  "30 años importando materia prima industrial en Venezuela. Representante exclusivo de Addcon, Yipin Pigmentos y Minerales Industriales, con stock local y despacho nacional.";
+---
+
+<BaseLayout title={title} description={description} theme="dark" active="nosotros">
+  <NosotrosSection />
+</BaseLayout>

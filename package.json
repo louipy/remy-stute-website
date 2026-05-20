@@ -1,0 +1,27 @@
+{
+  "name": "remy-stute-dev",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Remy & Stute C.A. — Sitio B2B industrial Venezuela",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "type-check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/sitemap": "^3.4.1",
+    "@tailwindcss/vite": "^4.1.13",
+    "astro": "^5.13.5",
+    "tailwindcss": "^4.1.13",
+    "zod": "^3.25.74"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "typescript": "^5.7.3"
+  }
+}
