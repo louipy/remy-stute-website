@@ -230,7 +230,7 @@ a { color: inherit; }
 .site-header .nav a:hover,
 .site-header .nav a[aria-current="page"] { color: #fff; }
 .site-header .header-phone { color: rgba(255, 255, 255, 0.7); }
-.site-header .header-phone:hover { color: #fff; }
+.site-header .header-phone:hover { color: #CBFF00; }
 .site-header .burger { color: #fff; }
 
 /* ─── Footer ──────────────────────────────────────────────────── */

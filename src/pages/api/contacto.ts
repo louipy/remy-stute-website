@@ -18,7 +18,8 @@
 import type { APIRoute } from 'astro';
 import { ContactoSchema } from '@lib/schemas/contacto';
 
-export const prerender = false;
+// FASE 3: descomentar cuando se configure el adaptador de servidor (node/cloudflare)
+// export const prerender = false;
 
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 

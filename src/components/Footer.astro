@@ -1,4 +1,6 @@
 ---
+import LogoNavbar from "../assets/logo-navbar-2.svg?raw";
+
 /* Footer — design-reference. Dark green, 4 columnas + barra inferior.
    Datos de marcador (RIF, dirección): se confirman después. */
 const year = new Date().getFullYear();
@@ -6,9 +8,7 @@ const year = new Date().getFullYear();
 const sitemap = [
   { label: "Productos", href: "/productos" },
   { label: "Nosotros", href: "/nosotros" },
-  { label: "Casos por industria", href: "/casos" },
-  { label: "Recursos técnicos", href: "/recursos" },
-  { label: "Contacto y cotización", href: "/contacto" },
+  { label: "Contacto", href: "/contacto" },
 ];
 ---
 
@@ -17,8 +17,8 @@ const sitemap = [
     <div class="footer-grid">
       <div class="footer-brand footer-col">
         <a href="/" class="brand">
-          <span class="brand-mark">RS</span>
-          <span class="brand-name">REMY &amp; STUTE</span>
+          <span class="brand-logo" set:html={LogoNavbar}></span>
+          <span class="brand-navbar-text">Rem<span class="brand-y">y</span><span class="ampersand">&amp;</span> Stute <span class="venezuela">Venezuela</span></span>
         </a>
         <p class="footer-desc">
           Importador venezolano de materia prima industrial. Representante
@@ -54,6 +54,34 @@ const sitemap = [
 
     <div class="footer-bottom">
       <span>© {year} REMY &amp; STUTE C.A. · RIF J-00123456-7</span>
+      <span class="footer-powered">Powered by Ixanity Studios</span>
     </div>
   </div>
 </footer>
+
+<style>
+  /* SVG logo — mismo tamaño que navbar */
+  .brand-logo {
+    display: flex;
+    align-items: center;
+  }
+  .brand-logo :global(svg) {
+    height: 68px;
+    width: auto;
+  }
+
+  /* brand-navbar-text en footer — siempre visible, sin animación */
+  :global(.site-footer .brand-navbar-text) {
+    opacity: 1 !important;
+    transform: scale(1) translateY(0) !important;
+    transition: none !important;
+  }
+
+  /* Firma Ixanity */
+  .footer-powered {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.2);
+  }
+</style>

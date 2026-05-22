@@ -1,14 +1,52 @@
 ---
-/* Ventaja competitiva — Home sección 04 (banda verde oscuro). */
 const cards = [
-  { n: "01", tag: "Operativo", title: "Stock local en el país", desc: "142 toneladas rotativas en almacén propio. Despacho a planta en 24–72 horas para los 5 productos Fase 1." },
-  { n: "02", tag: "Contractual", title: "Representación exclusiva regional", desc: "Únicos canalizadores autorizados de Addcon, Yipin y Minerales Industriales en territorio venezolano." },
-  { n: "03", tag: "Incluido", title: "Asesoría técnica incluida", desc: "Cada cotización viene con análisis de aplicación. Sin cargo, antes de la orden, por ingeniero formulador." },
-  { n: "04", tag: "Incluido", title: "Muestras gratuitas previas", desc: "Hasta 1 kg gratuito por producto para piloto productivo. Certificado de análisis del lote acompaña la muestra." },
+  {
+    num: "01",
+    tag: "Operativo",
+    title: "Stock local en el país",
+    desc: "142 toneladas rotativas en almacén propio. Despacho a planta en 24–72 horas.",
+    bottom: "Despacho 24–72h",
+    icon: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="22" height="14" rx="1"/><path d="M7 11V7a7 7 0 0 1 14 0v4"/><path d="M9 17h10M9 21h6"/></svg>`,
+  },
+  {
+    num: "02",
+    tag: "Contractual",
+    title: "Representación exclusiva regional",
+    desc: "Únicos canalizadores autorizados de Addcon, Yipin y Minerales Industriales en territorio venezolano.",
+    bottom: "3 marcas exclusivas",
+    icon: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4C10 4 4 8 4 14c0 3 1 5 3 7l1 3 4-2"/><path d="M14 4c4 0 10 4 10 10 0 3-1 5-3 7l-1 3-4-2"/><path d="M10 15l2 2 6-6"/></svg>`,
+  },
+  {
+    num: "03",
+    tag: "Incluido",
+    title: "Asesoría técnica incluida",
+    desc: "Cada cotización viene con análisis de aplicación. Sin cargo, antes de la orden, por personal capacitado.",
+    bottom: "Sin cargo adicional",
+    icon: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="10" r="6"/><path d="M11 8.5h6M14 7v4"/><path d="M10 16l-3 8h14l-3-8"/><path d="M12 20h4"/></svg>`,
+  },
+  {
+    num: "04",
+    tag: "Incluido",
+    title: "Muestras gratuitas previas",
+    desc: "Hasta 1 kg gratuito por producto para piloto productivo. Certificado de análisis del lote acompaña la muestra.",
+    bottom: "Hasta 1 kg gratis",
+    icon: `<svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="13" width="20" height="12" rx="1"/><rect x="3" y="9" width="22" height="4" rx="1"/><path d="M14 9v16"/><path d="M8 9c0-3 6-3 6 0"/><path d="M20 9c0-3-6-3-6 0"/></svg>`,
+  },
 ];
 ---
 
 <section class="ventaja">
+  <div class="ventaja__hex-bg" aria-hidden="true">
+    <svg viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="vc-hex" width="80" height="92" patternUnits="userSpaceOnUse">
+          <polygon points="40,2 74,24 74,68 40,90 6,68 6,24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1"></polygon>
+        </pattern>
+      </defs>
+      <rect width="600" height="600" fill="url(#vc-hex)"></rect>
+    </svg>
+  </div>
+
   <div class="wrap">
     <header class="ventaja__head reveal">
       <p class="eyebrow eyebrow--dark">
@@ -17,19 +55,24 @@ const cards = [
         <span>Ventaja competitiva · por qué Remy &amp; Stute</span>
       </p>
       <h2 class="ventaja__title">
-        30 años siendo <span class="y">la mejor opción.</span>
+        30 años siendo <em>la mejor opción.</em>
       </h2>
     </header>
 
     <div class="ventaja__grid reveal">
       {cards.map((c) => (
         <article class="vcard">
-          <div class="vcard__row">
-            <span class="vcard__num">{c.n}</span>
+          <div class="vcard__icon" set:html={c.icon}></div>
+          <div class="vcard__head">
+            <span class="vcard__num">{c.num}</span>
             <span class="vcard__tag">{c.tag}</span>
           </div>
           <h3 class="vcard__title">{c.title}</h3>
           <p class="vcard__desc">{c.desc}</p>
+          <div class="vcard__bottom">
+            <span class="vcard__dot"></span>
+            <span class="vcard__label">{c.bottom}</span>
+          </div>
         </article>
       ))}
     </div>
@@ -37,69 +80,218 @@ const cards = [
 </section>
 
 <style>
-  .ventaja { background: var(--ink); color: #fff; padding: 88px 0 96px; }
+  .ventaja {
+    position: relative;
+    overflow: hidden;
+    background: var(--ink);
+    color: #fff;
+    padding: 88px 0 96px;
+  }
+
+  /* ── Hex background pattern ── */
+  .ventaja__hex-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .ventaja__hex-bg svg {
+    position: absolute;
+    right: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 600px;
+    height: 600px;
+    opacity: 0.07;
+  }
+  .ventaja__hex-bg::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 15%;
+    width: 500px;
+    height: 400px;
+    background: radial-gradient(ellipse at 20% 50%, rgba(0,102,51,0.22) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── Wrap override for z-index ── */
+  .ventaja .wrap {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Header ── */
   .ventaja__head {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 32px;
-    margin-bottom: 48px;
+    margin-bottom: 56px;
+  }
+  .ventaja__head .eyebrow {
+    margin-bottom: 20px;
   }
   .ventaja__title {
-    margin-top: 20px;
-    max-width: 760px;
+    max-width: 680px;
     font-family: var(--display);
-    font-size: clamp(32px, 3.4vw, 44px);
-    font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
+    font-size: clamp(44px, 5vw, 72px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
     color: #fff;
   }
-  .ventaja__title .y { color: var(--yellow); }
+  .ventaja__title em {
+    font-style: italic;
+    color: var(--yellow);
+  }
+
+  /* ── Cards grid ── */
   .ventaja__grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
   }
+
+  /* ── Individual card ── */
   .vcard {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    padding: 28px;
-    transition: background 160ms, border-color 160ms;
+    position: relative;
+    background: #fff;
+    border-radius: 6px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(10,31,18,0.12);
+    transition: transform 360ms cubic-bezier(0.16,1,0.3,1),
+                box-shadow 360ms cubic-bezier(0.16,1,0.3,1);
+  }
+  .vcard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 24px;
+    right: 24px;
+    height: 3px;
+    background: var(--yellow);
+    border-radius: 0 0 2px 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 400ms cubic-bezier(0.16,1,0.3,1);
   }
   .vcard:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.32);
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(10,31,18,0.22), 0 2px 8px rgba(10,31,18,0.10);
   }
-  .vcard__row {
+  .vcard:hover::before {
+    transform: scaleX(1);
+  }
+
+  /* ── Icon circle ── */
+  .vcard__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(0,102,51,0.06);
+    border: 1.5px solid rgba(0,102,51,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    flex-shrink: 0;
+    color: var(--green);
+    transition: background 300ms, border-color 300ms, transform 300ms cubic-bezier(0.16,1,0.3,1), color 300ms;
+  }
+  .vcard:hover .vcard__icon {
+    background: var(--green);
+    border-color: var(--green);
+    transform: scale(1.05);
+    color: #F0E378;
+  }
+
+  /* ── Card header row ── */
+  .vcard__head {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 24px;
+    margin-bottom: 14px;
   }
-  .vcard__num { font-family: var(--num); font-size: 32px; color: var(--yellow); }
+  .vcard__num {
+    font-family: var(--num);
+    font-weight: 500;
+    font-size: 36px;
+    line-height: 1;
+    color: var(--green);
+    font-variant-numeric: tabular-nums;
+  }
   .vcard__tag {
     font-family: var(--mono);
     font-size: 9.5px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.45);
+    color: var(--muted);
+    font-weight: 500;
   }
+
+  /* ── Title + desc ── */
   .vcard__title {
     font-family: var(--display);
     font-size: 19px;
     font-weight: 700;
     line-height: 1.25;
-    color: #fff;
+    color: var(--ink);
+    letter-spacing: -0.01em;
     margin-bottom: 10px;
   }
-  .vcard__desc { font-size: 13.5px; line-height: 1.65; color: rgba(255, 255, 255, 0.7); }
+  .vcard__desc {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--text);
+    flex: 1;
+  }
 
+  /* ── Bottom accent bar ── */
+  .vcard__bottom {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0,102,51,0.12);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .vcard__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    opacity: 0.5;
+    flex-shrink: 0;
+    transition: opacity 300ms;
+  }
+  .vcard:hover .vcard__dot {
+    opacity: 1;
+  }
+  .vcard__label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+    transition: color 300ms;
+  }
+  .vcard:hover .vcard__label {
+    color: var(--green);
+  }
+
+  /* ── Responsive ── */
   @media (max-width: 980px) {
     .ventaja__grid { grid-template-columns: repeat(2, 1fr); }
-    .ventaja__head { flex-direction: column; align-items: flex-start; }
+    .ventaja__head { margin-bottom: 40px; }
   }
   @media (max-width: 560px) {
     .ventaja__grid { grid-template-columns: 1fr; }
+    .vcard { padding: 28px 24px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vcard, .vcard::before, .vcard__icon, .vcard__icon svg,
+    .vcard__dot, .vcard__label {
+      transition: none !important;
+    }
   }
 </style>

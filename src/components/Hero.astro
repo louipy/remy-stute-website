@@ -1,68 +1,68 @@
 ---
-/* Hero — Home. Réplica de design-reference (02 Home desktop 1440). */
+import slide1 from "../assets/carrusel-inicio-01-1920.webp";
+import slide2 from "../assets/carrusel-inicio-02-1920.webp";
+import slide3 from "../assets/carrusel-inicio-03-1920.webp";
+import slide4 from "../assets/carrusel-inicio-04-1920.webp";
+
 const stats = [
   { value: "30", unit: "Años", label: "Operando en Venezuela" },
   { value: "3", unit: "Marcas", label: "Representación exclusiva regional" },
-  { value: "<4", unit: "H", label: "Tiempo de primera respuesta", brown: true },
-  { value: "∞", unit: "", label: "Muestras gratis · asesoría técnica incluida" },
+  { value: "<2", unit: "H", label: "Tiempo de primera respuesta", brown: true },
+  { value: "∞", unit: "", label: "Muestras gratis" },
 ];
 
-/* Slideshow del hero — fotos provisionales de Unsplash (uso libre). */
 const heroSlides = [
-  {
-    src: "https://images.unsplash.com/photo-1587293852726-70cdb56c2866?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW5kdXN0cmlhbCUyMHdhcmVob3VzZXxlbnwwfHwwfHx8MA%3D%3D",
-    alt: "Almacén industrial de materia prima",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1693996046865-19217d179161?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bWluZXJhbCUyMHBvd2RlcnxlbnwwfHwwfHx8MA%3D%3D",
-    alt: "Materia prima mineral en polvo",
-  },
-  {
-    src: "https://images.unsplash.com/photo-1516937941344-00b4e0337589?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Y2hlbWljYWwlMjBpbmR1c3RyeXxlbnwwfHwwfHx8MA%3D%3D",
-    alt: "Planta química industrial",
-  },
+  { src: slide1.src, alt: "Instalaciones Remy & Stute" },
+  { src: slide2.src, alt: "Materia prima industrial en almacén" },
+  { src: slide3.src, alt: "Operaciones de despacho Remy & Stute" },
+  { src: slide4.src, alt: "Materia prima industrial Remy & Stute" },
 ];
 ---
 
 <section class="hero">
+
+  <!-- Columna izquierda: texto + CTAs -->
   <div class="hero__main">
-    <div class="hero__top reveal">
-      <p class="eyebrow">
-        <span class="num">EST. 1995</span>
-        <span class="line"></span>
-        <span>Importador · Caracas, Venezuela</span>
-      </p>
+    <div class="hero__body reveal">
+      <p class="eyebrow">EST. 1995 — Importador · Caracas, Venezuela</p>
+
       <h1 class="hero__title">
-        La materia prima que su planta necesita,
-        <span class="g">lista para despacho.</span>
+        La materia prima que mantiene tu producción
+        <span class="g">en marcha.</span>
       </h1>
+
       <p class="hero__lead">
         Representante exclusivo de <b>Addcon</b>, <b>Yipin Pigmentos</b> y
         <b>Minerales Industriales</b> en Venezuela. Cubrimos los sectores de
-        construcción, pinturas, petróleo, cerámica, vidrio y agroalimentos.
+        cerámicas, construcción, pinturas, feed, industrial y aminoácidos.
       </p>
-    </div>
 
-    <div class="hero__cta reveal">
-      <a href="/contacto" class="btn btn--primary">
-        Solicitar cotización
-        <i data-lucide="arrow-right"></i>
-      </a>
-      <a href="/productos" class="btn btn--outline">Descargar catálogo (PDF · 1.4 MB)</a>
-    </div>
-
-    <div class="hero__stats reveal">
-      {stats.map((s) => (
-        <div class="hstat">
-          <div class="hstat__num" data-brown={s.brown}>
-            {s.value}{s.unit && <span>{s.unit}</span>}
-          </div>
-          <div class="hstat__label">{s.label}</div>
-        </div>
-      ))}
+      <div class="hero__ctas">
+        <a href="/contacto" class="btn btn--primary">
+          Solicitar cotización
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+        <a href="/productos" class="btn btn--outline">
+          Ver catálogo
+        </a>
+      </div>
     </div>
   </div>
 
+  <!-- Stats bar: fila 2 del grid, columna izquierda -->
+  <div class="hero__stats reveal">
+    {stats.map((s) => (
+      <div class="hstat">
+        <div class="hstat__top">
+          <span class="hstat__num" data-brown={s.brown}>{s.value}</span>
+          {s.unit && <span class="hstat__unit" data-brown={s.brown}>{s.unit}</span>}
+        </div>
+        <div class="hstat__label">{s.label}</div>
+      </div>
+    ))}
+  </div>
+
+  <!-- Columna derecha: slideshow — abarca filas 1 y 2 del grid -->
   <div class="hero__media">
     <div class="hero__slides" id="heroSlides">
       {heroSlides.map((slide, i) => (
@@ -75,94 +75,168 @@ const heroSlides = [
         />
       ))}
     </div>
-    <span class="hero__media-tag" id="heroCounter">01 / 03</span>
+    <span class="hero__media-tag" id="heroCounter">01 / 04</span>
   </div>
 </section>
 
 <style>
+  /* ── Grid principal del hero ─────────────────────────────────── */
   .hero {
     display: grid;
-    grid-template-columns: minmax(0, 1.16fr) minmax(0, 1fr);
-    background: var(--white);
-    /* Ocupa toda la altura de la pantalla: la sección siguiente queda
-       por debajo del fold inicial. Las columnas se estiran (align-items
-       por defecto = stretch), así la imagen cubre el alto completo. */
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    /* Fondo oscuro: elimina el color claro que se filtra por la esquina
+       redondeada del hero__media. Solo hero__main lleva el color crema. */
+    background: var(--ink);
     min-height: 100vh;
   }
+
+  /* ── Columna izquierda: solo texto/CTAs ──────────────────────── */
   .hero__main {
-    padding: 104px var(--pad) 56px;
-    border-right: none;
+    grid-column: 1;
+    grid-row: 1;
+    padding: 88px 40px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    gap: 56px;
+    justify-content: center;
+    background: var(--cream-2);
   }
-  .hero__top { margin-top: auto; }
+
+  /* ── Bloque de contenido ─────────────────────────────────────── */
+  .hero__body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* ── Eyebrow — override local (color muted, fuente body) ─────── */
+  .hero .eyebrow {
+    font-family: var(--body);
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+  }
+
+  /* ── Título ─────────────────────────────────────────────────── */
   .hero__title {
-    margin: 24px 0;
+    margin: 28px 0 24px;
     font-family: var(--display);
-    font-size: clamp(40px, 4.6vw, 64px);
-    font-weight: 800;
-    line-height: 1.02;
+    font-size: clamp(42px, 4.5vw, 64px);
+    font-weight: 700;
+    line-height: 1.14;
     letter-spacing: -0.025em;
     color: var(--ink);
-    max-width: 620px;
+    text-wrap: balance;
   }
-  .hero__title .g { color: var(--green); }
+
+  /* display:block fuerza "lista para despacho." a su propia línea en verde */
+  .hero__title .g {
+    color: var(--green);
+    display: block;
+  }
+
+  /* ── Subtítulo ───────────────────────────────────────────────── */
   .hero__lead {
-    max-width: 560px;
-    font-size: 17px;
-    line-height: 1.6;
+    max-width: 580px;
+    font-size: 18px;
+    line-height: 1.7;
     color: var(--text);
+    margin-bottom: 36px;
   }
   .hero__lead b { font-weight: 700; }
-  .hero__cta { display: flex; gap: 14px; flex-wrap: wrap; }
-  .hero__stats {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 24px;
-    padding: 36px var(--pad);
-    margin-top: auto;
-    margin-left: calc(-1 * var(--pad));
-    margin-right: calc(-1 * var(--pad));
-    margin-bottom: -56px;
-    background: var(--ink);
+
+  /* ── CTAs ────────────────────────────────────────────────────── */
+  .hero__ctas {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
   }
-  .hstat { min-width: 0; }
+  .hero__ctas .btn {
+    font-size: 17px;
+    padding: 17px 28px;
+  }
+  .hero__ctas .btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ── Stats bar: fila 2, columna izquierda ────────────────────── */
+  .hero__stats {
+    grid-column: 1;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    padding: 57px var(--pad);
+    background: #111814;
+  }
+
+  .hstat {
+    flex: 1;
+    padding: 4px 12px;
+    display: flex;
+    flex-direction: column;
+  }
+  .hstat:first-child { padding-left: 0; }
+  .hstat + .hstat { border-left: 1px solid rgba(255, 255, 255, 0.12); }
+
+  .hstat__top {
+    display: flex;
+    align-items: flex-start;
+    gap: 3px;
+    line-height: 1;
+  }
+
   .hstat__num {
     font-family: var(--num);
-    font-size: 56px;
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.01em;
+    font-size: 65px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
     color: #fff;
   }
-  .hstat__num[data-brown="true"] { color: var(--yellow); }
-  .hstat__num span {
-    margin-left: 4px;
-    font-size: 22px;
-    color: rgb(255, 255, 255);
+  .hstat__num[data-brown="true"] { color: #C8F04D; }
+
+  .hstat__unit {
+    font-family: var(--num);
+    font-size: 21px;
+    font-weight: 600;
+    margin-top: 4px;
     text-transform: uppercase;
+    color: #fff;
   }
-  .hstat__num[data-brown="true"] span {
-    color: var(--yellow);
-  }
+  .hstat__unit[data-brown="true"] { color: #C8F04D; }
+
   .hstat__label {
-    margin-top: 8px;
+    margin-top: 5px;
     font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: 0.16em;
+    font-size: 13px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.55);
-    line-height: 1.5;
+    line-height: 1.45;
   }
+
+  /* ── Panel de imagen: columna derecha, filas 1 y 2 ──────────── */
   .hero__media {
+    grid-column: 2;
+    grid-row: 1 / 3;
     position: relative;
-    min-height: 620px;
     background: var(--ink);
     overflow: hidden;
+    border-radius: 20px 0 0 20px;
+    margin: 16px 0 0 0;
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.45),
+      0 8px 24px rgba(0, 0, 0, 0.55),
+      0 20px 56px rgba(0, 0, 0, 0.50),
+      0 40px 88px rgba(0, 0, 0, 0.40),
+      -16px 24px 64px rgba(0, 0, 0, 0.30),
+      0 24px 32px -8px rgba(0, 0, 0, 0.65),
+      0 48px 72px -16px rgba(0, 0, 0, 0.55);
   }
+
   .hero__slides { position: absolute; inset: 0; }
+
   .hero__slide {
     position: absolute;
     inset: 0;
@@ -173,6 +247,8 @@ const heroSlides = [
     transition: opacity 0.6s ease;
   }
   .hero__slide.is-active { opacity: 1; }
+
+  /* Contador de slideshow: top:88px lo pone justo debajo del navbar */
   .hero__media-tag {
     position: absolute;
     top: 88px;
@@ -184,14 +260,45 @@ const heroSlides = [
     color: rgba(255, 255, 255, 0.75);
   }
 
+  /* ── Responsive ─────────────────────────────────────────────── */
   @media (max-width: 980px) {
-    .hero { grid-template-columns: 1fr; }
-    .hero__main { border-right: 0; }
-    .hero__media { min-height: 320px; }
-    .hero__stats { grid-template-columns: repeat(2, 1fr); }
+    .hero {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+      /* En mobile no hay esquina redondeada en hero__media,
+         así que el fondo vuelve a cream para evitar banda oscura
+         en el espacio sobrante bajo las stats. */
+      background: var(--cream-2);
+    }
+    .hero__main  { grid-column: 1; grid-row: 1; }
+    .hero__media {
+      grid-column: 1;
+      grid-row: 2;
+      min-height: 320px;
+      margin: 0;
+      border-radius: 0;
+    }
+    .hero__stats {
+      grid-column: 1;
+      grid-row: 3;
+      flex-wrap: wrap;
+      padding-top: 22px;
+      padding-bottom: 22px;
+    }
+    .hstat,
+    .hstat + .hstat {
+      flex: 0 0 50%;
+      padding: 16px 20px;
+      border-left: none;
+    }
+    .hstat:first-child { padding-left: 20px; }
+    .hstat:nth-child(odd)  { border-right: 1px solid rgba(255, 255, 255, 0.12); }
+    .hstat:nth-child(3),
+    .hstat:nth-child(4)    { border-top: 1px solid rgba(255, 255, 255, 0.12); }
   }
+
   @media (max-width: 520px) {
-    .hstat__num { font-size: 44px; }
+    .hstat__num { font-size: 32px; }
   }
 </style>
 
@@ -206,6 +313,6 @@ const heroSlides = [
       i = (i + 1) % slides.length;
       slides[i].classList.add("is-active");
       if (counter) counter.textContent = "0" + (i + 1) + " / 0" + slides.length;
-    }, 3000);
+    }, 5000);
   })();
 </script>

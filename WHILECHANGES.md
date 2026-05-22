@@ -134,3 +134,56 @@ Si el rediseño exige cambiar nombres de campo (ej: separar nombre y apellido en
 - **Estructura por página:** Home = Hero + Industrias servidas (6 sectores) + Ventaja competitiva + CTA con flujo de 3 pasos. Productos = cabecera + filtros sector/marca + tabla de 5 SKU + vista detalle. Nosotros = hero oscuro + 4 cards expandibles + CTA. Contacto = cabecera + aside (oficina/mapa) + formulario brief técnico.
 - **Componentes:** `Navbar` (header con nav Inicio/Productos/Nosotros/Contacto + subrayado de página activa — corrige el bug de no poder volver al Home), `Footer` (4 columnas verde oscuro), `Hero`, `IndustriasServidas`, `VentajaCompetitiva`, `ContactoCTA`, `ProductosCatalogo`, `NosotrosSection`, `ContactSection`, `FlagRibbon`. `BaseLayout` admite `theme` y `active`.
 - **Pendiente (cambios quirúrgicos):** copy oficial, datos reales (RIF, dirección, cifras), fotografías reales (hoy placeholders de rayas diagonales como en el mockup), banner de cookies y modal de ficha (Fase 5).
+
+### ✅ — Cambios quirúrgicos de diseño (sesión 2026-05-21)
+- **Categoría:** diseño
+- **Agregado:** 2026-05-21 · **Cerrado:** 2026-05-21
+- **Contexto:** Tres tareas quirúrgicas sobre el home a partir de nuevas referencias de diseño (`design-reference/Remy _ Stute Hero.html` y `design-reference/Sectores - Remy_Stute.html`).
+- **Cambios aplicados:**
+  1. **Hero — reescritura completa (`Hero.astro`):** Grid restructurado con `grid-template-rows: 1fr auto`. `.hero__stats` extraído de `.hero__main` como hijo directo del grid (`grid-column: 1; grid-row: 2; background: var(--ink)`). `.hero__main` (`grid-row: 1`) conserva `background: var(--cream-2)`. `.hero__media` abarca ambas filas con `grid-row: 1/3; border-radius: 20px 0 0 20px; margin: 16px 0 0 0`. JS del slideshow y counter intactos. Stats: números 38px / separador `border-left: 1px solid rgba(255,255,255,0.12)`.
+  2. **Esquina crema detrás del slideshow (fix):** `.hero { background: var(--ink) }` rellena el área detrás del `border-radius` de `.hero__media`. `.hero__main { background: var(--cream-2) }` preserva el fondo claro en la columna de texto. En mobile (`@media max-width: 980px`), `.hero { background: var(--cream-2) }` porque `border-radius: 0`.
+  3. **Transición diagonal hero → sectores:** `clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 32px))` en `.sectores__head` genera una rampa geométrica de 32px desde la banda oscura hacia el grid. `padding-bottom: 60px` para que el clip no corte contenido.
+  4. **Grid de tarjetas de sectores (`IndustriasServidas.astro`):** Tarjetas planas reemplazadas por foto-cards con imagen de cobertura total (`position: absolute; inset: 0`), overlay `linear-gradient(to top, rgba(0,30,14,0.85) → transparent)`, `border-radius: 20px`, `min-height: 340px`. Hover: `translateY(-6px)`, `scale(1.06)` en foto, barra acento amarilla se expande al 100%, overline "Sector" y flecha circular aparecen con transición. `sectores__head` CONGELADO — no tocar.
+  5. **Botón CTA de sectores:** Nuevo `.sectores-cta` standalone (evita conflictos de especificidad con el global `.btn`). Verde outline → relleno verde en hover, flecha animada +4px.
+  6. **Accesibilidad:** `@media (prefers-reduced-motion: reduce)` en `IndustriasServidas.astro` desactiva todas las transiciones de tarjetas.
+- **Archivos afectados:** `src/components/Hero.astro`, `src/components/IndustriasServidas.astro`
+- **Notas:** Fotos de Unsplash siguen siendo provisionales. `sectores__head` aprobado — no modificar en sesiones futuras.
+
+### ✅ — Rediseño VentajaCompetitiva + calibración Hero (sesión 2026-05-21 / tarde)
+- **Categoría:** diseño
+- **Agregado:** 2026-05-21 · **Cerrado:** 2026-05-21
+- **Contexto:** Dos tareas quirúrgicas sobre el home. Nueva referencia de diseño `design-reference/Ventaja Competitiva.html` (exportada de Claude Design). Además, múltiples rondas de calibración del balance visual en el Hero.
+- **Cambios aplicados:**
+  1. **VentajaCompetitiva — rediseño completo (`VentajaCompetitiva.astro`):** Cards oscuras semitransparentes reemplazadas por cards blancas (`background: #fff; border-radius: 6px; padding: 32px 28px`). Icono circular verde (`width/height: 64px; border-radius: 50%; background: rgba(0,102,51,0.06); border: 1.5px solid rgba(0,102,51,0.15)`) con SVG inline en cada card. Número `01–04` en Oswald 36px verde. Tag en JetBrains Mono 9.5px uppercase muted. Barra inferior accent (`border-top: 1px solid rgba(0,102,51,0.12)` + dot verde + label mono 10px). Hover: card sube `translateY(-6px)`, sombra profunda, línea mustard crece desde la izquierda (`::before scaleX(0→1)`), icono cambia a fondo verde y stroke blanco. Patrón hexagonal SVG de fondo (opacity 0.07) + radial-gradient verde sutil a la izquierda. `@media (prefers-reduced-motion: reduce)` desactiva todas las transiciones.
+  2. **Hero — columna izquierda, layout y tipografía:**
+     - `.hero__main padding`: `88px 40px` (horizontal reducido de 56 a 40px para dar anchura al texto).
+     - `.hero__body`: `width: 100%` — eliminado `max-width` y `margin: 0 auto` que forzaban saltos de línea prematuros y apilaban los botones.
+     - Título: `font-size: clamp(42px, 4.5vw, 64px); font-weight: 700; line-height: 1.14; text-wrap: balance` (sin max-width en el selector del título).
+     - Lead: `font-size: 18px; line-height: 1.7; max-width: 580px`.
+     - Botones (override local): `font-size: 17px; padding: 17px 28px; width/height SVG: 16px`.
+  3. **Hero — barra de estadísticas, calibración:**
+     - `padding: 57px var(--pad)` (simétrico para centrar visualmente el contenido).
+     - `hstat__num`: `font-size: 65px; font-weight: 700; letter-spacing: -0.5px`.
+     - `hstat__unit`: `font-size: 21px; font-weight: 600; margin-top: 4px`.
+     - `hstat__label`: `font-size: 13px; letter-spacing: 0.12em; line-height: 1.45`.
+- **Archivos afectados:** `src/components/VentajaCompetitiva.astro`, `src/components/Hero.astro`, `CLAUDE.md`
+- **Notas:** CLAUDE.md actualizado con todos los valores aprobados (sección "Hero — arquitectura del grid" y nueva subsección "Hero — tipografía columna izquierda"). `sectores__head` y `IndustriasServidas.astro` no tocados.
+
+### ✅ — Cambios quirúrgicos y assets reales (sesión 2026-05-22)
+- **Categoría:** diseño · copy · infra
+- **Agregado:** 2026-05-22 · **Cerrado:** 2026-05-22
+- **Contexto:** Sesión de refinamiento con múltiples mejoras de copy, navegación cross-page, unificación de navbar/footer, reemplazo de imágenes Unsplash por assets webp locales, y primera build + deploy en Netlify (preview estático).
+- **Cambios aplicados:**
+  1. **Filtro cross-page sectores → productos (`IndustriasServidas.astro` + `ProductosCatalogo.astro`):** Tarjetas de sector cambiadas de `<article>` a `<a href="/productos?sector=X">`. `ProductosCatalogo.astro` lee `?sector=` de URL params al cargar y activa el chip de filtro correspondiente.
+  2. **Copy `ContactoCTA.astro`:** "Formulario técnico" → "Formulario"; "Respuesta <4h" → "Respuesta <2h"; eyebrow "cotización técnica" → "cotización"; acento título "en menos de 4h." → "en menos de 2h."; lead actualizado.
+  3. **Copy `VentajaCompetitiva.astro`:** Card 01: removido "para los 5 productos Fase 1."; Card 03: "por ingeniero formulador" → "por personal capacitado".
+  4. **Navbar unificado (`Navbar.astro`):** Eliminado el prop `variant` por completo — un único navbar para todas las páginas. Siempre ícono mensaje + "Solicitar cotización". Logo SVG inline (`logo-navbar-2.svg?raw`, height 68px). `brand-navbar-text` con animación de scroll: oculto en desktop, aparece con fade+slide al superar 60px de scroll vía clase `.scrolled`. Teléfono hover cambiado a `#CBFF00` en `global.css`. `BaseLayout.astro` actualizado (removido `variant` de `<Navbar>`).
+  5. **Footer unificado (`Footer.astro`):** Logo SVG idéntico al navbar + `brand-navbar-text` siempre visible (override `opacity:1; transition:none`). Firma "Powered by Ixanity Studios" (mono 9px, `rgba(255,255,255,0.2)`). Sitemap limpiado: quitados "Casos por industria" y "Recursos técnicos"; "Contacto y cotización" → "Contacto".
+  6. **Hero assets locales (`Hero.astro`):** 4 fotos webp locales (`carrusel-inicio-01–04-1920.webp`) reemplazan placeholders. Intervalo 5000ms. Counter "01 / 04".
+  7. **Imágenes sector locales (`IndustriasServidas.astro`):** `Sector-ceramicas.webp`, `Sector - pintura.webp`, `SECTOR-FEED.webp`, `SECTOR-CONSTRUCCION.webp` importados como assets locales. Industrial y Aminoácidos siguen con Unsplash (pendiente foto real).
+  8. **Nosotros — hero real (`NosotrosSection.astro`):** Placeholder reemplazado por `Candy-1920.webp`. Box-shadow multicapa (elevation reducida). `::after` overlay gradiente `rgba(5,15,8,0.38)` en borde inferior para transición suave a la sección siguiente.
+  9. **Nosotros — sección Statement:** Nueva sección `nos-statement` entre hero e historia. Fondo `#0A2418`. Eyebrow "Quiénes somos" (mono lime). Título grande "No somos un distribuidor de catálogo." (display 800, clamp 40–72px). Lead "Somos el proveedor que garantiza que su producción no se detiene." (mono 16px `#C8F04D`).
+  10. **API route (`src/pages/api/contacto.ts`):** `export const prerender = false` comentado para permitir build estático en Netlify preview. Restaurar junto con server adapter en Fase 3.
+  11. **Primera build y deploy Netlify:** `npm run build` exitoso (build estático). Deploy vía `netlify-cli` como preview. API endpoint de contacto no funcional en este deploy (requiere server adapter — Fase 3).
+- **Archivos afectados:** `Navbar.astro`, `Footer.astro`, `Hero.astro`, `IndustriasServidas.astro`, `ProductosCatalogo.astro`, `ContactoCTA.astro`, `VentajaCompetitiva.astro`, `NosotrosSection.astro`, `src/pages/api/contacto.ts`, `src/layouts/BaseLayout.astro`, `src/styles/global.css`, `CLAUDE.md`
+- **Pendiente (Fase 3):** Restaurar `prerender = false` en `api/contacto.ts` + instalar server adapter (`@astrojs/node` o `@astrojs/cloudflare`) para activar el formulario en producción.

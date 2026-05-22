@@ -1,0 +1,39 @@
+{
+  "mcpServers": {
+    "astro-docs": {
+      "type": "http",
+      "url": "https://mcp.docs.astro.build/mcp"
+    },
+    "airtable": {
+      "type": "http",
+      "url": "https://mcp.airtable.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${AIRTABLE_API_KEY}"
+      }
+    },
+    "n8n-docs": {
+      "command": "npx",
+      "args": ["-y", "n8n-mcp"],
+      "env": {}
+    },
+    "gtm": {
+      "type": "http",
+      "url": "https://gtm-mcp.stape.ai/mcp"
+    },
+    "ga4": {
+      "command": "python3",
+      "args": ["-m", "google_analytics_mcp"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "${GA4_CREDENTIALS_PATH}",
+        "GA_PROPERTY_ID": "${GA4_PROPERTY_ID}"
+      }
+    },
+    "stitch": {
+      "type": "http",
+      "url": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "${STITCH_API_KEY}"
+      }
+    }
+  }
+}

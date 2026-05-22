@@ -186,7 +186,7 @@ Formato obligatorio para componentes Hero/Landing:
 
 ---
 
-## SISTEMA VISUAL (design-reference aplicado — 2026-05-19)
+## SISTEMA VISUAL (design-reference aplicado — actualizado 2026-05-22)
 
 Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind utilities — todo va por custom properties.
 
@@ -214,7 +214,12 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 
 **Navbar fija (comportamiento universal — todas las páginas):**
 - `position: fixed; top: 4px;` — flota 4px sobre el flag ribbon
-- Fondo oscuro `rgba(10,15,13,0.95)` + `backdrop-filter: blur(12px)` y contenido blanco **desde el primer paint** en todas las páginas (sin estado transparente, sin listener de scroll). El JS de `Navbar.astro` solo gestiona el drawer móvil.
+- Fondo oscuro `rgba(10,15,13,0.95)` + `backdrop-filter: blur(12px)` y contenido blanco **desde el primer paint** en todas las páginas (sin estado transparente). El JS de `Navbar.astro` gestiona el drawer móvil + la clase `.scrolled`.
+- **Sin `variant` prop** — navbar unificado, igual en todas las páginas. Siempre muestra ícono mensaje y "Solicitar cotización".
+- **Logo SVG inline:** `import LogoNavbar from "../assets/logo-navbar-2.svg?raw"` → `<span class="brand-logo" set:html={LogoNavbar}>`. CSS: `.brand-logo :global(svg) { height: 68px; width: auto }` (`:global()` requerido porque Astro no scopea HTML inyectado con `set:html`).
+- **`brand-navbar-text`** (nombre empresa): oculto por defecto (`opacity: 0; transform: scale(0.98) translateY(-8px)`). Al hacer scroll >60px, JS agrega `.scrolled` al `.site-header` y aparece con transición 0.42s cubic-bezier. Font: Galano Grotesque 20px 700 `letter-spacing: -2px`. `.venezuela` en `rgba(255,255,255,0.5) font-weight: 400`.
+- **Teléfono hover:** `#CBFF00` (en `global.css`).
+- **Footer:** mismo logo SVG + `brand-navbar-text` siempre visible via `:global(.site-footer .brand-navbar-text) { opacity: 1 !important; transition: none !important }`. Firma "Powered by Ixanity Studios" en `font-size: 9px; color: rgba(255,255,255,0.2)`.
 - Override `body[data-theme="dark"]` se mantiene en CSS como red de seguridad pero ya no aporta diferencia visual.
 
 **Flag ribbon:**
@@ -226,11 +231,33 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 - `html { background: #0a2418; overscroll-behavior: none; }` — tapa el bounce en verde oscuro
 - `body { overscroll-behavior: none; }` — sin rubber-band en iOS/Chrome
 
+**Hero — arquitectura del grid (actualizado 2026-05-21 sesión 2):**
+- `.hero`: `display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); grid-template-rows: 1fr auto; background: var(--ink); min-height: 100vh`
+- `.hero__main` (`grid-column: 1; grid-row: 1`): `padding: 88px 40px` (NO usa `var(--pad)` en horizontal — valor fijo 40px aprobado). `display: flex; flex-direction: column; justify-content: center; background: var(--cream-2)`.
+- `.hero__body`: `display: flex; flex-direction: column; width: 100%` — sin `max-width` ni `margin: auto`. El padding de `.hero__main` controla los márgenes laterales.
+- `.hero__stats` (`grid-column: 1; grid-row: 2`): hijo **directo del grid**, no de `.hero__main`. `padding: 57px var(--pad); background: var(--ink)`. Sin full-bleed ni márgenes negativos.
+  - Tipografía stats aprobada: `hstat__num` 65px Oswald · `hstat__unit` 21px · `hstat__label` 13px JetBrains Mono.
+  - Mobile override `@media (max-width: 980px)`: `padding-top: 22px; padding-bottom: 22px`.
+- `.hero__media` (`grid-column: 2; grid-row: 1/3`): abarca las dos filas. `border-radius: 20px 0 0 20px; margin: 16px 0 0 0; background: var(--ink)`.
+- El `background: var(--ink)` del `.hero` rellena el área detrás de la esquina redondeada de `.hero__media`, eliminando el borde crema visible.
+- En mobile (`@media max-width: 980px`): `.hero { background: var(--cream-2) }` porque `.hero__media` pierde el `border-radius`.
+
+**Hero — tipografía columna izquierda (valores aprobados, no reducir sin instrucción explícita):**
+- Eyebrow: `font-size: 12px; letter-spacing: 0.15em; color: var(--muted)`
+- Título: `font-size: clamp(42px, 4.5vw, 64px); font-weight: 700; line-height: 1.14; text-wrap: balance`
+- Lead: `font-size: 18px; line-height: 1.7; max-width: 580px`
+- Botones (override local en `.hero__ctas`): `font-size: 17px; padding: 17px 28px`
+
 **Banda oscura continua hero → sectores (patrón visual):**
-- `.hero__stats` (recuadro de stats al fondo del hero izquierdo) y `.sectores__head` (cabecera de IndustriasServidas) comparten `background: var(--ink)` y se fusionan visualmente sin separación.
-- Full-bleed dentro del hero: `margin-left/right: calc(-1 * var(--pad))` + `margin-bottom: -56px` para tocar los bordes del `.hero__main`.
-- Full-bleed dentro del `.wrap`: `margin-left/right: calc(-50vw + 50%)` + `padding-left/right: calc(50vw - 50% + var(--pad))` para que el fondo llegue al viewport y el contenido reinserte dentro.
-- Textos sobre fondo oscuro: número/título en `#fff`, unidades/labels en `rgba(255,255,255,0.55)` (o `#fff` si lo hereda un padre con énfasis amarillo), acentos en `var(--yellow)`.
+- `.hero__stats` y `.sectores__head` comparten `background: var(--ink)` y se fusionan visualmente.
+- `.sectores__head`: full-bleed via `margin-left/right: calc(-50vw + 50%)` + `padding-left/right: calc(50vw - 50% + var(--pad))`. Sin `clip-path` — borde inferior recto (clip-path removido 2026-05-22).
+- Textos sobre fondo oscuro: número/título en `#fff`, unidades/labels en `rgba(255,255,255,0.55)`, acentos en `var(--yellow)`.
+
+**`sectores__head` — estado aprobado (2026-05-22):**
+- `flex-direction: column; align-items: flex-start; gap: 44px` — eyebrow arriba, h2 abajo con separación amplia
+- Sin `clip-path` — borde inferior recto
+- `box-shadow: inset` multicapa en borde superior (simula peso del hero encima): `0 2px 6px rgba(0,0,0,0.88)` + `0 10px 28px rgba(0,0,0,0.65)` + `0 28px 64px rgba(0,0,0,0.38)`
+- `padding: 56px var(--pad)` simétrico (top = bottom)
 
 ---
 
@@ -240,7 +267,7 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 /   (Raíz de remy-stute-dev)
 ├── src/
 │   ├── layouts/
-│   │   └── BaseLayout.astro          ← GTM Main Thread aquí (is:inline); props: navVariant, theme, active
+│   │   └── BaseLayout.astro          ← GTM Main Thread aquí (is:inline); props: theme, active (navVariant eliminado)
 │   ├── lib/
 │   │   ├── schemas/
 │   │   │   └── contacto.ts           ← ContactoSchema (Zod) — fuente de verdad
@@ -254,21 +281,20 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 │   │   ├── casos.astro               ← PageInConstruction (placeholder)
 │   │   ├── recursos.astro            ← PageInConstruction (placeholder)
 │   │   └── api/
-│   │       └── contacto.ts           ← Turnstile → Zod → n8n (en ese orden); prerender = false
+│   │       └── contacto.ts           ← Turnstile → Zod → n8n (en ese orden); prerender=false COMENTADO (build estático Netlify — restaurar en Fase 3 con server adapter)
 │   └── components/
-│       ├── Navbar.astro              ← props: active, variant ("home"|"default")
+│       ├── Navbar.astro              ← props: active (variant eliminado — navbar unificado); logo SVG inline; brand-navbar-text scroll animation
 │       ├── FlagRibbon.astro          ← fixed 4px, z-index 101
-│       ├── Footer.astro              ← 4 columnas verde oscuro; sin horario, sin segundo teléfono
-│       ├── Hero.astro                ← slideshow 3 fotos Unsplash, fade 3s, counter 01/03
-│       ├── IndustriasServidas.astro  ← 6 fotos Unsplash (Cerámicas/Construcción/Pinturas/Feed/Industrial/Aminoácidos)
-│       ├── VentajaCompetitiva.astro  ← banda verde oscuro, 4 tarjetas
+│       ├── Footer.astro              ← 4 columnas verde oscuro; logo SVG + brand-navbar-text siempre visible; firma Ixanity Studios; sin horario, sin segundo teléfono
+│       ├── Hero.astro                ← grid 2col (1.2fr/1fr), stats hijo directo del grid (row:2), slideshow 4 fotos locales webp (carrusel-inicio-01–04), fade 5s, counter 01/04
+│       ├── IndustriasServidas.astro  ← sectores__head CONGELADO; 6 tarjetas foto-cover hover animado (overline+acento+flecha); tarjetas son `<a href="/productos?sector=X">` para filtro cross-page; 4 fotos locales webp, 2 Unsplash
+│       ├── VentajaCompetitiva.astro  ← banda verde oscuro, 4 cards blancas con hover (lift + línea mustard), iconos SVG en círculo verde, números Oswald, dot+label accent bar inferior
 │       ├── ContactoCTA.astro         ← flujo 3 pasos + botón WhatsApp
-│       ├── ProductosCatalogo.astro   ← filtro dual sector+marca
-│       ├── NosotrosSection.astro     ← tema oscuro #0A0F0D, acento lima
+│       ├── ProductosCatalogo.astro   ← filtro dual sector+marca; lee ?sector= de URL params al cargar para activar chip correspondiente
+│       ├── NosotrosSection.astro     ← tema oscuro #0A0F0D, acento lima; hero Candy-1920.webp con box-shadow elevation; sección nos-statement (#0A2418) con copy grande
 │       └── ContactSection.astro     ← formulario brief técnico
 ├── design-reference/
-│   ├── _extract.cjs                  ← script parse5 para extraer blueprints de los HTML
-│   └── *.html                        ← exports de claudedesign (desktop 1440) — fuente de verdad visual
+│   └── *.png                         ← capturas de diseño (desktop 1440) — fuente de verdad visual
 ├── .mcp.json                         ← MCP servers (este archivo)
 ├── .env                              ← Variables de entorno (no en git)
 ├── .gitignore                        ← incluye .env y credentials.json

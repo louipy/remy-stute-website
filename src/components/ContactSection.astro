@@ -10,22 +10,29 @@
 
 const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 
-const productos = [
-  "Óxido de Hierro Naranja S960",
-  "RDP TY503",
-  "HPMC KPM 150000C",
-  "Grafito 285 Silvershine",
-  "Óxido de Magnesio",
-  "Varios / No estoy seguro",
+const cargos = [
+  "Director / Gerente de Compras",
+  "Director / Gerente de Producción",
+  "Nutricionista / Asesor Técnico",
+  "Gerente / Director General",
+  "Otro cargo gerencial",
+];
+
+const industrias = [
+  "Construcción, Petróleo y Gas",
+  "Cerámica e Insumos Refractarios",
+  "Pinturas, Pigmentos y Plásticos",
+  "Alimentación Animal / Acuicultura",
+  "Mascotas / Distribución pet shops",
 ];
 ---
 
 <section class="ct-head">
   <div class="wrap">
-    <p class="ct-eyebrow">Contacto · Diagnóstico técnico · Brief calificador</p>
+    <p class="ct-eyebrow">Contacto</p>
     <h1 class="ct-title">
       Cuéntenos qué necesita su planta.
-      <span class="g">Respuesta en &lt;4 h hábiles.</span>
+      <span class="g">Respuesta en &lt;2h hábiles.</span>
     </h1>
   </div>
 </section>
@@ -41,9 +48,6 @@ const productos = [
           Distrito Capital · Venezuela
         </p>
         <div class="ct-office-row ct-office-row--top">
-          <span>L–V</span><span class="b">08:00 – 17:00 VET</span>
-        </div>
-        <div class="ct-office-row">
           <span>RIF</span><span class="b">J-00123456-7</span>
         </div>
       </div>
@@ -54,7 +58,7 @@ const productos = [
     </aside>
 
     <div class="ct-formcard">
-      <p class="ct-form-label">Brief técnico · campos obligatorios marcados *</p>
+      <p class="ct-form-label">Formulario · campos obligatorios marcados *</p>
 
       <form id="contactoForm" novalidate>
         <input type="hidden" name="idempotency_key" id="idempotencyKey" value="" />
@@ -66,59 +70,47 @@ const productos = [
             <p class="field__err" data-error="nombre"></p>
           </div>
           <div class="field">
-            <label class="field__label" for="email">Correo electrónico *</label>
+            <label class="field__label" for="email">Email *</label>
             <input type="email" id="email" name="email" class="field__control" required autocomplete="email" placeholder="cmendez@empresa.com" />
             <p class="field__err" data-error="email"></p>
           </div>
           <div class="field">
-            <label class="field__label" for="empresa">Empresa *</label>
+            <label class="field__label" for="whatsapp">Teléfono / WhatsApp *</label>
+            <input type="tel" id="whatsapp" name="whatsapp" class="field__control" required autocomplete="tel" placeholder="+58 412 555 7788" />
+            <p class="field__err" data-error="whatsapp"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="empresa">Nombre de la empresa *</label>
             <input type="text" id="empresa" name="empresa" class="field__control" required autocomplete="organization" placeholder="Pinturas Aragua C.A." />
             <p class="field__err" data-error="empresa"></p>
           </div>
           <div class="field">
-            <label class="field__label" for="whatsapp">Número de contacto (WhatsApp) *</label>
-            <div class="field__wa">
-              <span class="field__flag" aria-hidden="true">🇻🇪</span>
-              <input type="tel" id="whatsapp" name="whatsapp" class="field__control" required autocomplete="tel" placeholder="+58 412 555 7788" />
-            </div>
-            <p class="field__err" data-error="whatsapp"></p>
-          </div>
-          <div class="field">
             <label class="field__label" for="cargo">Cargo *</label>
-            <input type="text" id="cargo" name="cargo" class="field__control" required autocomplete="organization-title" placeholder="Gerente de Compras" />
+            <select id="cargo" name="cargo" class="field__control" required>
+              <option value="" disabled selected>Seleccione su cargo</option>
+              {cargos.map((c) => <option value={c}>{c}</option>)}
+            </select>
             <p class="field__err" data-error="cargo"></p>
           </div>
           <div class="field">
-            <label class="field__label" for="producto">Producto de interés *</label>
-            <select id="producto" name="producto" class="field__control" required>
-              <option value="" disabled selected>Seleccione un producto</option>
-              {productos.map((p) => <option value={p}>{p}</option>)}
+            <label class="field__label" for="industria">Industria *</label>
+            <select id="industria" name="industria" class="field__control" required>
+              <option value="" disabled selected>Seleccione su industria</option>
+              {industrias.map((i) => <option value={i}>{i}</option>)}
             </select>
-            <p class="field__err" data-error="producto"></p>
-          </div>
-          <div class="field field--full">
-            <label class="field__label" for="volumen">Volumen estimado mensual</label>
-            <input type="text" id="volumen" name="volumen" class="field__control" placeholder="ej. 6 toneladas / mes" />
-            <p class="field__err" data-error="volumen"></p>
-          </div>
-          <div class="field field--full">
-            <label class="field__label" for="notas">Notas técnicas · especificación buscada</label>
-            <textarea id="notas" name="notas" class="field__control" rows="3" placeholder="Detalle la aplicación, formulación actual, propiedades requeridas (granulometría, pureza, pH, etc.). Mientras más específico, mejor cotización."></textarea>
-            <p class="field__err" data-error="notas"></p>
+            <p class="field__err" data-error="industria"></p>
           </div>
         </div>
 
-        <div class="ct-turnstile">
-          <div class="cf-turnstile" data-sitekey={siteKey} data-theme="light"></div>
-          <p class="field__err" data-error="turnstile"></p>
-        </div>
+        <div class="cf-turnstile" data-sitekey={siteKey} data-theme="light"></div>
+        <p class="field__err" data-error="turnstile"></p>
 
         <div class="ct-submit">
           <p class="ct-submit-note">
             Sin compromiso. Toda la información es confidencial.
           </p>
           <button type="submit" class="btn btn--primary" id="contactoSubmit">
-            <span class="btn-label">Enviar diagnóstico técnico</span>
+            <span class="btn-label">Enviar formulario</span>
             <i data-lucide="arrow-right"></i>
           </button>
         </div>
@@ -129,8 +121,8 @@ const productos = [
         <div class="ct-success-icon"><i data-lucide="check"></i></div>
         <h3>Solicitud recibida</h3>
         <p>
-          Mathias o Karelys se comunicarán con usted en menos de 24 horas
-          hábiles. Revise su correo y WhatsApp.
+          Solicitud recibida. Nuestro equipo técnico le contactará
+          en menos de 2 horas.
         </p>
         <a href="/productos" class="btn btn--outline">Ver catálogo de productos</a>
       </div>
@@ -139,13 +131,13 @@ const productos = [
 </section>
 
 <style>
-  .ct-head { background: var(--white); border-bottom: 1px solid var(--border); padding: 56px 0 32px; }
+  .ct-head { background: #111814; border-bottom: 1px solid var(--border); padding: 56px 0 32px; }
   .ct-eyebrow {
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: #CBFF00;
   }
   .ct-title {
     margin-top: 12px;
@@ -155,9 +147,9 @@ const productos = [
     font-weight: 800;
     line-height: 1.02;
     letter-spacing: -0.025em;
-    color: var(--ink);
+    color: #fff;
   }
-  .ct-title .g { color: var(--green); }
+  .ct-title .g { color: #C8F04D; }
 
   .ct-body { background: var(--cream); padding: 40px 0 96px; }
   .ct-grid {
@@ -300,12 +292,7 @@ const productos = [
     box-shadow: 0 0 0 3px rgba(165, 58, 46, 0.12);
   }
 
-  .ct-turnstile {
-    margin-top: 24px;
-    padding: 16px 18px;
-    background: var(--cream);
-    border: 1px dashed var(--border);
-  }
+  .cf-turnstile { margin-top: 24px; }
   .ct-submit {
     display: flex;
     align-items: center;
@@ -371,7 +358,7 @@ const productos = [
     function setLoading(on) {
       submitBtn.disabled = on;
       const label = submitBtn.querySelector(".btn-label");
-      if (label) label.textContent = on ? "Enviando…" : "Enviar diagnóstico técnico";
+      if (label) label.textContent = on ? "Enviando…" : "Enviar formulario";
     }
     function resetTurnstile() {
       if (window.turnstile && typeof window.turnstile.reset === "function") {
@@ -379,70 +366,15 @@ const productos = [
       }
     }
 
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
-      clearErrors();
       setLoading(true);
-
-      const fd = new FormData(form);
-      const turnstileToken = (fd.get("cf-turnstile-response") || "").toString();
-      if (!turnstileToken) {
-        setFieldError("turnstile", "Complete la verificación anti-bot.");
+      // MVP visual — sin llamada a API. Lógica de backend en Fase 3.
+      setTimeout(() => {
+        form.style.display = "none";
+        success.classList.add("show");
         setLoading(false);
-        return;
-      }
-
-      const payload = {
-        nombre: (fd.get("nombre") || "").toString(),
-        empresa: (fd.get("empresa") || "").toString(),
-        email: (fd.get("email") || "").toString(),
-        whatsapp: (fd.get("whatsapp") || "").toString(),
-        cargo: (fd.get("cargo") || "").toString(),
-        producto: (fd.get("producto") || "").toString(),
-        volumen: (fd.get("volumen") || "").toString(),
-        notas: (fd.get("notas") || "").toString(),
-        idempotency_key: idempotencyInput.value,
-        turnstile_token: turnstileToken,
-      };
-
-      try {
-        const res = await fetch("/api/contacto", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-
-        if (res.status === 200) {
-          form.style.display = "none";
-          success.classList.add("show");
-          return;
-        }
-
-        const data = await res.json().catch(() => ({}));
-        if (res.status === 403) {
-          setFieldError("turnstile", "Verificación anti-bot rechazada. Intente de nuevo.");
-          resetTurnstile();
-        } else if (res.status === 422 && data && data.fieldErrors) {
-          Object.keys(data.fieldErrors).forEach((field) => {
-            const messages = data.fieldErrors[field];
-            if (Array.isArray(messages) && messages.length > 0) setFieldError(field, messages[0]);
-          });
-          setGlobalError("Revise los campos marcados.");
-          resetTurnstile();
-        } else if (res.status === 502) {
-          setGlobalError("No pudimos enviar su solicitud. Intente de nuevo en unos minutos.");
-          resetTurnstile();
-        } else {
-          setGlobalError("Ocurrió un error inesperado. Intente de nuevo.");
-          resetTurnstile();
-        }
-      } catch (err) {
-        console.error("[contacto] Error de red", err);
-        setGlobalError("Error de conexión. Verifique su internet e intente de nuevo.");
-        resetTurnstile();
-      } finally {
-        setLoading(false);
-      }
+      }, 600);
     });
   })();
 </script>

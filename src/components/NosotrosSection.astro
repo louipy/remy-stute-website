@@ -1,220 +1,493 @@
 ---
-/* Nosotros — página /nosotros. Réplica de design-reference
-   (06 Nosotros desktop 1440 — tema oscuro, cards expandibles). */
-const cards = [
+import heroImg from "../assets/Candy-1920.webp";
+
+const filosofia = [
   {
-    icon: "hourglass",
-    title: "30 años de trayectoria continua",
-    desc: "Tres décadas operando sin interrupción en el mercado venezolano de materia prima industrial.",
-    extra: "Fundada en 1995, Remy & Stute ha sostenido el suministro a planta a través de cada ciclo del mercado venezolano.",
+    mod: "vision",
+    letter: "V",
+    kicker: "Visión",
+    title: "Proveedor líder con presencia regional",
+    body: "Ser proveedor líder de materia prima de alta calidad, contando con la máxima confianza de nuestros clientes nacionales e internacionales, para brindarles un servicio integral personalizado de asesoría, suministro, logística y aplicación de los productos.",
   },
   {
-    icon: "award",
-    title: "Representación exclusiva internacional",
-    desc: "Únicos canalizadores autorizados de Addcon, Yipin Pigmentos y Minerales Industriales en territorio venezolano.",
-    extra: "Sin intermediarios entre la fábrica y su planta: precio, lote y trazabilidad directos de origen.",
+    mod: "mision",
+    letter: "M",
+    kicker: "Misión",
+    title: "Suministro especializado de origen a entrega",
+    body: "Importar, exportar, distribuir y comercializar materia prima para las industrias de cerámica, petrolera y de pintura, con asesoría técnica, logística integral y cumplimiento riguroso de los requisitos técnicos y legales aplicables.",
   },
   {
-    icon: "package",
-    title: "Stock local · despacho inmediato",
-    desc: "Inventario rotativo en almacén propio en Caracas. Despacho a planta nacional en 24–72 horas.",
-    extra: "142 toneladas rotativas en Las Mercedes — sin esperas de importación que detengan su producción.",
-  },
-  {
-    icon: "flask-conical",
-    title: "Muestras gratis · asesoría incluida",
-    desc: "Hasta 1 kg gratuito por producto para piloto productivo, con análisis técnico previo a la orden.",
-    extra: "Cada muestra llega con certificado de análisis del lote y acompañamiento de un ingeniero formulador.",
+    mod: "sgc",
+    letter: "C",
+    kicker: "Sistema de Gestión",
+    title: "Calidad certificada en cada proceso",
+    body: "Implementamos y mantenemos un sistema de gestión de la calidad orientado a proporcionar un servicio eficaz que cumpla los requisitos de nuestros clientes y contribuya de forma continua al aumento de su satisfacción.",
   },
 ];
 ---
 
-<section class="ab-hero">
-  <div class="ab-hero__grid" aria-hidden="true"></div>
-  <div class="wrap ab-hero__inner reveal">
-    <p class="eyebrow eyebrow--lime">
-      <span class="line"></span>
-      <span>Nosotros · quiénes somos</span>
-    </p>
-    <h1 class="ab-hero__title">
-      NO SOMOS UN <span class="lime">DISTRIBUIDOR</span><br />DE CATÁLOGO.
-    </h1>
-    <p class="ab-hero__lead">
-      Somos el proveedor que garantiza que su producción
-      <strong>no se detiene.</strong>
+<!-- ── HERO — imagen estática ────────────────────────────────── -->
+<section class="nos-hero">
+  <img src={heroImg.src} alt="Instalaciones Remy & Stute" class="nos-hero__img" />
+</section>
+
+<!-- ── STATEMENT ─────────────────────────────────────────────── -->
+<section class="nos-statement">
+  <div class="wrap">
+    <p class="nos-statement__eyebrow reveal">Quiénes somos</p>
+    <h2 class="nos-statement__title reveal">
+      No somos un<br />
+      distribuidor<br />
+      <span class="nos-statement__accent">de catálogo.</span>
+    </h2>
+    <p class="nos-statement__lead reveal">
+      Somos el proveedor que garantiza que su producción no se detiene.
     </p>
   </div>
 </section>
 
-<section class="ab-cards">
+<!-- ── HISTORIA ──────────────────────────────────────────────── -->
+<section class="nos-historia">
+  <div class="wrap nos-historia__inner reveal">
+    <p class="eyebrow">
+      <span>Fundados en 1995 · Caracas, Venezuela</span>
+    </p>
+    <div class="nos-historia__body">
+
+      <!-- Timeline izquierdo -->
+      <div class="nos-historia__timeline">
+        <div class="nos-hist-year">1920</div>
+        <div class="nos-milestones">
+          <div class="nos-milestone">
+            <div class="nos-milestone__date">1920</div>
+            <div class="nos-milestone__label">Hamburgo<br />Alemania</div>
+          </div>
+          <div class="nos-milestone">
+            <div class="nos-milestone__date">1978</div>
+            <div class="nos-milestone__label">Primera oficina<br />Venezuela</div>
+          </div>
+          <div class="nos-milestone">
+            <div class="nos-milestone__date">1995</div>
+            <div class="nos-milestone__label">REMY &amp; STUTE<br />C.A. fundada</div>
+          </div>
+          <div class="nos-milestone">
+            <div class="nos-milestone__date">Hoy</div>
+            <div class="nos-milestone__label">Empresa especializada<br />en minerales industriales</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Texto derecho -->
+      <div class="nos-historia__text">
+        <p class="nos-historia__lead">
+          La empresa REMY &amp; CO. fue fundada en 1920 en la ciudad de Hamburgo,
+          Alemania, y se dedicó desde su primer día al comercio internacional de
+          materias primas industriales, con énfasis en el comercio entre
+          Latinoamérica y Europa. En la pre-globalización, REMY &amp; CO. fungía
+          como oficina de exportación para más de una de las empresas químicas
+          grandes de su época. A mediados del siglo pasado, el fuerte de sus
+          actividades en el continente Latinoamericano estaba concentrado en los
+          países Argentina, Bolivia, Venezuela y Colombia.
+        </p>
+        <p>
+          En el caso de Venezuela, existía la primera oficina regional a partir
+          del año 1978 en la figura de una sociedad con otros empresarios locales.
+          En 1995, se decidió abrir REMY &amp; STUTE, C.A., al principio una
+          sucursal de la casa matriz alemana. Después de pocos años, la firma
+          venezolana se independizó legalmente de REMY &amp; CO., pero siempre
+          manteniendo una muy relación estrecha entre ambas empresas. Aunque siendo
+          firmas independientes, la cooperación hasta la fecha está en sus niveles
+          óptimos — fructífera tanto para las dos empresas como también para sus
+          clientes.
+        </p>
+        <p>
+          Con el paso de los años, REMY &amp; STUTE, C.A. ha pasado de ser un
+          simple "trader" de materias primas a ser una compañía especializada en
+          el suministro de minerales industriales para las industrias de cerámica,
+          petrolera y de pinturas, un servicio técnico especializado, un control
+          de calidad alto y ofreciendo una logística funcionando a la perfección
+          desde origen hasta el sitio de producción del cliente incluso cuando los
+          dos puntos se encuentren a 20.000 km de distancia uno del otro.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── FILOSOFÍA ──────────────────────────────────────────────── -->
+<section class="nos-fil">
   <div class="wrap">
-    <div class="ab-grid">
-      {cards.map((c) => (
-        <article class="ab-card">
-          <div class="ab-card__icon">
-            <i data-lucide={c.icon}></i>
-          </div>
-          <div class="ab-card__head">
-            <h3 class="ab-card__title">{c.title}</h3>
-            <button type="button" class="ab-card__toggle" aria-expanded="false" aria-label="Expandir">
-              <i data-lucide="plus"></i>
-            </button>
-          </div>
-          <p class="ab-card__desc">{c.desc}</p>
-          <p class="ab-card__extra">{c.extra}</p>
+    <p class="eyebrow reveal">
+      <span class="line"></span>
+      <span>Filosofía institucional</span>
+    </p>
+    <div class="nos-fil__grid reveal">
+      {filosofia.map((c) => (
+        <article class={`fil-card fil-card--${c.mod}`} data-letter={c.letter}>
+          <p class="fil-card__kicker">{c.kicker}</p>
+          <h3 class="fil-card__title">{c.title}</h3>
+          <p class="fil-card__body">{c.body}</p>
         </article>
       ))}
     </div>
+  </div>
+</section>
 
-    <div class="ab-cta">
-      <div>
-        <p class="eyebrow eyebrow--lime" style="margin-bottom:8px;">
-          <span>Siguiente paso</span>
-        </p>
-        <p class="ab-cta__title">¿Listo para que su planta no dependa de catálogos?</p>
-      </div>
-      <a href="/contacto" class="btn btn--lime">
-        Solicitar diagnóstico técnico
-        <i data-lucide="arrow-right"></i>
-      </a>
+<!-- ── CTA BAND ──────────────────────────────────────────────── -->
+<section class="nos-cta">
+  <div class="wrap nos-cta__inner">
+    <div class="nos-cta__text">
+      <p class="nos-cta__label">Siguiente paso</p>
+      <p class="nos-cta__title">¿Listo para que su planta no dependa de catálogos?</p>
     </div>
+    <a href="/contacto" class="nos-cta__btn">
+      Solicitar cotización
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </a>
   </div>
 </section>
 
 <style>
-  /* Hero oscuro */
-  .ab-hero { position: relative; overflow: hidden; padding: 120px 0 96px; }
-  .ab-hero__grid {
+  /* ── Hero — imagen estática ───────────────────────────────── */
+  .nos-hero {
+    position: relative;
+    height: 420px;
+    background: #0D1A0F;
+    overflow: hidden;
+    z-index: 1;
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.22),
+      0 8px 24px rgba(0, 0, 0, 0.28),
+      0 20px 56px rgba(0, 0, 0, 0.24),
+      0 40px 88px rgba(0, 0, 0, 0.18),
+      0 24px 32px -8px rgba(0, 0, 0, 0.30),
+      0 48px 72px -16px rgba(0, 0, 0, 0.24);
+  }
+  .nos-hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .nos-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(to bottom, transparent 0%, rgba(5, 15, 8, 0.38) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* ── Statement ───────────────────────────────────────────── */
+  .nos-statement {
+    background: var(--white);
+    background: #0A2418;
+    padding: 72px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .nos-statement__eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #CBFF00;
+    margin-bottom: 20px;
+  }
+  .nos-statement__title {
+    font-family: var(--display);
+    font-size: clamp(40px, 5.5vw, 72px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin-bottom: 28px;
+  }
+  .nos-statement__accent {
+    color: #C8F04D;
+  }
+  .nos-statement__lead {
+    max-width: 560px;
+    font-family: var(--mono);
+    font-size: 16px;
+    line-height: 1.7;
+    color: #C8F04D;
+  }
+
+  /* ── Historia ─────────────────────────────────────────────── */
+  .nos-historia {
+    background: #fff;
+    padding: 80px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .nos-historia__inner {
+    max-width: 1040px;
+  }
+  .nos-historia .eyebrow {
+    margin-bottom: 0;
+  }
+  .nos-historia__body {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 64px;
+    align-items: stretch;
+    margin-top: 36px;
+  }
+
+  /* Timeline izquierdo */
+  .nos-historia__timeline {
+    padding-top: 4px;
+    display: flex;
+    flex-direction: column;
+  }
+  .nos-hist-year {
+    font-family: var(--num);
+    font-size: 52px;
+    font-weight: 500;
+    color: var(--green);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .nos-milestones {
+    margin-top: 22px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-left: 2px solid var(--border);
+  }
+  .nos-milestone {
+    padding-left: 12px;
+  }
+  .nos-milestone__date {
+    font-family: var(--num);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--green);
+    letter-spacing: 0.02em;
+  }
+  .nos-milestone__label {
+    margin-top: 3px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.5;
+  }
+
+  /* Texto derecho */
+  .nos-historia__text {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .nos-historia__lead {
+    font-family: var(--display);
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .nos-historia__text p:not(.nos-historia__lead) {
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--text);
+  }
+  .nos-historia__text p strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ── Filosofía ────────────────────────────────────────────── */
+  .nos-fil {
+    background: var(--cream);
+    padding: 80px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .nos-fil::before {
+    content: '';
     position: absolute;
     inset: 0;
-    opacity: 0.4;
-    background-image:
-      linear-gradient(rgba(203, 255, 0, 0.16) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(203, 255, 0, 0.16) 1px, transparent 1px);
-    background-size: 48px 48px;
+    background-image: radial-gradient(circle, rgba(0,102,51,0.045) 1px, transparent 1px);
+    background-size: 28px 28px;
+    pointer-events: none;
   }
-  .ab-hero__inner { position: relative; max-width: 1080px; }
-  .ab-hero__title {
-    margin-top: 24px;
-    font-family: var(--display);
-    font-size: clamp(48px, 6.5vw, 84px);
-    font-weight: 800;
-    line-height: 0.98;
-    letter-spacing: -0.03em;
-    color: var(--dark-text);
+  .nos-fil .eyebrow {
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
   }
-  .ab-hero__title .lime { color: var(--lime); }
-  .ab-hero__lead {
-    margin-top: 32px;
-    max-width: 760px;
-    font-size: clamp(18px, 2.2vw, 22px);
-    line-height: 1.45;
-    color: rgba(240, 237, 230, 0.7);
-  }
-  .ab-hero__lead strong { color: var(--dark-text); font-weight: 600; }
-
-  /* Cards */
-  .ab-cards { padding: 0 0 120px; }
-  .ab-grid {
+  .nos-fil__grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+    position: relative;
+    z-index: 1;
   }
-  .ab-card {
-    background: var(--dark-panel);
-    border: 1px solid rgba(203, 255, 0, 0.16);
-    padding: 36px;
-    cursor: pointer;
-    transition: border-color 180ms, background 180ms;
-  }
-  .ab-card:hover { border-color: rgba(203, 255, 0, 0.4); }
-  .ab-card__icon {
-    width: 64px;
-    height: 64px;
-    border: 1px solid var(--lime);
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    margin-bottom: 32px;
-    color: var(--dark-text);
-  }
-  .ab-card__icon i { width: 26px; height: 26px; }
-  .ab-card__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
-  .ab-card__title {
-    font-family: var(--display);
-    font-size: 24px;
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-    text-transform: uppercase;
-    color: var(--dark-text);
-  }
-  .ab-card__toggle {
-    flex-shrink: 0;
-    width: 36px;
-    height: 36px;
-    border: 1px solid rgba(203, 255, 0, 0.16);
-    border-radius: 4px;
-    background: transparent;
-    color: var(--lime);
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    transition: transform 200ms, background 160ms;
-  }
-  .ab-card__toggle i { width: 14px; height: 14px; }
-  .ab-card__toggle[aria-expanded="true"] { transform: rotate(45deg); background: rgba(203, 255, 0, 0.1); }
-  .ab-card__desc {
-    margin-top: 16px;
-    font-size: 14.5px;
-    line-height: 1.65;
-    color: rgba(240, 237, 230, 0.55);
-  }
-  .ab-card__extra {
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid rgba(203, 255, 0, 0.16);
-    font-size: 13.5px;
-    line-height: 1.65;
-    color: rgba(240, 237, 230, 0.75);
-    display: none;
-  }
-  .ab-card.is-open .ab-card__extra { display: block; }
 
-  /* CTA band */
-  .ab-cta {
-    margin-top: 64px;
+  /* Card base */
+  .fil-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 32px 28px 52px;
+    border-top: 3px solid var(--green);
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: transform 280ms cubic-bezier(0.16,1,0.3,1),
+                box-shadow 280ms cubic-bezier(0.16,1,0.3,1),
+                background 280ms;
+  }
+  /* Shine sweep */
+  .fil-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 55%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+    transform: skewX(-18deg);
+    pointer-events: none;
+    z-index: 2;
+    transition: none;
+  }
+  .fil-card:hover::before { left: 150%; transition: left 700ms ease; }
+  /* Background letter */
+  .fil-card::after {
+    content: attr(data-letter);
+    position: absolute;
+    bottom: -20px;
+    right: 10px;
+    font-family: var(--num);
+    font-size: 108px;
+    font-weight: 700;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    letter-spacing: -0.02em;
+    color: rgba(0,102,51,0.04);
+    transition: transform 280ms cubic-bezier(0.16,1,0.3,1), color 280ms;
+  }
+
+  /* Variantes de color */
+  .fil-card--mision { border-top-color: var(--brown); }
+  .fil-card--mision::after { color: rgba(112,51,0,0.04); }
+  .fil-card--sgc    { border-top-color: var(--yellow); }
+  .fil-card--sgc::after { color: rgba(200,180,50,0.10); }
+
+  /* Hover estados */
+  .fil-card:hover {
+    transform: translateY(-7px);
+    background: #FDFDFD;
+    box-shadow: 0 4px 8px rgba(0,102,51,0.04), 0 14px 30px rgba(0,102,51,0.10);
+  }
+  .fil-card:hover::after          { transform: scale(1.06); color: rgba(0,102,51,0.07); }
+  .fil-card--mision:hover::after  { color: rgba(112,51,0,0.07); }
+  .fil-card--sgc:hover::after     { color: rgba(180,160,40,0.18); }
+  .fil-card:hover .fil-card__kicker          { color: var(--green); }
+  .fil-card--mision:hover .fil-card__kicker  { color: var(--brown); }
+  .fil-card--sgc:hover .fil-card__kicker     { color: #8a7200; }
+
+  /* Contenido */
+  .fil-card__kicker {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    transition: color 220ms;
+  }
+  .fil-card__title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 14px;
+  }
+  .fil-card__body {
+    font-size: 13.5px;
+    line-height: 1.75;
+    color: var(--text);
+  }
+
+  /* ── CTA band ─────────────────────────────────────────────── */
+  .nos-cta {
+    background: #111814;
+    padding: 36px 0;
+  }
+  .nos-cta__inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 32px;
-    background: var(--dark-panel-2);
-    border: 1px solid rgba(203, 255, 0, 0.16);
-    padding: 28px 32px;
   }
-  .ab-cta__title {
+  .nos-cta__label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #C8F04D;
+    margin-bottom: 6px;
+  }
+  .nos-cta__title {
     font-family: var(--display);
-    font-size: 22px;
+    font-size: clamp(17px, 2vw, 22px);
     font-weight: 700;
+    line-height: 1.3;
+    color: #fff;
     letter-spacing: -0.01em;
-    color: var(--dark-text);
+    max-width: 560px;
+  }
+  .nos-cta__btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: #F0E378;
+    color: var(--ink);
+    border-radius: 2px;
+    font-family: var(--body);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 200ms, transform 200ms;
+  }
+  .nos-cta__btn:hover {
+    background: #e6d85e;
+    transform: translateY(-2px);
   }
 
-  @media (max-width: 860px) {
-    .ab-grid { grid-template-columns: 1fr; }
-    .ab-cta { flex-direction: column; align-items: flex-start; }
+  /* ── Responsive ───────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .nos-fil__grid { grid-template-columns: 1fr 1fr; }
+    .fil-card:last-child { grid-column: 1 / -1; }
+  }
+  @media (max-width: 640px) {
+    .nos-hero { height: 280px; }
+    .nos-fil__grid { grid-template-columns: 1fr; }
+    .fil-card:last-child { grid-column: auto; }
+    .nos-cta__inner { flex-direction: column; align-items: flex-start; }
+    .nos-historia__body { grid-template-columns: 1fr; gap: 40px; }
+    .nos-milestones { flex-direction: row; flex-wrap: wrap; gap: 16px 24px; }
+    .nos-milestone { border-left: none; border-top: 2px solid var(--border); padding-left: 0; padding-top: 8px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nos-card, .nos-cta__btn { transition: none; }
+    .nos-card:hover { transform: none; }
   }
 </style>
-
-<script is:inline>
-  document.querySelectorAll(".ab-card").forEach((card) => {
-    const toggle = card.querySelector(".ab-card__toggle");
-    if (!toggle) return;
-    function flip(e) {
-      e.preventDefault();
-      const open = card.classList.toggle("is-open");
-      toggle.setAttribute("aria-expanded", open ? "true" : "false");
-    }
-    card.addEventListener("click", flip);
-  });
-</script>

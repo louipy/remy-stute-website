@@ -72,7 +72,7 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site ?? Astr
     <!-- GTM_BODY_PLACEHOLDER -->
 
     <FlagRibbon />
-    <Navbar active={active} variant={navVariant} />
+    <Navbar active={active} />
 
     <main class:list={[{ "main--offset": navVariant !== "home" }]}>
       <slot />
