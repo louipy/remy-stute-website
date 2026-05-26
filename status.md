@@ -76,25 +76,58 @@ Se reconstruyó el sitio replicando fielmente los 4 `.html` desktop 1440 de
 
 ---
 
-## ⬜ FASE 3 — CRM Airtable
+## 🟡 FASE 3 — CRM Airtable (en curso — 2026-05-26)
 
 **Objetivo:** Cada lead válido llega a Airtable SANDBOX con todos sus campos.
 
-**Requiere antes de empezar:**
-- Cuenta Airtable con API key configurada
-- Instancia n8n activa (Cloud o self-hosted)
-- Fase 2 completada
+**Decisión de arquitectura (2026-05-26):** el API route de Astro escribe directamente a Airtable
+sin n8n. La fase de automatizaciones (n8n + WhatsApp) viene después para controlar costos.
+La migración será quirúrgica: una línea en el API route.
+
+**Código implementado en esta sesión:**
+- ✅ `@astrojs/netlify@6` instalado — adapter SSR compatible con Astro 5.18
+- ✅ `astro.config.mjs` — adapter netlify, output estático con API route SSR
+- ✅ `src/lib/airtable.ts` — cliente REST nativo (sin SDK): checkIdempotency, createProspecto, logError. R3+R7+R8 aplicados.
+- ✅ `src/lib/email.ts` — notificación Resend vía fetch nativo (sin SDK)
+- ✅ `src/pages/api/contacto.ts` — `prerender = false` activado; flujo: Turnstile → Zod → Airtable dedup → Create → Resend
 
 **Puntos de trabajo:**
-1. ⬜ Crear las 2 bases en Airtable: "Pipeline Comercial — SANDBOX" y "Pipeline Comercial — PRODUCCIÓN"
-2. ⬜ Crear las tablas: PROSPECTOS, PIPELINE, ACTIVIDADES, Cola de Errores con los campos definidos en el skill
-3. ⬜ Crear las vistas: "Mis Prospectos Activos", "Hot Leads", "Seguimiento Esta Semana", "Pipeline Kanban"
-4. ⬜ Configurar AIRTABLE_API_KEY en .env con scope limitado a las 2 bases del proyecto (no "All workspaces")
-5. ⬜ Crear el workflow básico en n8n: Webhook → Check idempotency → Create en SANDBOX
-6. ⬜ Agregar el X-Webhook-Secret al webhook de n8n (R2) y verificar que rechaza sin él
-7. ⬜ Wiring en el API route de Astro: enviar payload al webhook n8n con el header secreto
-8. ⬜ Probar submit doble del formulario → solo un registro en SANDBOX (idempotencia, R3)
-9. ⬜ Configurar el Wait node (250ms) y retry con backoff para rate limits de Airtable (R7)
+1. ✅ Adapter SSR instalado y configurado
+2. ⬜ Crear las 2 bases en Airtable: "Pipeline Comercial — SANDBOX" y "Pipeline Comercial — PRODUCCIÓN"
+3. ⬜ Crear las tablas PROSPECTOS y Cola de Errores con los campos exactos (ver schema abajo)
+4. ⬜ Crear las vistas: "Mis Prospectos Activos", "Hot Leads", "Seguimiento Esta Semana", "Pipeline Kanban"
+5. ⬜ Configurar las 5 variables de entorno en .env y en Netlify Dashboard
+6. ⬜ Probar submit del formulario → verificar registro en SANDBOX
+7. ⬜ Probar submit doble → solo un registro (idempotencia, R3)
+8. ⬜ Probar email de notificación con Resend
+
+**Schema de Airtable (crear este orden exacto):**
+
+Tabla PROSPECTOS — campos:
+  nombre (Single line text) | empresa (Single line text) | email (Email)
+  whatsapp (Phone number) | cargo (Single line text) | producto (Single line text)
+  volumen (Single line text) | notas (Long text) | idempotency_key (Single line text)
+  estado (Single select): Nuevo · En contacto · Calificado · Propuesta enviada · Cerrado ✓ · Cerrado ✗
+  fuente (Single select): Formulario web | fecha_creacion (Created time — automático)
+
+Tabla Cola de Errores — campos:
+  payload_raw (Long text) | error_mensaje (Single line text)
+  error_tipo (Single select): Airtable · Email · Interno
+  resuelto (Checkbox) | timestamp (Created time — automático)
+
+Vistas (en PROSPECTOS):
+  "Mis Prospectos Activos" — filtro: estado ≠ Cerrado ✓ AND ≠ Cerrado ✗
+  "Hot Leads" — filtro: fecha_creacion dentro de las últimas 48 horas
+  "Seguimiento Esta Semana" — filtro: fecha_creacion esta semana
+  "Pipeline Kanban" — kanban agrupado por estado
+
+**Variables de entorno requeridas (.env + Netlify Dashboard):**
+  AIRTABLE_API_KEY=pat_...
+  AIRTABLE_BASE_SANDBOX=appYYYY...
+  AIRTABLE_BASE_PRODUCTION=appXXXX...
+  RESEND_API_KEY=re_...
+  NOTIFY_EMAIL=email@delequipo.com
+  RESEND_FROM_EMAIL=(opcional — requiere dominio verificado en Resend)
 
 **Entregable:** 10 leads de prueba en SANDBOX sin duplicados, sin errores silenciosos.
 

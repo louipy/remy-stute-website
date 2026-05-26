@@ -4,22 +4,30 @@
  * Orden de validación FIJO (R4 de CLAUDE.md):
  *   1. Cloudflare Turnstile (siteverify server-side)  → 403 si falla
  *   2. Zod (ContactoSchema)                            → 422 si falla
- *   3. Forward a n8n con X-Webhook-Secret (R2)         → 502 si falla
+ *   3. Check idempotencia en Airtable (R3)             → 200 duplicate si ya existe
+ *   4. Crear prospecto en Airtable SANDBOX
+ *   5. Notificar al equipo por email (Resend) — best-effort
+ *
+ * Fase 3: escritura directa a Airtable sin n8n.
+ * Migración a n8n en la fase de automatizaciones:
+ *   reemplazar el bloque Airtable+Resend por una llamada al webhook de n8n
+ *   con el mismo `parsed.data` que ya está estructurado.
  *
  * Códigos de respuesta:
- *   200 — lead aceptado
+ *   200 — lead aceptado (o duplicado detectado)
  *   400 — body inválido (no parseable, método incorrecto)
  *   403 — Turnstile rechazó el token
  *   422 — validación Zod falló (incluye fieldErrors)
  *   500 — error interno
- *   502 — n8n no respondió OK
+ *   502 — error al escribir en Airtable
  */
 
 import type { APIRoute } from 'astro';
 import { ContactoSchema } from '@lib/schemas/contacto';
+import { checkIdempotency, createProspecto, logError } from '@lib/airtable';
+import { notifyNewLead } from '@lib/email';
 
-// FASE 3: descomentar cuando se configure el adaptador de servidor (node/cloudflare)
-// export const prerender = false;
+export const prerender = false;
 
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
@@ -81,7 +89,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return jsonResponse(403, { ok: false, error: 'turnstile_missing' });
   }
 
-  // 1. Turnstile (R4)
+  // 1. Turnstile (R4) — en dev se omite para facilitar testing local
   const remoteIp = (() => {
     try {
       return clientAddress;
@@ -89,7 +97,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       return null;
     }
   })();
-  const turnstileOk = await verifyTurnstile(turnstileToken, remoteIp);
+  const turnstileOk = import.meta.env.DEV || await verifyTurnstile(turnstileToken, remoteIp);
   if (!turnstileOk) {
     return jsonResponse(403, { ok: false, error: 'turnstile_failed' });
   }
@@ -102,39 +110,42 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return jsonResponse(422, { ok: false, error: 'validation_failed', fieldErrors });
   }
 
-  // 3. Forward a n8n (R2) — el wiring real se completa en Fase 3
-  const webhookUrl = import.meta.env.N8N_WEBHOOK_URL;
-  const webhookSecret = import.meta.env.N8N_WEBHOOK_SECRET;
+  // Si Airtable no está configurado (sin credenciales), se acepta el lead de todas formas
+  // para no bloquear el formulario durante el onboarding.
+  const airtableReady =
+    !!import.meta.env.AIRTABLE_API_KEY && !!import.meta.env.AIRTABLE_BASE_SANDBOX;
 
-  if (!webhookUrl || !webhookSecret) {
+  if (!airtableReady) {
     console.info(
-      '[contacto] Lead validado (Fase 2). N8N_WEBHOOK_URL/SECRET aún no configurados — wiring en Fase 3.',
-      { idempotency_key: parsed.data.idempotency_key },
+      '[contacto] Airtable no configurado — lead validado localmente',
+      parsed.data.idempotency_key,
     );
-    return jsonResponse(200, { ok: true, stage: 'phase-2-validated' });
+    return jsonResponse(200, { ok: true, stage: 'validated-no-airtable' });
   }
 
   try {
-    const n8nRes = await fetch(webhookUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Webhook-Secret': webhookSecret,
-      },
-      body: JSON.stringify(parsed.data),
-    });
-
-    if (!n8nRes.ok) {
-      // TODO Fase 4: persistir en "Cola de Errores" de Airtable + notificar (R8)
-      console.error('[contacto] n8n respondió no-OK', n8nRes.status, await n8nRes.text());
-      return jsonResponse(502, { ok: false, error: 'n8n_unavailable' });
+    // 3. Idempotencia (R3): abortar si ya existe el key
+    const isDuplicate = await checkIdempotency(parsed.data.idempotency_key);
+    if (isDuplicate) {
+      console.info('[contacto] Intento duplicado detectado', parsed.data.idempotency_key);
+      return jsonResponse(200, { ok: true, duplicate: true });
     }
+
+    // 4. Crear prospecto en Airtable SANDBOX
+    await createProspecto(parsed.data);
+
+    // 5. Notificar al equipo — best-effort, no bloquea la respuesta (R8)
+    notifyNewLead(parsed.data).catch((err: unknown) => {
+      console.error('[contacto] Error enviando notificación email', err);
+      logError(parsed.data, String(err), 'Email').catch(() => {});
+    });
 
     return jsonResponse(200, { ok: true });
   } catch (err) {
-    // TODO Fase 4: persistir en "Cola de Errores" de Airtable + notificar (R8)
-    console.error('[contacto] Error enviando a n8n', err);
-    return jsonResponse(502, { ok: false, error: 'n8n_unreachable' });
+    // R8: nunca silencioso — log en Cola de Errores + 502
+    console.error('[contacto] Error escribiendo a Airtable', err);
+    await logError(parsed.data, String(err), 'Airtable').catch(() => {});
+    return jsonResponse(502, { ok: false, error: 'airtable_unavailable' });
   }
 };
 
