@@ -10,7 +10,8 @@ Sistema de captación y calificación de prospectos B2B industriales venezolanos
 Valor por lead: $5,000–$27,000 USD. Tolerancia a errores lógicos: cero.
 Prioridad absoluta: precisión > velocidad en toda operación automatizada.
 
-Stack: Astro + TypeScript + Tailwind + Zod + Sanity CMS + n8n + Airtable + GTM + GA4 + Meta Pixel + Cloudflare Turnstile
+Stack: Astro 5 + TypeScript + Tailwind + Zod + Airtable + Resend + Netlify + GTM + GA4 + Meta Pixel + Cloudflare Turnstile
+Stack (fase automatizaciones, no activo aún): n8n + Sanity CMS + WhatsApp Business API
 
 ---
 
@@ -63,28 +64,33 @@ Si algún MCP no aparece como activo, no continúes la tarea que lo requiere. Re
 Todas deben estar en `.env` (nunca en el repositorio).
 
 ```bash
-# Airtable — DOS bases obligatorias
+# Airtable — Fase 3 activa
 AIRTABLE_API_KEY=pat_XXXXXXXXXXXXXXXX
-AIRTABLE_BASE_SANDBOX=appYYYYYYYYYYYYYY       
-AIRTABLE_BASE_PRODUCTION=appXXXXXXXXXXXXXX    
+AIRTABLE_BASE_SANDBOX=appYYYYYYYYYYYYYY
+AIRTABLE_BASE_PRODUCTION=appXXXXXXXXXXXXXX   # configurar al duplicar SANDBOX para producción
 
-# n8n
-N8N_API_URL=https://TU-INSTANCIA.app.n8n.cloud/api/v1
-N8N_API_KEY=tu_api_key_n8n
-N8N_WEBHOOK_URL=https://TU-INSTANCIA.app.n8n.cloud/webhook/XXXXX
-N8N_WEBHOOK_SECRET=genera_con_openssl_rand_hex_32
+# Resend — notificaciones email al equipo (Fase 3)
+RESEND_API_KEY=re_XXXXXXXXXXXXXXXX
+NOTIFY_EMAIL=equipo@empresa.com
+RESEND_FROM_EMAIL=noreply@remyvenezuela.com   # opcional; requiere dominio verificado en Resend
 
 # Cloudflare Turnstile
-TURNSTILE_SITE_KEY=0x4AAAAAAA...
+PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAA...
 TURNSTILE_SECRET_KEY=0x4AAAAAAA...
 
-# Sanity CMS
-SANITY_PROJECT_ID=xxxxxxxxx
-SANITY_DATASET=production
+# Fase automatizaciones (no activas aún — se configuran cuando llegue n8n)
+# N8N_API_URL=https://TU-INSTANCIA.app.n8n.cloud/api/v1
+# N8N_API_KEY=tu_api_key_n8n
+# N8N_WEBHOOK_URL=https://TU-INSTANCIA.app.n8n.cloud/webhook/XXXXX
+# N8N_WEBHOOK_SECRET=genera_con_openssl_rand_hex_32
 
-# GA4
-GA4_CREDENTIALS_PATH=/ruta/absoluta/credentials.json
-GA4_PROPERTY_ID=XXXXXXXXX
+# Fase SEO (no activa aún)
+# SANITY_PROJECT_ID=xxxxxxxxx
+# SANITY_DATASET=production
+
+# Fase Analytics (no activa aún)
+# GA4_CREDENTIALS_PATH=/ruta/absoluta/credentials.json
+# GA4_PROPERTY_ID=XXXXXXXXX
 ```
 
 ---
@@ -93,13 +99,13 @@ GA4_PROPERTY_ID=XXXXXXXXX
 
 ### R1 — ENTORNO: SANDBOX primero, siempre
 
-**Durante desarrollo y testing, todas las escrituras automatizadas van a SANDBOX.**
+**Durante desarrollo y testing, todas las escrituras van a SANDBOX.**
 
-- Variable `AIRTABLE_TARGET_BASE` en n8n = `SANDBOX` por defecto
-- Claude Code opera sobre `AIRTABLE_BASE_SANDBOX` salvo instrucción explícita del usuario
+- `src/lib/airtable.ts` lee `AIRTABLE_BASE_SANDBOX` por defecto
 - No cambiar a `AIRTABLE_BASE_PRODUCTION` sin: todos los edge cases probados + 48h limpio en sandbox + confirmación explícita del usuario en el chat
+- Para ir a producción: duplicar la base SANDBOX en Airtable, cambiar `AIRTABLE_BASE_SANDBOX` por `AIRTABLE_BASE_PRODUCTION` en `getCredentials()` de `airtable.ts`
 
-Si el usuario pide "crear un prospecto" o "probar el workflow" sin especificar base, usar SANDBOX.
+Si el usuario pide "probar el formulario" sin especificar base, siempre es SANDBOX.
 
 ### R2 — WEBHOOK: Nunca desnudo
 
@@ -121,17 +127,21 @@ El `idempotency_key` se genera en el componente del formulario al cargar la pág
 ```typescript
 const idempotencyKey = crypto.randomUUID(); // Una vez al montar, no al hacer submit
 ```
-Este mismo UUID es el `event_id` para Meta CAPI. Un solo UUID sirve a los dos sistemas.
+Este mismo UUID es el `event_id` para Meta CAPI (Fase 5). Un solo UUID sirve a los dos sistemas.
 
-n8n busca en Airtable SANDBOX/PRODUCCIÓN por `idempotency_key` antes de crear registro.
-Si existe → log "Intento duplicado" → stop. Si no existe → crear registro.
+`checkIdempotency()` en `src/lib/airtable.ts` busca en Airtable por `idempotency_key` antes de crear.
+Si existe → API devuelve `{ ok: true, duplicate: true }` → no se crea registro.
+La columna `idempotency_key` en Airtable NUNCA se renombra.
 
 ### R4 — FORMULARIO: Orden de validación fijo
 
 El API route `/api/contacto.ts` valida en este orden exacto. No modificar el orden:
 1. Verificar Cloudflare Turnstile (server-side call a `siteverify`) → si falla: HTTP 403
+   (bypass automático en `import.meta.env.DEV` para facilitar testing local)
 2. Parsear con `ContactoSchema.safeParse()` de Zod → si falla: HTTP 422 con fieldErrors
-3. Solo si 1 y 2 pasan: enviar payload a n8n webhook con `X-Webhook-Secret`
+3. Solo si 1 y 2 pasan: `checkIdempotency()` → si duplicado: HTTP 200 `{duplicate:true}`
+4. `createProspecto()` en Airtable SANDBOX → si falla: log en Cola de Errores + HTTP 502
+5. `notifyNewLead()` vía Resend → best-effort, no bloquea la respuesta
 
 ### R5 — GTM: Main Thread, no Partytown
 
@@ -155,19 +165,20 @@ Sin esto, `Correo@Empresa.com` y `correo@empresa.com` producen hashes distintos 
 
 ### R7 — RATE LIMITS AIRTABLE: Escritura secuencial
 
-En n8n, todas las operaciones de escritura en Airtable:
-- Concurrencia = 1 (nunca "Split in Batches" con más de 1 hilo paralelo)
-- Wait node de 250ms después de cada Create/Update
-- Retry con backoff: 1000ms → 2000ms → 4000ms en HTTP 429
-- HTTP 429 dispara alerta al equipo + registro en "Cola de Errores"
+En `src/lib/airtable.ts`, todas las operaciones de escritura:
+- Concurrencia = 1 (el API route procesa un lead a la vez)
+- `await sleep(250)` después de cada operación Create/Write
+- Retry con backoff en HTTP 429: 1000ms → 2000ms → 4000ms (función `airtableFetch`)
+- HTTP 429 después de 3 reintentos → lanza excepción → se loguea en "Cola de Errores"
 
 ### R8 — ERRORES: Nunca silenciosos
 
-Todo error en cualquier workflow n8n debe:
-1. Guardar el payload raw en tabla "Cola de Errores" de Airtable (SANDBOX o PROD según entorno)
-2. Enviar notificación por email al equipo
+Todo error en el API route o en `src/lib/airtable.ts` debe:
+1. Llamar a `logError(payload, mensaje, tipo)` → guarda en tabla "Cola de Errores" de Airtable
+2. Devolver HTTP 502 al cliente (nunca 200 con error silencioso)
 
-Un workflow que falla sin dejar rastro es inaceptable.
+`logError()` es best-effort (no lanza excepción) para no enmascarar el error original.
+Un fallo que no deja rastro en "Cola de Errores" es inaceptable.
 
 ### R9 — PROMPTS DE COMPONENTES: Especificación exacta
 
@@ -271,8 +282,10 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 │   ├── lib/
 │   │   ├── schemas/
 │   │   │   └── contacto.ts           ← ContactoSchema (Zod) — fuente de verdad
+│   │   ├── airtable.ts               ← cliente REST Airtable: checkIdempotency, createProspecto, logError (R3+R7+R8)
+│   │   ├── email.ts                  ← notificación Resend al equipo vía fetch nativo
 │   │   └── analytics/
-│   │       └── dataLayer.ts          ← DataLayerEvents + trackEvent() — INMUTABLE
+│   │       └── dataLayer.ts          ← DataLayerEvents + trackEvent() — INMUTABLE (Fase 5)
 │   ├── pages/
 │   │   ├── index.astro               ← navVariant="home" → Hero + IndustriasServidas + VentajaCompetitiva + ContactoCTA
 │   │   ├── productos.astro           ← ProductosCatalogo (filtro sector+marca, tabla 5 SKU)
@@ -281,7 +294,7 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 │   │   ├── casos.astro               ← PageInConstruction (placeholder)
 │   │   ├── recursos.astro            ← PageInConstruction (placeholder)
 │   │   └── api/
-│   │       └── contacto.ts           ← Turnstile → Zod → n8n (en ese orden); prerender=false COMENTADO (build estático Netlify — restaurar en Fase 3 con server adapter)
+│   │       └── contacto.ts           ← Turnstile → Zod → Airtable → Resend (R4); prerender=false ACTIVO; bypass Turnstile en DEV
 │   └── components/
 │       ├── Navbar.astro              ← props: active (variant eliminado — navbar unificado); logo SVG inline; brand-navbar-text scroll animation
 │       ├── FlagRibbon.astro          ← fixed 4px, z-index 101
@@ -292,7 +305,7 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 │       ├── ContactoCTA.astro         ← flujo 3 pasos + botón WhatsApp
 │       ├── ProductosCatalogo.astro   ← filtro dual sector+marca; lee ?sector= de URL params al cargar para activar chip correspondiente
 │       ├── NosotrosSection.astro     ← tema oscuro #0A0F0D, acento lima; hero Candy-1920.webp con box-shadow elevation; sección nos-statement (#0A2418) con copy grande
-│       └── ContactSection.astro     ← formulario brief técnico
+│       └── ContactSection.astro     ← formulario brief técnico (provisional); submit real al API; campos: nombre, empresa, email, whatsapp, cargo, producto, volumen, notas
 ├── design-reference/
 │   └── *.png                         ← capturas de diseño (desktop 1440) — fuente de verdad visual
 ├── .mcp.json                         ← MCP servers (este archivo)
@@ -307,15 +320,14 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 
 ## CHECKLISTS DE ACTIVACIÓN (requeridos antes de ir a producción)
 
-### Checklist: Webhook n8n listo para producción
+### Checklist: Airtable + Resend listos para producción
 ```
-□ Webhook rechaza requests sin X-Webhook-Secret (probar con curl, esperar HTTP 401)
-□ Submit doble del formulario → solo un registro en Airtable SANDBOX
-□ Todos los edge cases de la tabla (Skill 1) probados con datos reales
-□ Error path probado: desconectar Airtable temporalmente → verificar que "Cola de Errores" captura el payload
-□ Template de WhatsApp pre-aprobado en Meta Business Manager
-□ Dry-run completo en SANDBOX: mínimo 10 leads de prueba sin errores
-□ Sign-off del equipo → cambiar AIRTABLE_TARGET_BASE a PRODUCTION
+□ Submit doble del formulario → solo un registro en SANDBOX (idempotencia R3)
+□ Error path: AIRTABLE_BASE_SANDBOX inválido → "Cola de Errores" captura el payload (R8)
+□ Email de notificación llega a NOTIFY_EMAIL con todos los campos correctos
+□ RESEND_FROM_EMAIL configurado con dominio verificado (no onboarding@resend.dev)
+□ Dry-run en SANDBOX: mínimo 10 leads de prueba sin errores en 48h
+□ Sign-off del equipo → actualizar getCredentials() en airtable.ts para apuntar a PRODUCTION
 ```
 
 ### Checklist: Sitio Astro listo para producción
@@ -325,7 +337,7 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 □ GTM snippet presente en <head> con is:inline, sin Partytown
 □ Lighthouse mobile score > 90 (LCP < 2.5s, CLS = 0, INP < 200ms)
 □ idempotencyKey se genera al cargar la página, no al hacer submit
-□ Formulario enviado → event_id aparece en dataLayer.push ANTES del request a n8n
+□ Formulario enviado → event_id aparece en dataLayer.push ANTES del request a /api/contacto
 ```
 
 ### Checklist: Analytics listo para producción
@@ -333,7 +345,7 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 □ GTM Preview → 'generate_lead' dispara con event_id en submit de formulario
 □ Meta Pixel Helper (Chrome) → Lead event muestra event_id correcto
 □ Meta Events Manager → Test Events → CAPI recibe mismo event_id que Pixel
-□ Code node SHA256 en n8n: email y teléfono normalizados con .trim().toLowerCase() antes del hash
+□ SHA256 en n8n (fase automatizaciones): email y teléfono normalizados con .trim().toLowerCase() antes del hash (R6)
 □ Consent mode configurado: ad_storage y analytics_storage = 'denied' por defecto
 □ Privacy Policy en footer con enlace visible
 □ GTM container publicado solo después de verificar los 5 puntos anteriores

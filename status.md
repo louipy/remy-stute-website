@@ -76,58 +76,40 @@ Se reconstruyó el sitio replicando fielmente los 4 `.html` desktop 1440 de
 
 ---
 
-## 🟡 FASE 3 — CRM Airtable (en curso — 2026-05-26)
+## ✅ FASE 3 — CRM Airtable — COMPLETADA (2026-05-26)
 
 **Objetivo:** Cada lead válido llega a Airtable SANDBOX con todos sus campos.
 
-**Decisión de arquitectura (2026-05-26):** el API route de Astro escribe directamente a Airtable
-sin n8n. La fase de automatizaciones (n8n + WhatsApp) viene después para controlar costos.
-La migración será quirúrgica: una línea en el API route.
-
-**Código implementado en esta sesión:**
-- ✅ `@astrojs/netlify@6` instalado — adapter SSR compatible con Astro 5.18
-- ✅ `astro.config.mjs` — adapter netlify, output estático con API route SSR
-- ✅ `src/lib/airtable.ts` — cliente REST nativo (sin SDK): checkIdempotency, createProspecto, logError. R3+R7+R8 aplicados.
-- ✅ `src/lib/email.ts` — notificación Resend vía fetch nativo (sin SDK)
-- ✅ `src/pages/api/contacto.ts` — `prerender = false` activado; flujo: Turnstile → Zod → Airtable dedup → Create → Resend
+**Decisión de arquitectura:** el API route de Astro escribe directamente a Airtable sin n8n.
+La fase de automatizaciones (n8n + WhatsApp) viene después. Migración futura: cambiar una línea
+en el API route para enviar a n8n en lugar de Airtable directo — el payload ya está estructurado.
 
 **Puntos de trabajo:**
-1. ✅ Adapter SSR instalado y configurado
-2. ⬜ Crear las 2 bases en Airtable: "Pipeline Comercial — SANDBOX" y "Pipeline Comercial — PRODUCCIÓN"
-3. ⬜ Crear las tablas PROSPECTOS y Cola de Errores con los campos exactos (ver schema abajo)
-4. ⬜ Crear las vistas: "Mis Prospectos Activos", "Hot Leads", "Seguimiento Esta Semana", "Pipeline Kanban"
-5. ⬜ Configurar las 5 variables de entorno en .env y en Netlify Dashboard
-6. ⬜ Probar submit del formulario → verificar registro en SANDBOX
-7. ⬜ Probar submit doble → solo un registro (idempotencia, R3)
-8. ⬜ Probar email de notificación con Resend
+1. ✅ `@astrojs/netlify@6` instalado — adapter SSR compatible con Astro 5.18
+2. ✅ `astro.config.mjs` — adapter netlify; páginas estáticas + `/api/contacto` SSR
+3. ✅ `src/lib/airtable.ts` — cliente REST nativo: checkIdempotency, createProspecto, logError (R3+R7+R8)
+4. ✅ `src/lib/email.ts` — notificación HTML al equipo vía Resend (fetch nativo, sin SDK)
+5. ✅ `src/pages/api/contacto.ts` — `prerender = false` activo; flujo: Turnstile → Zod → dedup → Airtable → Resend
+6. ✅ `ContactSection.astro` — submit real al API (stub MVP eliminado); campo `industria` → `producto`; agrega `volumen` y `notas`
+7. ✅ Variables de entorno configuradas en `.env`
+8. ✅ Prueba end-to-end: lead llega a Airtable SANDBOX correctamente
+9. ✅ Prueba de idempotencia: doble submit con mismo UUID → 1 solo registro en Airtable
 
-**Schema de Airtable (crear este orden exacto):**
+**Schema Airtable SANDBOX — tabla PROSPECTOS (nombres exactos de columnas):**
+  Nombre · Empresa · Email · Whatsapp · Cargo · Producto · Volumen · Notas
+  idempotency_key · Estado · Fuente · Fecha
 
-Tabla PROSPECTOS — campos:
-  nombre (Single line text) | empresa (Single line text) | email (Email)
-  whatsapp (Phone number) | cargo (Single line text) | producto (Single line text)
-  volumen (Single line text) | notas (Long text) | idempotency_key (Single line text)
-  estado (Single select): Nuevo · En contacto · Calificado · Propuesta enviada · Cerrado ✓ · Cerrado ✗
-  fuente (Single select): Formulario web | fecha_creacion (Created time — automático)
+**Schema Airtable SANDBOX — tabla Cola de Errores:**
+  payload_raw · error_mensaje · error_tipo · resuelto · timestamp (Created time)
 
-Tabla Cola de Errores — campos:
-  payload_raw (Long text) | error_mensaje (Single line text)
-  error_tipo (Single select): Airtable · Email · Interno
-  resuelto (Checkbox) | timestamp (Created time — automático)
+**Variables de entorno activas (.env):**
+  AIRTABLE_API_KEY · AIRTABLE_BASE_SANDBOX · RESEND_API_KEY · NOTIFY_EMAIL
+  (AIRTABLE_BASE_PRODUCTION se configura cuando se duplique la base para producción)
 
-Vistas (en PROSPECTOS):
-  "Mis Prospectos Activos" — filtro: estado ≠ Cerrado ✓ AND ≠ Cerrado ✗
-  "Hot Leads" — filtro: fecha_creacion dentro de las últimas 48 horas
-  "Seguimiento Esta Semana" — filtro: fecha_creacion esta semana
-  "Pipeline Kanban" — kanban agrupado por estado
-
-**Variables de entorno requeridas (.env + Netlify Dashboard):**
-  AIRTABLE_API_KEY=pat_...
-  AIRTABLE_BASE_SANDBOX=appYYYY...
-  AIRTABLE_BASE_PRODUCTION=appXXXX...
-  RESEND_API_KEY=re_...
-  NOTIFY_EMAIL=email@delequipo.com
-  RESEND_FROM_EMAIL=(opcional — requiere dominio verificado en Resend)
+**Nota — formulario provisional:** los campos actuales (Producto, Volumen, Notas, Cargo)
+cambiarán en una iteración futura. Al cambiar: actualizar ContactSection.astro +
+ContactoSchema en contacto.ts + objeto fields en airtable.ts + columnas en Airtable.
+La columna `idempotency_key` NUNCA se renombra.
 
 **Entregable:** 10 leads de prueba en SANDBOX sin duplicados, sin errores silenciosos.
 
