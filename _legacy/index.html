@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Remy & Stute C.A. — Materia Prima Industrial Venezuela</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* ─── RESET & BASE ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #0A0F0D;
+      color: #F0EDE6;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ─── CSS VARIABLES ────────────────────────────────────────────── */
+    :root {
+      --bg-primary: #0A0F0D;
+      --bg-secondary: #111814;
+      --bg-footer: #060908;
+      --accent: #C8F04D;
+      --accent-dark: #2A3D2E;
+      --text-primary: #F0EDE6;
+      --text-secondary: #8A9488;
+      --border: rgba(200, 240, 77, 0.15);
+      --border-hover: rgba(200, 240, 77, 0.35);
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    /* ─── NOISE TEXTURE ────────────────────────────────────────────── */
+    .noise::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── SCROLL ANIMATION ─────────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ─── BUTTONS ──────────────────────────────────────────────────── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #0A0F0D;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 15px;
+      padding: 14px 28px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 200ms, transform 200ms, box-shadow 200ms;
+      white-space: nowrap;
+    }
+    .btn-primary:hover {
+      background: #d8ff5a;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(200, 240, 77, 0.25);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 15px;
+      padding: 13px 28px;
+      border-radius: 4px;
+      border: 1px solid var(--border-hover);
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 200ms, color 200ms, background 200ms;
+    }
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(200, 240, 77, 0.05);
+    }
+
+    /* ─── SECTION TITLES ───────────────────────────────────────────── */
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 4vw, 56px);
+      line-height: 1.1;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+    .section-subtitle {
+      font-size: 17px;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+    .section-header { margin-bottom: 56px; }
+
+    /* ─── SEPARATOR LINE ───────────────────────────────────────────── */
+    .sep {
+      width: 48px;
+      height: 2px;
+      background: var(--accent);
+      margin-bottom: 24px;
+      border-radius: 2px;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       NAVBAR
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    /* ─── FLAG RIBBON ──────────────────────────────────────────────── */
+    .flag-ribbon {
+      width: 100%;
+      height: 4px;
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+    .flag-ribbon .seg-yellow { flex: 1; background: #FAD348; }
+    .flag-ribbon .seg-blue   { flex: 1; background: #2A61BB; }
+    .flag-ribbon .seg-red    { flex: 1; background: #C51104; }
+
+    #navbar {
+      position: fixed;
+      top: 4px;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+      transition: background 300ms, border-color 300ms, backdrop-filter 300ms;
+    }
+    #navbar.scrolled {
+      background: rgba(10, 15, 13, 0.95);
+      border-bottom-color: var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .nav-logo {
+      font-family: 'Oswald', sans-serif;
+      font-weight: 400;
+      font-size: 26px;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+      text-decoration: none;
+      line-height: 1;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      transition: color 200ms;
+    }
+    .nav-links a:hover { color: var(--text-primary); }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .nav-whatsapp {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 200ms;
+    }
+    .nav-whatsapp:hover { color: var(--accent); }
+    .nav-whatsapp ph-icon { width: 16px; height: 16px; }
+
+    /* hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--text-primary);
+      transition: transform 300ms, opacity 300ms;
+      border-radius: 1px;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* mobile drawer */
+    .mobile-drawer {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      bottom: 0;
+      width: 280px;
+      background: #111814;
+      border-left: 1px solid var(--border);
+      z-index: 200;
+      padding: 80px 32px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      transition: right 300ms cubic-bezier(0.4,0,0.2,1);
+    }
+    .mobile-drawer.open { right: 0; }
+    .mobile-drawer-links { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+    .mobile-drawer-links a {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: color 200ms;
+    }
+    .mobile-drawer-links a:hover { color: var(--accent); }
+    .drawer-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 150;
+    }
+    .drawer-overlay.active { display: block; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       HERO
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(135deg, rgba(10,15,13,0.92) 0%, rgba(10,15,13,0.75) 50%, rgba(42,61,46,0.60) 100%),
+        url('https://images.unsplash.com/photo-1518640467707-6811f4a6ab73?w=1920&q=85');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 120px 24px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+    }
+    .hero-content { max-width: 620px; }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      background: rgba(200, 240, 77, 0.05);
+    }
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(52px, 6.5vw, 96px);
+      line-height: 1.0;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+      letter-spacing: 0.01em;
+    }
+    .hero-headline .word {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .hero-headline .word.animate {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .hero-subheadline {
+      font-size: 18px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 520px;
+    }
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .hero-disclaimer {
+      font-size: 13px;
+      color: #6a7a68;
+      font-style: italic;
+    }
+
+    /* stat cards */
+    .hero-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: flex-end;
+    }
+    .stat-card {
+      background: rgba(10, 15, 13, 0.65);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 28px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      min-width: 200px;
+      text-align: left;
+      transition: border-color 200ms, transform 200ms;
+    }
+    .stat-card:hover {
+      border-color: var(--border-hover);
+      transform: translateX(-4px);
+    }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 40px;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-family: var(--font-mono);
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       TRUST BAR
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #trust-bar {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 0;
+      overflow: hidden;
+    }
+    .trust-bar-inner {
+      display: flex;
+      align-items: center;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 0 24px;
+      height: 72px;
+      gap: 0;
+    }
+    .trust-bar-inner::-webkit-scrollbar { display: none; }
+    .trust-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 20px;
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      padding: 0 28px;
+      transition: color 200ms;
+    }
+    .trust-item:hover { color: var(--accent); }
+    .trust-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       SECTIONS WRAPPER
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    section {
+      padding: 96px 24px;
+      position: relative;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       PRODUCTOS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #productos { background: var(--bg-primary); }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+    .product-card {
+      position: relative;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      padding: 36px 32px 40px;
+      overflow: hidden;
+      transition: border-color 300ms, transform 300ms;
+      cursor: default;
+    }
+    .product-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(200,240,77,0.03) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 300ms;
+    }
+    .product-card:hover {
+      border-color: var(--border-hover);
+    }
+    .product-card:hover::before { opacity: 1; }
+    .product-num {
+      font-family: var(--font-display);
+      font-size: 80px;
+      color: rgba(200, 240, 77, 0.07);
+      line-height: 1;
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      user-select: none;
+      letter-spacing: -2px;
+    }
+    .product-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      padding: 3px 10px;
+      border-radius: 2px;
+      margin-bottom: 16px;
+      background: rgba(200,240,77,0.05);
+    }
+    .product-name {
+      font-family: var(--font-display);
+      font-size: 28px;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+    }
+    .product-use {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .product-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: gap 200ms;
+    }
+    .product-cta:hover { gap: 10px; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       INDUSTRIAS
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #industrias { background: var(--bg-secondary); }
+    .industrias-blocks {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .industria-block {
+      position: relative;
+      overflow: hidden;
+      min-height: 220px;
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      transition: border-color 300ms;
+    }
+    .industria-block:hover { border-color: var(--border-hover); }
+    .industria-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.15) saturate(0.5);
+      transition: filter 400ms;
+    }
+    .industria-block:hover .industria-bg { filter: brightness(0.22) saturate(0.6); }
+    .industria-content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 280px 1fr auto;
+      gap: 48px;
+      align-items: center;
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+    .industria-name {
+      font-family: var(--font-display);
+      font-size: 56px;
+      color: var(--text-primary);
+      line-height: 1;
+      letter-spacing: 0.02em;
+    }
+    .industria-decisor {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .industria-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .industria-bullets li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .industria-bullets li::before {
+      content: '';
+      display: block;
+      width: 6px;
+      height: 6px;
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       POR QUÉ REMY
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #nosotros { background: var(--bg-primary); }
+    .nosotros-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      margin-bottom: 56px;
+    }
+    .nosotros-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      padding: 40px;
+      transition: border-color 300ms;
+    }
+    .nosotros-card:hover { border-color: var(--border-hover); }
+    .nosotros-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 24px;
+      color: var(--accent);
+      transition: border-color 200ms, background 200ms;
+    }
+    .nosotros-card:hover .nosotros-icon {
+      border-color: var(--accent);
+      background: rgba(200,240,77,0.08);
+    }
+    .nosotros-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      letter-spacing: 0.02em;
+    }
+    .nosotros-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    .nosotros-quote {
+      background: var(--accent-dark);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 40px 48px;
+      text-align: center;
+    }
+    .nosotros-quote blockquote {
+      font-family: var(--font-display);
+      font-size: clamp(22px, 2.8vw, 36px);
+      color: var(--text-primary);
+      line-height: 1.3;
+      letter-spacing: 0.02em;
+    }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       FORMULARIO
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    #contacto {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+    }
+    .contacto-inner {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .contacto-aside {
+      position: sticky;
+      top: 88px;
+    }
+    .contacto-aside .section-title { font-size: clamp(36px, 3.5vw, 52px); }
+    .contacto-detail {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-top: 32px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+    .contacto-detail + .contacto-detail { border-top: 1px solid var(--border); margin-top: 16px; padding-top: 16px; }
+    .contacto-detail-icon {
+      color: var(--accent);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .contacto-detail-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+    .contacto-detail-value {
+      font-size: 15px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .contacto-response-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(200,240,77,0.08);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 16px;
+      margin-top: 32px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+    }
+    .response-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* Form styles */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group.full-width { grid-column: 1 / -1; }
+    .form-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+    .form-control {
+      background: rgba(17, 24, 20, 0.8);
+      border: 1px solid rgba(200, 240, 77, 0.12);
+      border-radius: 4px;
+      padding: 12px 16px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 200ms, background 200ms;
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+    }
+    .form-control::placeholder { color: #4a5a48; }
+    .form-control:focus {
+      border-color: rgba(200, 240, 77, 0.4);
+      background: rgba(17, 24, 20, 1);
+    }
+    select.form-control {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A9488' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+      cursor: pointer;
+    }
+    select.form-control option { background: #111814; color: var(--text-primary); }
+
+    .form-submit { margin-top: 24px; }
+    .btn-submit {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--accent);
+      color: #0A0F0D;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px 28px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      transition: background 200ms, transform 200ms, box-shadow 200ms;
+      letter-spacing: 0.02em;
+    }
+    .btn-submit:hover {
+      background: #d8ff5a;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(200, 240, 77, 0.3);
+    }
+    .form-footer-text {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #6a7a68;
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* Success state */
+    .form-success {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 64px 32px;
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: rgba(200,240,77,0.03);
+    }
+    .form-success.show { display: flex; }
+    .form-success-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+    }
+    .form-success h3 {
+      font-family: var(--font-display);
+      font-size: 32px;
+      color: var(--text-primary);
+    }
+    .form-success p { font-size: 15px; color: var(--text-secondary); max-width: 360px; }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       FOOTER
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    footer {
+      background: var(--bg-footer);
+      border-top: 1px solid var(--border);
+      padding: 64px 24px 32px;
+    }
+    .footer-grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 28px;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      letter-spacing: 0.04em;
+    }
+    .footer-logo span { color: var(--accent); }
+    .footer-contact-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      margin-bottom: 10px;
+      transition: color 200ms;
+    }
+    .footer-contact-item:hover { color: var(--accent); }
+    .footer-col-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .footer-links a {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 200ms;
+    }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-brands {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-brand-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .footer-brand-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.6;
+      flex-shrink: 0;
+    }
+    .footer-bottom {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #4a5a48;
+      letter-spacing: 0.06em;
+    }
+    .footer-bottom-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .footer-bottom-right span { color: var(--accent); }
+
+    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       RESPONSIVE — 768px
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+    @media (max-width: 1024px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+      .hero-stats {
+        flex-direction: row;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+      }
+      .stat-card:hover { transform: none; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); }
+      .contacto-inner { grid-template-columns: 1fr; gap: 48px; }
+      .contacto-aside { position: static; }
+      .industria-content { grid-template-columns: 200px 1fr; gap: 32px; }
+      .industria-content .btn-ghost { display: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      section { padding: 72px 20px; }
+      .nav-links, .nav-whatsapp, .nav-right .btn-primary { display: none; }
+      .hamburger { display: flex; }
+      .hero-inner { padding: 100px 20px 64px; }
+      .hero-stats {
+        gap: 12px;
+      }
+      .stat-card { min-width: 140px; padding: 16px 20px; }
+      .stat-value { font-size: 32px; }
+      .products-grid { grid-template-columns: 1fr; }
+      .nosotros-grid { grid-template-columns: 1fr; }
+      .industria-content {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 28px 20px;
+      }
+      .industria-name { font-size: 40px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full-width { grid-column: 1; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="flag-ribbon">
+  <div class="seg-yellow"></div>
+  <div class="seg-blue"></div>
+  <div class="seg-red"></div>
+</div>
+
+<!-- ──────────────────────────────────── NAVBAR ────────────────────────────── -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">REMY <span>&</span> STUTE</a>
+  <ul class="nav-links">
+    <li><a href="#productos">Productos</a></li>
+    <li><a href="#industrias">Industrias</a></li>
+    <li><a href="#nosotros">Nosotros</a></li>
+    <li><a href="#contacto">Contacto</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="https://wa.me/584122600043" class="nav-whatsapp" target="_blank" rel="noopener">
+      <i data-lucide="message-circle" style="width:16px;height:16px;"></i>
+      +58 412-260-0043
+    </a>
+    <a href="#contacto" class="btn-primary">Solicitar cotización</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Abrir menú">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- Mobile Drawer -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="mobile-drawer" id="mobileDrawer">
+  <ul class="mobile-drawer-links">
+    <li><a href="#productos" class="drawer-link">Productos</a></li>
+    <li><a href="#industrias" class="drawer-link">Industrias</a></li>
+    <li><a href="#nosotros" class="drawer-link">Nosotros</a></li>
+    <li><a href="#contacto" class="drawer-link">Contacto</a></li>
+  </ul>
+  <a href="https://wa.me/584122600043" class="footer-contact-item" target="_blank" rel="noopener" style="font-size:16px;color:var(--accent);">
+    <i data-lucide="message-circle" style="width:16px;height:16px;"></i>
+    +58 412-260-0043
+  </a>
+  <a href="#contacto" class="btn-primary drawer-link" style="justify-content:center;">Solicitar cotización</a>
+</div>
+
+<!-- ──────────────────────────────────── HERO ──────────────────────────────── -->
+<section id="hero" aria-label="Hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <i data-lucide="factory" style="width:13px;height:13px;"></i>
+        30 AÑOS · REPRESENTANTES EXCLUSIVOS · STOCK LOCAL
+      </div>
+      <h1 class="hero-headline" id="heroHeadline">
+        La materia prima que mantiene tu producción en marcha.
+      </h1>
+      <p class="hero-subheadline">
+        Representantes exclusivos de Addcon, Yipin Pigmentos y Minerales Industriales en Venezuela. Suministro inmediato, asesoría técnica incluida, despacho a nivel nacional.
+      </p>
+      <div class="hero-cta-group">
+        <a href="#contacto" class="btn-primary">
+          <i data-lucide="flask-conical" style="width:16px;height:16px;"></i>
+          Solicitar muestra gratis
+        </a>
+        <a href="#productos" class="btn-ghost">
+          Ver productos
+          <i data-lucide="arrow-right" style="width:14px;height:14px;"></i>
+        </a>
+      </div>
+      <p class="hero-disclaimer">Sin compromiso. Respuesta en menos de 24h.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-card reveal">
+        <div class="stat-value">+50</div>
+        <div class="stat-label">Clientes activos<br>en Venezuela</div>
+      </div>
+      <div class="stat-card reveal reveal-delay-1">
+        <div class="stat-value">&lt;24H</div>
+        <div class="stat-label">Tiempo de primera<br>respuesta</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────────────────── TRUST BAR ────────────────────────── -->
+<div id="trust-bar">
+  <div class="trust-bar-inner">
+    <span class="trust-item">Representantes exclusivos</span>
+    <span class="trust-dot"></span>
+    <span class="trust-item">Addcon</span>
+    <span class="trust-dot"></span>
+    <span class="trust-item">Yipin Pigmentos</span>
+    <span class="trust-dot"></span>
+    <span class="trust-item">Minerales Industriales</span>
+    <span class="trust-dot"></span>
+    <span class="trust-item">30 años de trayectoria</span>
+    <span class="trust-dot"></span>
+    <span class="trust-item">Despacho nacional</span>
+    <span class="trust-dot"></span>
+    <span class="trust-item">Asesoría técnica incluida</span>
+    <span class="trust-dot"></span>
+    <!-- repeat for continuous feel -->
+    <span class="trust-item">Representantes exclusivos</span>
+    <span class="trust-dot"></span>
+    <span class="trust-item">Addcon</span>
+    <span class="trust-dot"></span>
+    <span class="trust-item">Yipin Pigmentos</span>
+    <span class="trust-dot"></span>
+    <span class="trust-item">Minerales Industriales</span>
+  </div>
+</div>
+
+<!-- ──────────────────────────────────── PRODUCTOS ────────────────────────── -->
+<section id="productos">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="sep"></div>
+      <p class="section-eyebrow">Nuestro portafolio</p>
+      <h2 class="section-title">Materias primas para la<br>gran industria venezolana</h2>
+      <p class="section-subtitle">Cinco productos de alto rendimiento, disponibles en stock.</p>
+    </div>
+    <div class="products-grid">
+
+      <div class="product-card reveal">
+        <span class="product-num">01</span>
+        <span class="product-badge">Pigmentos</span>
+        <h3 class="product-name">Óxido de Hierro Naranja S960</h3>
+        <p class="product-use">Coloración de alta resistencia para pinturas industriales, concreto pigmentado y recubrimientos de protección.</p>
+        <a href="#contacto" class="product-cta">
+          Solicitar muestra
+          <i data-lucide="arrow-right" style="width:13px;height:13px;"></i>
+        </a>
+      </div>
+
+      <div class="product-card reveal reveal-delay-1">
+        <span class="product-num">02</span>
+        <span class="product-badge">Construcción</span>
+        <h3 class="product-name">RDP TY503</h3>
+        <p class="product-use">Polvo redispersable de alta cohesión para fabricación de pego, morteros secos y sistemas de impermeabilización.</p>
+        <a href="#contacto" class="product-cta">
+          Solicitar muestra
+          <i data-lucide="arrow-right" style="width:13px;height:13px;"></i>
+        </a>
+      </div>
+
+      <div class="product-card reveal reveal-delay-2">
+        <span class="product-num">03</span>
+        <span class="product-badge">Construcción</span>
+        <h3 class="product-name">HPMC KPM 150000C</h3>
+        <p class="product-use">Hidroxipropilmetilcelulosa de alta viscosidad para retención de agua y trabajabilidad en morteros y adhesivos.</p>
+        <a href="#contacto" class="product-cta">
+          Solicitar muestra
+          <i data-lucide="arrow-right" style="width:13px;height:13px;"></i>
+        </a>
+      </div>
+
+      <div class="product-card reveal">
+        <span class="product-num">04</span>
+        <span class="product-badge">Industria pesada</span>
+        <h3 class="product-name">Grafito 285 Silvershine</h3>
+        <p class="product-use">Grafito micronizado de alta pureza para sistemas de frenos, lubricantes sólidos y manufactura de lápices.</p>
+        <a href="#contacto" class="product-cta">
+          Solicitar muestra
+          <i data-lucide="arrow-right" style="width:13px;height:13px;"></i>
+        </a>
+      </div>
+
+      <div class="product-card reveal reveal-delay-1">
+        <span class="product-num">05</span>
+        <span class="product-badge">Agroindustria</span>
+        <h3 class="product-name">Óxido de Magnesio</h3>
+        <p class="product-use">Suplemento mineral de alta biodisponibilidad para formulación de alimentos balanceados en nutrición animal.</p>
+        <a href="#contacto" class="product-cta">
+          Solicitar muestra
+          <i data-lucide="arrow-right" style="width:13px;height:13px;"></i>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────────────────── INDUSTRIAS ───────────────────────── -->
+<section id="industrias" style="padding-left:0;padding-right:0;">
+  <div class="container" style="padding:0 24px;">
+    <div class="section-header reveal">
+      <div class="sep"></div>
+      <p class="section-eyebrow">Sectores que atendemos</p>
+      <h2 class="section-title">Hablamos el idioma<br>de tu industria</h2>
+    </div>
+  </div>
+  <div class="industrias-blocks">
+
+    <div class="industria-block reveal">
+      <div class="industria-bg" style="background-image:url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1400&q=80');"></div>
+      <div class="industria-content">
+        <div class="industria-name">Construc&shy;ción</div>
+        <div>
+          <p class="industria-decisor">Para jefes de compras · Gerentes de planta</p>
+          <ul class="industria-bullets">
+            <li>Pigmentos y aditivos para morteros con ficha técnica en español</li>
+            <li>Stock local — sin esperas de importación que paren tu obra</li>
+            <li>Volúmenes desde 25 kg hasta contenedor completo</li>
+          </ul>
+        </div>
+        <a href="#contacto" class="btn-ghost" style="white-space:nowrap;">Hablar con un especialista</a>
+      </div>
+    </div>
+
+    <div class="industria-block reveal">
+      <div class="industria-bg" style="background-image:linear-gradient(rgba(10,15,13,0.75),rgba(10,15,13,0.75)),url('https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1600&q=80');"></div>
+      <div class="industria-content">
+        <div class="industria-name">Petróleo<br>y Gas</div>
+        <div>
+          <p class="industria-decisor">Para ingenieros de operaciones · Gerentes de suministros</p>
+          <ul class="industria-bullets">
+            <li>Grafito y lubricantes sólidos para maquinaria de extracción</li>
+            <li>Cumplimiento de especificaciones API e ISO a solicitud</li>
+            <li>Despacho a campo en todo el territorio nacional</li>
+          </ul>
+        </div>
+        <a href="#contacto" class="btn-ghost" style="white-space:nowrap;">Hablar con un especialista</a>
+      </div>
+    </div>
+
+    <div class="industria-block reveal">
+      <div class="industria-bg" style="background-image:url('https://images.unsplash.com/photo-1615811361523-6bd03d7748e7?w=1400&q=80');"></div>
+      <div class="industria-content">
+        <div class="industria-name">Agroali&shy;mentario</div>
+        <div>
+          <p class="industria-decisor">Para nutricionistas · Gerentes de producción animal</p>
+          <ul class="industria-bullets">
+            <li>Óxido de Magnesio con certificado de calidad por lote</li>
+            <li>Asesoría técnica en formulación de dietas balanceadas</li>
+            <li>Entrega en planta o distribuidores en toda Venezuela</li>
+          </ul>
+        </div>
+        <a href="#contacto" class="btn-ghost" style="white-space:nowrap;">Hablar con un especialista</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ──────────────────────────────────── POR QUÉ REMY ─────────────────────── -->
+<section id="nosotros">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="sep"></div>
+      <p class="section-eyebrow">Por qué elegirnos</p>
+      <h2 class="section-title">No somos un distribuidor<br>de catálogo.</h2>
+      <p class="section-subtitle">Somos el proveedor que garantiza que tu producción no se detiene.</p>
+    </div>
+
+    <div class="nosotros-grid">
+      <div class="nosotros-card reveal">
+        <div class="nosotros-icon">
+          <i data-lucide="hourglass" style="width:24px;height:24px;"></i>
+        </div>
+        <h3 class="nosotros-title">30 años de trayectoria continua</h3>
+        <p class="nosotros-desc">Fundada en 1994, hemos prosperado en el mercado venezolano durante tres décadas. Conocemos sus ciclos, sus retos y sus oportunidades mejor que nadie.</p>
+      </div>
+      <div class="nosotros-card reveal reveal-delay-1">
+        <div class="nosotros-icon">
+          <i data-lucide="award" style="width:24px;height:24px;"></i>
+        </div>
+        <h3 class="nosotros-title">Representación exclusiva internacional</h3>
+        <p class="nosotros-desc">Somos los únicos distribuidores autorizados de Addcon, Yipin Pigmentos y Minerales Industriales en Venezuela. No hay intermediario entre la fábrica y tu planta.</p>
+      </div>
+      <div class="nosotros-card reveal reveal-delay-2">
+        <div class="nosotros-icon">
+          <i data-lucide="package" style="width:24px;height:24px;"></i>
+        </div>
+        <h3 class="nosotros-title">Stock local · Despacho inmediato</h3>
+        <p class="nosotros-desc">Mantenemos inventario permanente en Venezuela. Sin esperas de importación, sin contingencias de flete. Tu pedido sale el mismo día de la confirmación.</p>
+      </div>
+      <div class="nosotros-card reveal reveal-delay-3">
+        <div class="nosotros-icon">
+          <i data-lucide="flask-conical" style="width:24px;height:24px;"></i>
+        </div>
+        <h3 class="nosotros-title">Muestras gratis · Asesoría incluida</h3>
+        <p class="nosotros-desc">Enviamos muestras sin costo antes de cualquier compra. Nuestro equipo técnico acompaña la evaluación del producto en tu proceso productivo específico.</p>
+      </div>
+    </div>
+
+    <div class="nosotros-quote reveal">
+      <blockquote>
+        "Con nosotros no solo compras un producto. Adquieres la certeza de que tu planta no para por falta de materia prima."
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────────────────── FORMULARIO ───────────────────────── -->
+<section id="contacto">
+  <div class="container">
+    <div class="contacto-inner">
+
+      <div class="contacto-aside reveal">
+        <div class="sep"></div>
+        <p class="section-eyebrow">Contáctanos</p>
+        <h2 class="section-title" style="font-size:clamp(36px,3.5vw,52px);">Hablemos de tu operación.</h2>
+        <p class="section-subtitle" style="margin-bottom:0;">Cuéntanos qué necesitas y te respondemos antes de 24 horas.</p>
+
+        <div class="contacto-detail">
+          <div class="contacto-detail-icon">
+            <i data-lucide="message-circle" style="width:20px;height:20px;"></i>
+          </div>
+          <div>
+            <p class="contacto-detail-label">WhatsApp directo</p>
+            <a href="https://wa.me/584122600043" class="contacto-detail-value" style="color:var(--text-primary);text-decoration:none;" target="_blank">+58 412-260-0043</a>
+          </div>
+        </div>
+        <div class="contacto-detail">
+          <div class="contacto-detail-icon">
+            <i data-lucide="phone" style="width:20px;height:20px;"></i>
+          </div>
+          <div>
+            <p class="contacto-detail-label">Oficina Caracas</p>
+            <p class="contacto-detail-value">+58 212-993.65.08</p>
+          </div>
+        </div>
+        <div class="contacto-detail">
+          <div class="contacto-detail-icon">
+            <i data-lucide="mail" style="width:20px;height:20px;"></i>
+          </div>
+          <div>
+            <p class="contacto-detail-label">Correo electrónico</p>
+            <a href="mailto:info@remyvenezuela.com" class="contacto-detail-value" style="color:var(--text-primary);text-decoration:none;">info@remyvenezuela.com</a>
+          </div>
+        </div>
+
+        <div class="contacto-response-badge">
+          <span class="response-dot"></span>
+          Respondemos antes de 24h hábiles
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-1">
+        <form id="contactoForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="nombre">Nombre completo</label>
+              <input type="text" id="nombre" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="empresa">Empresa</label>
+              <input type="text" id="empresa" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="email">Correo electrónico</label>
+              <input type="email" id="email" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="whatsapp">WhatsApp</label>
+              <input type="tel" id="whatsapp" class="form-control" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cargo">Cargo</label>
+              <select id="cargo" class="form-control" required>
+                <option value="" disabled selected>Selecciona tu cargo</option>
+                <option>Gerente de Planta</option>
+                <option>Jefe de Compras</option>
+                <option>Nutricionista Industrial</option>
+                <option>Director de Operaciones</option>
+                <option>Ingeniero de Proceso</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="industria">Industria</label>
+              <select id="industria" class="form-control" required>
+                <option value="" disabled selected>Selecciona tu industria</option>
+                <option>Construcción</option>
+                <option>Petróleo y Gas</option>
+                <option>Agroalimentario</option>
+                <option>Manufactura</option>
+                <option>Minería</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="producto">Producto de interés</label>
+              <select id="producto" class="form-control" required>
+                <option value="" disabled selected>Selecciona un producto</option>
+                <option>Óxido de Hierro Naranja S960</option>
+                <option>RDP TY503</option>
+                <option>HPMC KPM 150000C</option>
+                <option>Grafito 285 Silvershine</option>
+                <option>Óxido de Magnesio</option>
+                <option>Varios / No sé aún</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="volumen">Volumen estimado</label>
+              <select id="volumen" class="form-control">
+                <option value="" disabled selected>Volumen aproximado</option>
+                <option>Muestra (< 5 kg)</option>
+                <option>Pequeño (5 – 50 kg)</option>
+                <option>Mediano (50 kg – 1 TM)</option>
+                <option>Grande (1 – 10 TM)</option>
+                <option>Industrial (> 10 TM)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-submit">
+            <button type="submit" class="btn-submit">
+              <i data-lucide="send" style="width:18px;height:18px;"></i>
+              Enviar solicitud
+            </button>
+          </div>
+          <p class="form-footer-text">Sin compromiso. Toda la información es confidencial.</p>
+        </form>
+
+        <div class="form-success" id="formSuccess">
+          <div class="form-success-icon">
+            <i data-lucide="check-circle" style="width:28px;height:28px;"></i>
+          </div>
+          <h3>Solicitud recibida</h3>
+          <p>Nuestro equipo técnico se comunicará contigo antes de 24 horas hábiles. Revisa tu correo y WhatsApp.</p>
+          <a href="#productos" class="btn-ghost" style="margin-top:8px;">Ver más productos</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ──────────────────────────────────── FOOTER ───────────────────────────── -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">REMY <span>&</span> STUTE</div>
+      <p style="font-size:13px;color:var(--text-secondary);max-width:280px;margin-bottom:20px;line-height:1.7;">
+        Importadora venezolana de materia prima industrial con 30 años de trayectoria. Representantes exclusivos en Venezuela.
+      </p>
+      <a href="https://wa.me/584122600043" class="footer-contact-item" target="_blank" rel="noopener">
+        <i data-lucide="message-circle" style="width:16px;height:16px;"></i>
+        +58 412-260-0043
+      </a>
+      <a href="tel:+582129936508" class="footer-contact-item">
+        <i data-lucide="phone" style="width:16px;height:16px;"></i>
+        +58 212-993.65.08
+      </a>
+      <a href="mailto:info@remyvenezuela.com" class="footer-contact-item">
+        <i data-lucide="mail" style="width:16px;height:16px;"></i>
+        info@remyvenezuela.com
+      </a>
+    </div>
+    <div>
+      <p class="footer-col-title">Navegación</p>
+      <ul class="footer-links">
+        <li><a href="#productos">Productos</a></li>
+        <li><a href="#industrias">Industrias</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Marcas representadas</p>
+      <div class="footer-brands">
+        <div class="footer-brand-item">
+          <span class="footer-brand-dot"></span>
+          Addcon
+        </div>
+        <div class="footer-brand-item">
+          <span class="footer-brand-dot"></span>
+          Yipin Pigmentos
+        </div>
+        <div class="footer-brand-item">
+          <span class="footer-brand-dot"></span>
+          Minerales Industriales
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 REMY &amp; STUTE C.A. · Todos los derechos reservados</span>
+    <div class="footer-bottom-right">
+      Diseñado por <span>Inxanity Studio</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ──────────────────────────────────── SCRIPTS ──────────────────────────── -->
+<script>
+  /* ── Navbar scroll ── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  /* ── Mobile drawer ── */
+  const hamburger = document.getElementById('hamburger');
+  const mobileDrawer = document.getElementById('mobileDrawer');
+  const drawerOverlay = document.getElementById('drawerOverlay');
+
+  function closeDrawer() {
+    hamburger.classList.remove('open');
+    mobileDrawer.classList.remove('open');
+    drawerOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  hamburger.addEventListener('click', () => {
+    const isOpen = mobileDrawer.classList.toggle('open');
+    hamburger.classList.toggle('open', isOpen);
+    drawerOverlay.classList.toggle('active', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  });
+
+  drawerOverlay.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.drawer-link').forEach(link => {
+    link.addEventListener('click', closeDrawer);
+  });
+
+  /* ── Scroll reveal ── */
+  const revealElements = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  revealElements.forEach(el => observer.observe(el));
+
+  /* ── Hero headline stagger ── */
+  const headline = document.getElementById('heroHeadline');
+  const text = headline.innerText;
+  const words = text.split(' ');
+  headline.innerHTML = words.map(w => `<span class="word">${w}&nbsp;</span>`).join('');
+
+  setTimeout(() => {
+    document.querySelectorAll('.hero-headline .word').forEach((word, i) => {
+      setTimeout(() => word.classList.add('animate'), i * 60);
+    });
+  }, 200);
+
+  /* ── Form submit ── */
+  const form = document.getElementById('contactoForm');
+  const success = document.getElementById('formSuccess');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    form.style.opacity = '0';
+    form.style.transform = 'translateY(-8px)';
+    form.style.transition = 'opacity 300ms, transform 300ms';
+    setTimeout(() => {
+      form.style.display = 'none';
+      success.classList.add('show');
+      success.style.opacity = '0';
+      success.style.transform = 'translateY(12px)';
+      setTimeout(() => {
+        success.style.transition = 'opacity 400ms, transform 400ms';
+        success.style.opacity = '1';
+        success.style.transform = 'translateY(0)';
+      }, 50);
+    }, 320);
+  });
+
+</script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

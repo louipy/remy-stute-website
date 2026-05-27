@@ -102,7 +102,7 @@ const sectores = [
     align-items: flex-start;
     gap: 44px;
     margin-bottom: 48px;
-    background: #0A2418;
+    background: var(--ink);
     padding: 56px var(--pad) 56px;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
@@ -113,8 +113,8 @@ const sectores = [
       inset 0 10px 28px rgba(0, 0, 0, 0.65),
       inset 0 28px 64px rgba(0, 0, 0, 0.38);
   }
-  .sectores__head .eyebrow { color: #CBFF00; }
-  .sectores__head .eyebrow .line { background: #CBFF00; }
+  .sectores__head .eyebrow { color: var(--lime); }
+  .sectores__head .eyebrow .line { background: var(--lime); }
   .sectores__title {
     margin-top: 0;
     max-width: 760px;
@@ -213,7 +213,7 @@ const sectores = [
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #CBFF00;
+    color: var(--lime);
     opacity: 0;
     transform: translateY(6px);
     transition:
@@ -244,7 +244,7 @@ const sectores = [
     left: 0;
     width: 0;
     height: 3px;
-    background: #CBFF00;
+    background: var(--lime);
     border-radius: 2px;
     transform-origin: left;
     transition: width 0.35s ease-out;
@@ -277,7 +277,7 @@ const sectores = [
   .sector:hover .sector__arrow {
     opacity: 1;
     transform: scale(1);
-    background: #CBFF00;
+    background: var(--lime);
     color: var(--ink);
   }
 

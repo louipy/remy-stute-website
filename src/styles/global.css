@@ -49,7 +49,7 @@
 html {
   scroll-behavior: smooth;
   /* color del footer: evita el pantallazo blanco al hacer overscroll al fondo */
-  background: #0a2418;
+  background: var(--ink);
   overscroll-behavior: none;
 }
 body {
@@ -162,27 +162,6 @@ a { color: inherit; }
   justify-content: space-between;
 }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.brand-mark {
-  width: 28px;
-  height: 28px;
-  border-radius: 3px;
-  background: var(--ink);
-  color: var(--cream);
-  display: grid;
-  place-items: center;
-  font-family: var(--display);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  flex-shrink: 0;
-}
-.brand-name {
-  font-family: var(--display);
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: var(--ink);
-}
 .nav { display: flex; align-items: center; gap: 32px; }
 .nav a {
   position: relative;
@@ -224,13 +203,11 @@ a { color: inherit; }
 .burger span { display: block; width: 22px; height: 2px; background: currentColor; }
 
 /* Contenido claro del header: aplica siempre (fondo oscuro permanente). */
-.site-header .brand-mark { background: var(--white); color: var(--ink); }
-.site-header .brand-name { color: #fff; }
 .site-header .nav a { color: rgba(255, 255, 255, 0.7); }
 .site-header .nav a:hover,
 .site-header .nav a[aria-current="page"] { color: #fff; }
 .site-header .header-phone { color: rgba(255, 255, 255, 0.7); }
-.site-header .header-phone:hover { color: #CBFF00; }
+.site-header .header-phone:hover { color: var(--lime); }
 .site-header .burger { color: #fff; }
 
 /* ─── Footer ──────────────────────────────────────────────────── */
@@ -242,8 +219,6 @@ a { color: inherit; }
   padding-bottom: 48px;
   border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-.footer-brand .brand-mark { background: #fff; color: var(--ink); }
-.footer-brand .brand-name { color: #fff; }
 .footer-desc {
   max-width: 320px;
   margin-top: 20px;

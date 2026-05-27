@@ -206,8 +206,8 @@ La columna `idempotency_key` NUNCA se renombra.
 | Fase | Nombre              | Dependencias                          | Estado      |
 |------|---------------------|---------------------------------------|-------------|
 | 1    | Fundación Astro     | Ninguna                               | ✅ Completa |
-| 2    | Formulario validado | Fase 1 + Cloudflare Turnstile         | ⬜ Pendiente |
-| 3    | CRM Airtable        | Fase 2 + Airtable + n8n               | ⬜ Pendiente |
+| 2    | Formulario validado | Fase 1 + Cloudflare Turnstile         | ✅ Completa  |
+| 3    | CRM Airtable        | Fase 2 + Airtable                     | ✅ Completa  |
 | 4    | Notificaciones      | Fase 3 + WhatsApp Business API        | ⬜ Pendiente |
 | 5    | Analytics           | Fase 2 + GTM + Meta CAPI              | ⬜ Pendiente |
 | 6    | SEO y Contenido     | Fase 1 + Sanity CMS                   | ⬜ Pendiente |

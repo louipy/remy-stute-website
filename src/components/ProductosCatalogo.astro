@@ -14,8 +14,6 @@ const productos = [
     desc: "Coloración de alta resistencia para pinturas industriales, concreto pigmentado y recubrimientos.",
     marca: "Yipin Pigmentos",
     sector: "Pinturas",
-    sectorLabel: "Pinturas",
-    swatch: "#4c7ef8",
   },
   {
     n: "02",
@@ -23,8 +21,6 @@ const productos = [
     desc: "Polvo redispersable de alta cohesión para pego, morteros secos e impermeabilizantes.",
     marca: "Addcon",
     sector: "Construcción",
-    sectorLabel: "Construcción",
-    swatch: "#6d7c42",
   },
   {
     n: "03",
@@ -32,8 +28,6 @@ const productos = [
     desc: "Hidroxipropilmetilcelulosa de alta viscosidad. Retención de agua y trabajabilidad en morteros.",
     marca: "Addcon",
     sector: "Construcción",
-    sectorLabel: "Construcción",
-    swatch: "#6d7c42",
   },
   {
     n: "04",
@@ -41,8 +35,6 @@ const productos = [
     desc: "Grafito micronizado para frenos, lubricantes sólidos y manufactura de lápices.",
     marca: "Minerales Industriales",
     sector: "Industrial",
-    sectorLabel: "Industrial",
-    swatch: "#703300",
   },
   {
     n: "05",
@@ -50,8 +42,6 @@ const productos = [
     desc: "Suplemento mineral grado alimenticio para nutrición animal y alimento balanceado.",
     marca: "Minerales Industriales",
     sector: "Feed",
-    sectorLabel: "Feed",
-    swatch: "#8cc63f",
   },
 ];
 
@@ -114,7 +104,7 @@ const especificacion = [
             </div>
             <div class="pc-prod-marca">{p.marca}</div>
             <div class="pc-prod-sector">
-              {p.sectorLabel}
+              {p.sector}
             </div>
             <div class="pc-prod-actions">
               <a href="/contacto" class="btn btn--primary btn--sm btn--block">
@@ -180,13 +170,13 @@ const especificacion = [
 
 <style>
   /* Cabecera */
-  .pc-head { background: #111814; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 56px 0 32px; }
+  .pc-head { background: var(--dark-panel-2); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 56px 0 32px; }
   .pc-eyebrow {
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: #CBFF00;
+    color: var(--lime);
   }
   .pc-title {
     margin-top: 12px;
@@ -255,7 +245,7 @@ const especificacion = [
     font-size: 10px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    background: #111814;
+    background: var(--dark-panel-2);
     color: #C8F04D;
   }
   .pc-prod.is-hidden { display: none; }
@@ -264,7 +254,7 @@ const especificacion = [
     font-size: 32px;
     color: var(--yellow);
     line-height: 1;
-    background: #0A2418;
+    background: var(--ink);
     align-self: stretch;
     display: flex;
     align-items: center;
@@ -281,8 +271,7 @@ const especificacion = [
   }
   .pc-prod-desc { margin-top: 4px; font-size: 12.5px; line-height: 1.5; color: var(--text); }
   .pc-prod-marca { font-size: 13px; font-weight: 500; color: var(--ink); }
-  .pc-prod-sector { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
-  .pc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .pc-prod-sector { font-size: 13px; color: var(--text); }
   .pc-prod-actions { display: flex; flex-direction: column; gap: 8px; }
   .pc-empty {
     padding: 56px 24px;
