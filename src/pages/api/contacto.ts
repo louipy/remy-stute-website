@@ -84,12 +84,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return jsonResponse(400, { ok: false, error: 'invalid_json' });
   }
 
+  const isDev = import.meta.env.DEV;
   const turnstileToken = typeof payload.turnstile_token === 'string' ? payload.turnstile_token : '';
-  if (!turnstileToken) {
+
+  // 1. Turnstile (R4) — en dev se omite para facilitar testing local
+  if (!isDev && !turnstileToken) {
     return jsonResponse(403, { ok: false, error: 'turnstile_missing' });
   }
 
-  // 1. Turnstile (R4) — en dev se omite para facilitar testing local
   const remoteIp = (() => {
     try {
       return clientAddress;
@@ -97,7 +99,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       return null;
     }
   })();
-  const turnstileOk = import.meta.env.DEV || await verifyTurnstile(turnstileToken, remoteIp);
+  const turnstileOk = isDev || await verifyTurnstile(turnstileToken, remoteIp);
   if (!turnstileOk) {
     return jsonResponse(403, { ok: false, error: 'turnstile_failed' });
   }
@@ -118,16 +120,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   if (!airtableReady) {
     console.info(
       '[contacto] Airtable no configurado — lead validado localmente',
-      parsed.data.idempotency_key,
+      parsed.data.idempotencyKey,
     );
     return jsonResponse(200, { ok: true, stage: 'validated-no-airtable' });
   }
 
   try {
     // 3. Idempotencia (R3): abortar si ya existe el key
-    const isDuplicate = await checkIdempotency(parsed.data.idempotency_key);
+    const isDuplicate = await checkIdempotency(parsed.data.idempotencyKey);
     if (isDuplicate) {
-      console.info('[contacto] Intento duplicado detectado', parsed.data.idempotency_key);
+      console.info('[contacto] Intento duplicado detectado', parsed.data.idempotencyKey);
       return jsonResponse(200, { ok: true, duplicate: true });
     }
 

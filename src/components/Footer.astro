@@ -18,29 +18,24 @@ const sitemap = [
       <div class="footer-brand footer-col">
         <a href="/" class="brand">
           <span class="brand-logo" set:html={LogoNavbar}></span>
-          <span class="brand-navbar-text">Rem<span class="brand-y">y</span><span class="ampersand">&amp;</span> Stute <span class="venezuela">Venezuela</span></span>
+          <span class="brand-navbar-text">Rem<span class="brand-y">y</span><span class="ampersand">&amp;</span> Stute</span>
         </a>
         <p class="footer-desc">
           Importador venezolano de materia prima industrial. Representante
-          exclusivo de Addcon, Yipin Pigmentos y Minerales Industriales.
+          exclusivo de Addcon, Yipin Pigmentos y Minerales Industriales, entre otros.
         </p>
       </div>
 
       <div class="footer-col">
-        <p class="footer-col-title">Oficina · Caracas</p>
-        <p>
-          Av. Orinoco<br />
-          Edif. Nalania<br />
-          Las Mercedes, Caracas
-        </p>
+        <p class="footer-col-title">Ubicación administrativa</p>
+        <p>Las Mercedes, Caracas</p>
       </div>
 
       <div class="footer-col">
         <p class="footer-col-title">Contacto directo</p>
         <p>
-          <a href="tel:+582129936508">+58 212 993·65·08</a><br />
-          <a href="mailto:ventas@remyvenezuela.com" class="footer-mail">ventas@remyvenezuela.com</a><br />
-          @remystute
+          <a href="https://wa.me/584122600046">+58 412 260·00·46</a><br />
+          <a href="mailto:info@remyvenezuela.com" class="footer-mail">info@remyvenezuela.com</a>
         </p>
       </div>
 
@@ -53,7 +48,7 @@ const sitemap = [
     </div>
 
     <div class="footer-bottom">
-      <span>© {year} REMY &amp; STUTE C.A. · RIF J-00123456-7</span>
+      <span class="footer-rif">© {year} REMY &amp; STUTE C.A. · RIF J-30298111-5</span>
       <span class="footer-powered">Powered by Ixanity Studios</span>
     </div>
   </div>
@@ -75,6 +70,12 @@ const sitemap = [
     opacity: 1 !important;
     transform: scale(1) translateY(0) !important;
     transition: none !important;
+  }
+
+  /* RIF — resaltado con neon lime del sistema visual */
+  .footer-rif {
+    color: var(--lime);
+    font-weight: 600;
   }
 
   /* Firma Ixanity */

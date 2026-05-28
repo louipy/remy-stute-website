@@ -32,13 +32,12 @@ export async function notifyNewLead(data: ContactoData): Promise<void> {
           <tr><td style="padding: 8px 0; color: #6b7770; font-size: 13px; width: 130px;">Nombre</td><td style="padding: 8px 0; font-size: 14px; font-weight: 600;">${data.nombre}</td></tr>
           <tr><td style="padding: 8px 0; color: #6b7770; font-size: 13px;">Cargo</td><td style="padding: 8px 0; font-size: 14px;">${data.cargo}</td></tr>
           <tr><td style="padding: 8px 0; color: #6b7770; font-size: 13px;">Email</td><td style="padding: 8px 0; font-size: 14px;"><a href="mailto:${data.email}" style="color: #006633;">${data.email}</a></td></tr>
-          <tr><td style="padding: 8px 0; color: #6b7770; font-size: 13px;">WhatsApp</td><td style="padding: 8px 0; font-size: 14px;"><a href="https://wa.me/${data.whatsapp.replace('+', '')}" style="color: #006633;">${data.whatsapp}</a></td></tr>
-          <tr><td style="padding: 8px 0; color: #6b7770; font-size: 13px;">Producto</td><td style="padding: 8px 0; font-size: 14px;">${data.producto}</td></tr>
-          ${data.volumen ? `<tr><td style="padding: 8px 0; color: #6b7770; font-size: 13px;">Volumen</td><td style="padding: 8px 0; font-size: 14px;">${data.volumen}</td></tr>` : ''}
-          ${data.notas ? `<tr><td style="padding: 8px 0; color: #6b7770; font-size: 13px; vertical-align: top;">Notas</td><td style="padding: 8px 0; font-size: 14px;">${data.notas}</td></tr>` : ''}
+          <tr><td style="padding: 8px 0; color: #6b7770; font-size: 13px;">WhatsApp</td><td style="padding: 8px 0; font-size: 14px;">${data.telefono}</td></tr>
+          <tr><td style="padding: 8px 0; color: #6b7770; font-size: 13px;">Industria</td><td style="padding: 8px 0; font-size: 14px;">${data.industria}</td></tr>
+          <tr><td style="padding: 8px 0; color: #6b7770; font-size: 13px;">Empresa Constituida</td><td style="padding: 8px 0; font-size: 14px;">${data.empresaConstituida}</td></tr>
         </table>
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e3e1d6;">
-          <p style="font-size: 11px; color: #9aa39c; margin: 0;">ID: ${data.idempotency_key}</p>
+          <p style="font-size: 11px; color: #9aa39c; margin: 0;">ID: ${data.idempotencyKey}</p>
         </div>
       </div>
     </div>
@@ -53,7 +52,7 @@ export async function notifyNewLead(data: ContactoData): Promise<void> {
     body: JSON.stringify({
       from,
       to,
-      subject: `🔔 Nuevo lead: ${data.empresa} — ${data.producto}`,
+      subject: `🔔 Nuevo lead: ${data.empresa} — ${data.industria}`,
       html,
     }),
   });

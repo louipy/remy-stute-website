@@ -1,140 +1,208 @@
 ---
-/* Contacto — página /contacto. Réplica de design-reference
-   (08 Contacto desktop 1440 — brief técnico + estados de campo).
-
-   Contrato de Fase 2 (preservado):
-     - id="contactoForm", id="formSuccess", id="contactoSubmit", id="idempotencyKey"
-     - inputs: nombre, empresa, email, whatsapp, cargo, producto, volumen, notas
-     - <input name="idempotency_key"> (R3) · .cf-turnstile (Turnstile) · data-error
-     - Orden de validación lo aplica /api/contacto: Turnstile → Zod → Airtable → Resend (R4). */
-
-const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
-
-const cargos = [
-  "Director / Gerente de Compras",
-  "Director / Gerente de Producción",
-  "Nutricionista / Asesor Técnico",
-  "Gerente / Director General",
-  "Otro cargo gerencial",
-];
-
-
+import LogoNavbar from '../assets/logo-navbar-2.svg?raw';
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '';
+const hasTurnstile = Boolean(siteKey);
 ---
 
+<!-- ── CABECERA OSCURA ──────────────────────────────────────────────── -->
 <section class="ct-head">
   <div class="wrap">
     <p class="ct-eyebrow">Contacto</p>
     <h1 class="ct-title">
       Cuéntenos qué necesita su planta.
-      <span class="g">Respuesta en &lt;2h hábiles.</span>
+      <span class="g">Respuesta en &lt;24h hábiles.</span>
     </h1>
   </div>
 </section>
 
+<!-- ── CUERPO: info + formulario multi-paso ────────────────────────── -->
 <section class="ct-body">
   <div class="wrap ct-grid">
+
+    <!-- Columna izquierda: datos de contacto -->
     <aside class="ct-aside">
-      <div class="ct-office">
-        <p class="ct-office-title">Oficina · Caracas</p>
-        <p class="ct-office-addr">
-          Av. Orinoco, Edif. Nalania<br />
-          Las Mercedes, Caracas 1060<br />
-          Distrito Capital · Venezuela
-        </p>
-        <div class="ct-office-row ct-office-row--top">
-          <span>RIF</span><span class="b">J-00123456-7</span>
-        </div>
+      <div class="ct-sep"></div>
+      <p class="ct-aside-eyebrow">Contáctanos</p>
+      <h2 class="ct-aside-title">Hablemos de<br>tu operación.</h2>
+      <p class="ct-aside-sub">
+        Cuéntanos qué necesitas y te respondemos antes de 24 horas hábiles.
+      </p>
+
+      <div class="ct-details">
+        <a href="https://wa.me/584122600043" class="ct-detail" target="_blank" rel="noopener">
+          <span class="ct-detail-label">WhatsApp directo</span>
+          <span class="ct-detail-value">+58 412-260-0043</span>
+        </a>
+        <a href="mailto:info@remyvenezuela.com" class="ct-detail">
+          <span class="ct-detail-label">Correo electrónico</span>
+          <span class="ct-detail-value">info@remyvenezuela.com</span>
+        </a>
       </div>
-      <div class="ct-map" aria-hidden="true">
-        <span class="ct-map-pin"></span>
-        <span class="ct-map-badge">[ MAPA · LAS MERCEDES ]</span>
+
+      <div class="ct-badge">
+        <span class="ct-badge-dot"></span>
+        Respondemos antes de 24h hábiles
       </div>
     </aside>
 
-    <div class="ct-formcard">
-      <p class="ct-form-label">Formulario · campos obligatorios marcados *</p>
+    <!-- Columna derecha: formulario multi-paso -->
+    <div class="ct-formwrap">
+      <div id="msfContainer" class="msf-card">
 
-      <form id="contactoForm" novalidate>
-        <input type="hidden" name="idempotency_key" id="idempotencyKey" value="" />
-
-        <div class="ct-form-grid">
-          <div class="field">
-            <label class="field__label" for="nombre">Nombre completo *</label>
-            <input type="text" id="nombre" name="nombre" class="field__control" required autocomplete="name" placeholder="Carlos Méndez" />
-            <p class="field__err" data-error="nombre"></p>
-          </div>
-          <div class="field">
-            <label class="field__label" for="email">Email *</label>
-            <input type="email" id="email" name="email" class="field__control" required autocomplete="email" placeholder="cmendez@empresa.com" />
-            <p class="field__err" data-error="email"></p>
-          </div>
-          <div class="field">
-            <label class="field__label" for="whatsapp">Teléfono / WhatsApp *</label>
-            <input type="tel" id="whatsapp" name="whatsapp" class="field__control" required autocomplete="tel" placeholder="+58 412 555 7788" />
-            <p class="field__err" data-error="whatsapp"></p>
-          </div>
-          <div class="field">
-            <label class="field__label" for="empresa">Nombre de la empresa *</label>
-            <input type="text" id="empresa" name="empresa" class="field__control" required autocomplete="organization" placeholder="Pinturas Aragua C.A." />
-            <p class="field__err" data-error="empresa"></p>
-          </div>
-          <div class="field">
-            <label class="field__label" for="cargo">Cargo *</label>
-            <select id="cargo" name="cargo" class="field__control" required>
-              <option value="" disabled selected>Seleccione su cargo</option>
-              {cargos.map((c) => <option value={c}>{c}</option>)}
-            </select>
-            <p class="field__err" data-error="cargo"></p>
-          </div>
-          <div class="field">
-            <label class="field__label" for="producto">Producto que necesita *</label>
-            <input type="text" id="producto" name="producto" class="field__control" required placeholder="Ej: Carbonato de calcio, Fosfato bicálcico…" />
-            <p class="field__err" data-error="producto"></p>
+        <!-- ── PASO 1: Filtro de calificación ── -->
+        <div id="msf-step1" class="msf-step">
+          <p class="msf-q">¿Es su empresa una industria constituida?</p>
+          <div class="msf-opts">
+            <label class="msf-opt">
+              <input type="radio" name="step1" value="Sí, somos empresa industrial con RIF activo" hidden>
+              Sí, somos empresa industrial con RIF activo
+            </label>
+            <label class="msf-opt">
+              <input type="radio" name="step1" value="No" hidden>
+              No
+            </label>
           </div>
         </div>
 
-        <div class="field ct-field-full">
-          <label class="field__label" for="volumen">Volumen estimado (opcional)</label>
-          <input type="text" id="volumen" name="volumen" class="field__control" placeholder="Ej: 5 toneladas mensuales" />
-          <p class="field__err" data-error="volumen"></p>
-        </div>
-
-        <div class="field ct-field-full">
-          <label class="field__label" for="notas">Notas adicionales (opcional)</label>
-          <textarea id="notas" name="notas" class="field__control" rows="3" placeholder="Especificaciones técnicas, condiciones de entrega, preguntas…"></textarea>
-          <p class="field__err" data-error="notas"></p>
-        </div>
-
-        <div class="cf-turnstile" data-sitekey={siteKey} data-theme="light"></div>
-        <p class="field__err" data-error="turnstile"></p>
-
-        <div class="ct-submit">
-          <p class="ct-submit-note">
-            Sin compromiso. Toda la información es confidencial.
+        <!-- ── PANTALLA DE CIERRE ── -->
+        <div id="msf-close" class="msf-screen" style="display:none;">
+          <div class="msf-close-logo">
+            <span class="msf-close-logo-svg" set:html={LogoNavbar}></span>
+            <span class="msf-close-logo-text">Rem<span class="brand-y">y</span><span class="ampersand">&amp;</span> Stute</span>
+          </div>
+          <h3 class="msf-close-title">¡Gracias por su interés!</h3>
+          <p class="msf-close-body">
+            Nuestros productos están dirigidos exclusivamente al sector industrial.
+            Gracias por su interés.
           </p>
-          <button type="submit" class="btn btn--primary" id="contactoSubmit">
-            <span class="btn-label">Enviar formulario</span>
-            <i data-lucide="arrow-right"></i>
+          <hr class="msf-close-sep">
+          <p class="msf-close-note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Su respuesta no será enviada a Remy &amp; Stute.
+          </p>
+          <button type="button" class="msf-btn-ghost" id="msf-back-to-hero">
+            Volver al inicio
           </button>
         </div>
-        <p class="field__err field__err--global" data-error="__global__"></p>
-      </form>
 
-      <div class="ct-success" id="formSuccess">
-        <div class="ct-success-icon"><i data-lucide="check"></i></div>
-        <h3>Solicitud recibida</h3>
-        <p>
-          Solicitud recibida. Nuestro equipo técnico le contactará
-          en menos de 2 horas.
-        </p>
-        <a href="/productos" class="btn btn--outline">Ver catálogo de productos</a>
-      </div>
+        <!-- ── PASOS 2–5 ── -->
+        <div id="msf-main" style="display:none;">
+          <div class="msf-header">
+            <button type="button" class="msf-back" id="msfBack">← Atrás</button>
+            <span class="msf-count" id="msfCount"></span>
+          </div>
+          <div class="msf-progress">
+            <div class="msf-progress-fill" id="msfFill"></div>
+          </div>
+
+          <!-- Paso 2: Empresa -->
+          <div id="msf-step2" class="msf-panel" style="display:none;">
+            <p class="msf-q">Nombre de la empresa</p>
+            <input type="text" id="msf-empresa" class="msf-input" autocomplete="organization">
+            <button type="button" class="msf-btn" id="btn-s2" disabled>Continuar</button>
+          </div>
+
+          <!-- Paso 3: Cargo -->
+          <div id="msf-step3" class="msf-panel" style="display:none;">
+            <p class="msf-q">¿Cuál es su cargo?</p>
+            <div class="msf-opts">
+              <label class="msf-opt"><input type="radio" name="cargo" value="Jefe/Gerente de Compras" hidden>Jefe/Gerente de Compras</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Gerente de Planta" hidden>Gerente de Planta</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Ingeniero de Procesos" hidden>Ingeniero de Procesos</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Formulador / Laboratorio" hidden>Formulador / Laboratorio</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Director General / Dueño" hidden>Director General / Dueño</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Nutricionista / Formulador Feed" hidden>Nutricionista / Formulador Feed</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Otro" hidden>Otro</label>
+            </div>
+            <div id="cargo-otro-wrap" style="display:none; margin-top:10px;">
+              <input type="text" id="cargo-otro-input" class="msf-input">
+            </div>
+            <button type="button" class="msf-btn" id="btn-s3" disabled>Continuar</button>
+          </div>
+
+          <!-- Paso 4: Industria -->
+          <div id="msf-step4" class="msf-panel" style="display:none;">
+            <p class="msf-q">¿En qué industria opera su empresa?</p>
+            <div class="msf-opts">
+              <label class="msf-opt"><input type="radio" name="industria" value="General" hidden>General</label>
+              <label class="msf-opt"><input type="radio" name="industria" value="Cerámicas" hidden>Cerámicas</label>
+              <label class="msf-opt"><input type="radio" name="industria" value="Hidrocarburos" hidden>Hidrocarburos</label>
+              <label class="msf-opt"><input type="radio" name="industria" value="Pinturas" hidden>Pinturas</label>
+              <label class="msf-opt"><input type="radio" name="industria" value="Alimento Animal" hidden>Alimento Animal</label>
+            </div>
+            <button type="button" class="msf-btn" id="btn-s4" disabled>Continuar</button>
+          </div>
+
+          <!-- Paso 5: Contacto + envío -->
+          <div id="msf-step5" class="msf-panel" style="display:none;">
+            <p class="msf-q">Información de contacto</p>
+            <p class="msf-sub">
+              Remy &amp; Stute C.A. utilizará sus datos para enviarle la
+              documentación técnica solicitada y contactarlo con información
+              comercial sobre materias primas industriales.
+            </p>
+            <div class="msf-field">
+              <label class="msf-label" for="msf-email">Correo electrónico</label>
+              <input type="email" id="msf-email" class="msf-input" autocomplete="email">
+            </div>
+            <div class="msf-field">
+              <label class="msf-label" for="msf-nombre">Nombre completo</label>
+              <input type="text" id="msf-nombre" class="msf-input" autocomplete="name">
+            </div>
+            <div class="msf-field">
+              <label class="msf-label" for="msf-telefono">Teléfono / WhatsApp</label>
+              <input type="tel" id="msf-telefono" class="msf-input" autocomplete="tel">
+            </div>
+            {hasTurnstile && (
+              <div class="cf-turnstile" data-sitekey={siteKey} data-theme="dark" style="margin-top:1rem;"></div>
+            )}
+            <p class="msf-err" id="msf-global-err"></p>
+            <button type="button" class="msf-btn" id="btn-s5" disabled>Enviar formulario</button>
+            <p class="msf-footer-note">
+              Tu información es confidencial. Solo la usa el equipo de Remy &amp; Stute.
+            </p>
+          </div>
+
+        </div><!-- end msf-main -->
+
+        <!-- ── PANTALLA DE ÉXITO ── -->
+        <div id="msf-success" class="msf-screen" style="display:none;">
+          <div class="msf-close-logo">
+            <span class="msf-close-logo-svg" set:html={LogoNavbar}></span>
+            <span class="msf-close-logo-text">Rem<span class="brand-y">y</span><span class="ampersand">&amp;</span> Stute</span>
+          </div>
+          <h3 class="msf-success-title">Solicitud recibida</h3>
+          <p class="msf-close-body">
+            Nuestro departamento técnico se pondrá en contacto con usted
+            en menos de 24 horas hábiles.
+          </p>
+          <p class="msf-close-body msf-success-wa">
+            Si desea comunicarse de inmediato, escríbanos por
+            <a href="https://wa.me/584122600043?text=Hola%20requiero%20información"
+               class="msf-success-wa-link"
+               target="_blank"
+               rel="noopener">WhatsApp</a>.
+          </p>
+          <hr class="msf-close-sep">
+          <p class="msf-close-note">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C8F04D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Su información ha sido enviada a Remy &amp; Stute.
+          </p>
+        </div>
+
+      </div><!-- end msf-card -->
     </div>
+
   </div>
 </section>
 
 <style>
-  .ct-head { background: var(--dark-panel-2); border-bottom: 1px solid var(--border); padding: 56px 0 32px; }
+  /* ── Cabecera oscura ── */
+  .ct-head {
+    background: var(--ink);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 56px 0 32px;
+  }
   .ct-eyebrow {
     font-family: var(--mono);
     font-size: 11px;
@@ -154,262 +222,624 @@ const cargos = [
   }
   .ct-title .g { color: #C8F04D; }
 
-  .ct-body { background: var(--cream); padding: 40px 0 96px; }
+  /* ── Cuerpo ── */
+  .ct-body { background: var(--cream-2); padding: 64px 0 96px; }
   .ct-grid {
     display: grid;
-    grid-template-columns: minmax(0, 0.74fr) minmax(0, 1fr);
-    gap: 0;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 72px;
     align-items: start;
   }
 
-  /* Aside */
-  .ct-aside { display: flex; flex-direction: column; gap: 2px; }
-  .ct-office { background: var(--white); border: 1px solid var(--border); padding: 28px; }
-  .ct-office-title {
+  /* ── Aside izquierdo ── */
+  .ct-aside { position: sticky; top: 96px; }
+  .ct-sep { width: 40px; height: 2px; background: var(--green); border-radius: 2px; margin-bottom: 20px; }
+  .ct-aside-eyebrow {
     font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
-  }
-  .ct-office-addr { font-size: 14px; line-height: 1.7; color: var(--text); }
-  .ct-office-row {
-    display: flex;
-    justify-content: space-between;
-    font-family: var(--mono);
-    font-size: 12px;
-    margin-top: 6px;
-  }
-  .ct-office-row--top { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
-  .ct-office-row span:first-child { color: var(--muted); letter-spacing: 0.1em; }
-  .ct-office-row .b { color: var(--ink); font-weight: 600; }
-  .ct-map {
-    position: relative;
-    min-height: 220px;
-    border: 1px solid var(--border);
-    display: grid;
-    place-items: center;
-    background-image: repeating-linear-gradient(
-      45deg,
-      var(--cream-2) 0,
-      var(--cream-2) 12px,
-      rgba(0, 102, 51, 0.06) 12px,
-      rgba(0, 102, 51, 0.06) 24px
-    );
-  }
-  .ct-map-badge {
-    padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.92);
-    border: 1px solid var(--border);
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .ct-map-pin {
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--brown);
-    border: 3px solid #fff;
-  }
-
-  /* Form card */
-  .ct-formcard { background: var(--white); border: 1px solid var(--border-2); padding: 32px; }
-  .ct-form-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 20px;
-  }
-  .ct-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px 16px;
-  }
-  .field { display: flex; flex-direction: column; }
-  .field__label {
-    font-family: var(--mono);
-    font-size: 10px;
+    font-size: 11px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 6px;
+    margin-bottom: 12px;
   }
-  .field__control {
-    width: 100%;
-    height: 42px;
-    padding: 10px 14px;
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    font-family: var(--body);
-    font-size: 14px;
+  .ct-aside-title {
+    font-family: var(--display);
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 800;
+    line-height: 1.1;
     color: var(--ink);
-    outline: none;
-    transition: border-color 140ms, background 140ms, box-shadow 140ms;
-    -webkit-appearance: none;
-    appearance: none;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
   }
-  textarea.field__control { height: auto; min-height: 96px; resize: vertical; line-height: 1.55; }
-  .field__control::placeholder { color: var(--faint); }
-  .field__control:focus {
-    background: var(--white);
-    border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(0, 102, 51, 0.15);
-  }
-  select.field__control {
-    cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7770' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 38px;
-  }
-  .field__err {
-    margin-top: 6px;
-    font-size: 11.5px;
-    line-height: 1.4;
-    color: var(--err);
-    min-height: 1em;
-  }
-  .field__err--global { text-align: center; font-weight: 500; margin-top: 12px; }
-  .field.has-error .field__control {
-    background: #fff6f4;
-    border-color: var(--err);
-    box-shadow: 0 0 0 3px rgba(165, 58, 46, 0.12);
+  .ct-aside-sub {
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 340px;
   }
 
-  .cf-turnstile { margin-top: 24px; }
-  .ct-submit {
+  .ct-details { display: flex; flex-direction: column; }
+  .ct-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+    text-decoration: none;
+  }
+  .ct-detail:last-child { border-bottom: 1px solid var(--border); }
+  .ct-detail-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ct-detail-value { font-size: 15px; color: var(--ink); font-weight: 500; transition: color 150ms; }
+  a.ct-detail:hover .ct-detail-value { color: var(--green); }
+
+  .ct-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 8px 16px;
+    background: rgba(0,102,51,0.06);
+    border: 1px solid rgba(0,102,51,0.15);
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--green);
+    letter-spacing: 0.08em;
+  }
+  .ct-badge-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    flex-shrink: 0;
+    animation: ctpulse 2s ease-in-out infinite;
+  }
+  @keyframes ctpulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%      { opacity:.5; transform:scale(.8); }
+  }
+
+  /* ── Tarjeta del formulario ── */
+  .msf-card {
+    background: #111814;
+    border: 1px solid rgba(200,240,77,0.12);
+    border-radius: 8px;
+    padding: 2rem;
+  }
+
+  /* Barra de progreso */
+  .msf-progress {
+    height: 3px;
+    background: rgba(200,240,77,0.12);
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .msf-progress-fill {
+    height: 100%;
+    background: #C8F04D;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 300ms ease;
+  }
+
+  /* Header (atrás + contador) */
+  .msf-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    margin-top: 24px;
+    margin-bottom: 1rem;
   }
-  .ct-field-full { grid-column: 1 / -1; }
-  .ct-submit-note { font-size: 12px; font-style: italic; color: var(--muted); }
-  #contactoSubmit[disabled] { opacity: 0.6; cursor: not-allowed; }
+  .msf-back {
+    background: none;
+    border: none;
+    color: rgba(240,237,230,0.5);
+    font-family: var(--body);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    transition: color 150ms;
+  }
+  .msf-back:hover { color: #F0EDE6; }
+  .msf-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: rgba(240,237,230,0.4);
+  }
 
-  /* Éxito */
-  .ct-success { display: none; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 48px 24px; }
-  .ct-success.show { display: flex; }
-  .ct-success-icon {
+  /* Pregunta */
+  .msf-q {
+    font-family: var(--display);
+    font-size: clamp(18px, 2vw, 22px);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #F0EDE6;
+    margin-bottom: 1.25rem;
+    line-height: 1.3;
+  }
+  .msf-sub {
+    font-size: 13px;
+    color: rgba(240,237,230,0.55);
+    line-height: 1.65;
+    margin-top: -0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Tarjetas de opción */
+  .msf-opts { display: flex; flex-direction: column; }
+  .msf-opt {
+    display: block;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(200,240,77,0.12);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    color: #F0EDE6;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 200ms ease;
+    user-select: none;
+  }
+  .msf-opt:last-child { margin-bottom: 0; }
+  .msf-opt:hover { border-color: rgba(200,240,77,0.4); }
+  .msf-opt.selected {
+    border-color: #C8F04D;
+    background: rgba(200,240,77,0.08);
+  }
+
+  /* Input de texto */
+  .msf-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(200,240,77,0.12);
+    border-radius: 4px;
+    font-family: var(--body);
+    font-size: 14px;
+    color: #F0EDE6;
+    outline: none;
+    transition: border-color 200ms, background 200ms;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .msf-input:focus {
+    border-color: rgba(200,240,77,0.45);
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* Campo con label */
+  .msf-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .msf-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.45);
+  }
+
+  /* Botón continuar / enviar */
+  .msf-btn {
+    width: 100%;
+    background: #C8F04D;
+    color: #0A0F0D;
+    border: none;
+    border-radius: 4px;
+    padding: 14px;
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    letter-spacing: 0.01em;
+    transition: background 200ms;
+  }
+  .msf-btn:hover:not(:disabled) { background: #d8ff5a; }
+  .msf-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Botón fantasma (pantalla de cierre) */
+  .msf-btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(240,237,230,0.2);
+    border-radius: 4px;
+    padding: 12px 24px;
+    color: rgba(240,237,230,0.7);
+    font-family: var(--body);
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 200ms, color 200ms;
+  }
+  .msf-btn-ghost:hover { border-color: rgba(240,237,230,0.5); color: #F0EDE6; }
+
+  .msf-footer-note {
+    font-size: 12px;
+    color: rgba(240,237,230,0.3);
+    text-align: center;
+    font-style: italic;
+    margin-top: 12px;
+  }
+
+  .msf-err {
+    font-size: 12px;
+    color: #ff8080;
+    min-height: 1em;
+    margin-top: 8px;
+  }
+
+  /* Pantallas especiales (cierre / éxito) */
+  .msf-screen { text-align: center; padding: 2rem 1rem; }
+  .msf-screen-title {
+    font-family: var(--display);
+    font-size: 24px;
+    font-weight: 700;
+    color: #F0EDE6;
+    margin-bottom: 1rem;
+    letter-spacing: 0.01em;
+  }
+  .msf-screen-text {
+    font-size: 14px;
+    color: rgba(240,237,230,0.6);
+    line-height: 1.7;
+    max-width: 360px;
+    margin: 0 auto 1.5rem;
+  }
+  .msf-screen-icon {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: var(--green);
-    color: #fff;
-    display: grid;
-    place-items: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin: 0 auto 1.25rem;
   }
-  .ct-success-icon i { width: 26px; height: 26px; }
-  .ct-success h3 { font-family: var(--display); font-size: 26px; font-weight: 800; color: var(--ink); }
-  .ct-success p { max-width: 380px; font-size: 14px; color: var(--text); }
+  .msf-screen-icon--close { background: rgba(255,255,255,0.06); color: rgba(240,237,230,0.6); }
+  .msf-screen-icon--ok    { background: rgba(200,240,77,0.12); border: 1px solid rgba(200,240,77,0.3); color: #C8F04D; }
 
-  @media (max-width: 920px) {
-    .ct-grid { grid-template-columns: 1fr; gap: 24px; }
+  /* Pantalla de cierre — nuevo diseño */
+  .msf-close-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 0;
+  }
+  .msf-close-logo-svg :global(svg) {
+    height: 60px;
+    width: auto;
+  }
+  .msf-close-logo-text {
+    font-family: 'Galano Grotesque', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    color: #FFFFFF;
+    white-space: nowrap;
+  }
+  .msf-close-title {
+    font-family: var(--display);
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 700;
+    color: #F0EDE6;
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+    letter-spacing: 0.01em;
+  }
+  .msf-close-body {
+    font-family: var(--body);
+    font-size: 14px;
+    color: #8A9488;
+    line-height: 1.6;
+    max-width: 350px;
+    margin: 0.75rem auto 0;
+  }
+  .msf-close-sep {
+    border: none;
+    border-top: 1px solid rgba(200,240,77,0.15);
+    max-width: 300px;
+    margin: 1.5rem auto;
+  }
+  .msf-close-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    font-size: 12px;
+    color: rgba(138,148,136,0.6);
+    margin: 0 0 1.5rem;
+  }
+
+  /* Pantalla de éxito */
+  .msf-success-title {
+    font-family: var(--num);
+    font-size: clamp(22px, 3vw, 28px);
+    font-weight: 700;
+    color: #F0EDE6;
+    margin-top: 1.5rem;
+    margin-bottom: 0;
+    text-align: center;
+  }
+  .msf-success-wa {
+    margin-top: 0.5rem !important;
+  }
+  .msf-success-wa-link {
+    color: #C8F04D;
+    text-decoration: none;
+  }
+  .msf-success-wa-link:hover { text-decoration: underline; }
+
+  /* Responsive */
+  @media (max-width: 960px) {
+    .ct-grid { grid-template-columns: 1fr; gap: 40px; }
+    .ct-aside { position: static; }
   }
   @media (max-width: 560px) {
-    .ct-form-grid { grid-template-columns: 1fr; }
-    .ct-submit { flex-direction: column; align-items: stretch; }
-    .ct-formcard { padding: 24px; }
+    .msf-card { padding: 1.5rem; }
+    .ct-body { padding: 40px 0 64px; }
   }
 </style>
 
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline></script>
+<script is:inline define:vars={{ hasTurnstile }}>
+  if (hasTurnstile) {
+    var ts = document.createElement('script');
+    ts.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    ts.async = true;
+    ts.defer = true;
+    document.head.appendChild(ts);
+  }
+</script>
 
 <script is:inline>
-  (function () {
-    const form = document.getElementById("contactoForm");
-    const success = document.getElementById("formSuccess");
-    const submitBtn = document.getElementById("contactoSubmit");
-    const idempotencyInput = document.getElementById("idempotencyKey");
-    if (!form || !success || !submitBtn || !idempotencyInput) return;
+(function () {
+  var idempotencyKey = crypto.randomUUID();
+  var TOTAL = 5;
+  var currentStep = 1;
+  var formData = {
+    empresaConstituida: '',
+    empresa: '',
+    cargo: '',
+    industria: '',
+    email: '',
+    nombre: '',
+    telefono: '',
+    idempotencyKey: idempotencyKey,
+  };
 
-    // R3: idempotency_key se genera UNA SOLA VEZ al montar.
-    idempotencyInput.value = crypto.randomUUID();
+  var step1El = document.getElementById('msf-step1');
+  var closeEl = document.getElementById('msf-close');
+  var mainEl  = document.getElementById('msf-main');
+  var okEl    = document.getElementById('msf-success');
+  var fillEl  = document.getElementById('msfFill');
+  var countEl = document.getElementById('msfCount');
+  var backBtn = document.getElementById('msfBack');
 
-    function clearErrors() {
-      form.querySelectorAll(".field__err").forEach((el) => (el.textContent = ""));
-      form.querySelectorAll(".field.has-error").forEach((el) => el.classList.remove("has-error"));
-    }
-    function setFieldError(field, message) {
-      const el = form.querySelector('[data-error="' + field + '"]');
-      if (el) {
-        el.textContent = message;
-        const wrap = el.closest(".field");
-        if (wrap) wrap.classList.add("has-error");
-      }
-    }
-    function setGlobalError(message) { setFieldError("__global__", message); }
-    function setLoading(on) {
-      submitBtn.disabled = on;
-      const label = submitBtn.querySelector(".btn-label");
-      if (label) label.textContent = on ? "Enviando…" : "Enviar formulario";
-    }
-    function resetTurnstile() {
-      if (window.turnstile && typeof window.turnstile.reset === "function") {
-        try { window.turnstile.reset(); } catch (_) {}
-      }
-    }
+  function updateProgress(n) {
+    fillEl.style.width = (n / TOTAL * 100) + '%';
+    countEl.textContent = n + '/' + TOTAL;
+  }
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      clearErrors();
-      setLoading(true);
+  function animOut(el, dir) {
+    el.style.transition = 'opacity 200ms ease, transform 200ms ease';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(' + (dir > 0 ? '-' : '') + '20px)';
+  }
 
-      const turnstileInput = form.querySelector('[name="cf-turnstile-response"]');
-      const turnstile_token = turnstileInput ? turnstileInput.value : "";
+  function animIn(el, dir) {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(' + (dir > 0 ? '' : '-') + '20px)';
+    el.style.transition = '';
+    el.style.display = 'block';
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        el.style.transition = 'opacity 200ms ease, transform 200ms ease';
+        el.style.opacity = '1';
+        el.style.transform = 'translateX(0)';
+      });
+    });
+  }
 
-      const payload = {
-        nombre:           form.querySelector('[name="nombre"]').value,
-        empresa:          form.querySelector('[name="empresa"]').value,
-        email:            form.querySelector('[name="email"]').value,
-        whatsapp:         form.querySelector('[name="whatsapp"]').value,
-        cargo:            form.querySelector('[name="cargo"]').value,
-        producto:         form.querySelector('[name="producto"]').value,
-        volumen:          form.querySelector('[name="volumen"]')?.value || "",
-        notas:            form.querySelector('[name="notas"]')?.value || "",
-        idempotency_key:  idempotencyInput.value,
-        turnstile_token,
-      };
+  function clearAnim(el) {
+    el.style.transition = '';
+    el.style.opacity = '';
+    el.style.transform = '';
+  }
 
-      try {
-        const res = await fetch("/api/contacto", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+  function goToStep(n) {
+    var dir = n >= currentStep ? 1 : -1;
+    var prev = currentStep;
 
-        const json = await res.json();
-
-        if (res.ok) {
-          form.style.display = "none";
-          success.classList.add("show");
-        } else if (res.status === 422 && json.fieldErrors) {
-          Object.entries(json.fieldErrors).forEach(([field, errors]) => {
-            if (Array.isArray(errors) && errors.length > 0) {
-              setFieldError(field, errors[0]);
-            }
-          });
-        } else if (res.status === 403) {
-          setGlobalError("Error de verificación. Recargue la página e intente de nuevo.");
-          resetTurnstile();
-        } else {
-          setGlobalError("Error temporal. Por favor, intente de nuevo en un momento.");
-          resetTurnstile();
+    function showN() {
+      currentStep = n;
+      if (n === 1) {
+        mainEl.style.display = 'none';
+        animIn(step1El, -1);
+      } else {
+        if (prev === 1) {
+          step1El.style.display = 'none';
+          mainEl.style.display = 'block';
         }
-      } catch (_) {
-        setGlobalError("Error de conexión. Verifique su conexión e intente de nuevo.");
-      } finally {
-        setLoading(false);
+        updateProgress(n);
+        animIn(document.getElementById('msf-step' + n), dir);
+      }
+    }
+
+    if (prev === 1) {
+      animOut(step1El, 1);
+      setTimeout(function () {
+        step1El.style.display = 'none';
+        clearAnim(step1El);
+        showN();
+      }, 200);
+    } else {
+      var prevEl = document.getElementById('msf-step' + prev);
+      animOut(prevEl, dir);
+      setTimeout(function () {
+        prevEl.style.display = 'none';
+        clearAnim(prevEl);
+        showN();
+      }, 200);
+    }
+  }
+
+  backBtn.addEventListener('click', function () { goToStep(currentStep - 1); });
+
+  document.getElementById('msf-back-to-hero').addEventListener('click', function (e) {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* ── Paso 1 ── */
+  document.querySelectorAll('#msf-step1 .msf-opt').forEach(function (card) {
+    card.addEventListener('click', function () {
+      document.querySelectorAll('#msf-step1 .msf-opt').forEach(function (c) { c.classList.remove('selected'); });
+      card.classList.add('selected');
+      var val = card.querySelector('input').value;
+      formData.empresaConstituida = val;
+      if (val === 'No') {
+        setTimeout(function () {
+          step1El.style.display = 'none';
+          closeEl.style.display = 'block';
+        }, 250);
+      } else {
+        setTimeout(function () { goToStep(2); }, 250);
       }
     });
-  })();
+  });
+
+  /* ── Paso 2: empresa ── */
+  var s2input = document.getElementById('msf-empresa');
+  var btnS2   = document.getElementById('btn-s2');
+  s2input.addEventListener('input', function () { btnS2.disabled = s2input.value.trim().length < 3; });
+  btnS2.addEventListener('click', function () { formData.empresa = s2input.value.trim(); goToStep(3); });
+
+  /* ── Paso 3: cargo ── */
+  var btnS3        = document.getElementById('btn-s3');
+  var cargoOtroW   = document.getElementById('cargo-otro-wrap');
+  var cargoOtroInp = document.getElementById('cargo-otro-input');
+
+  document.querySelectorAll('#msf-step3 .msf-opt').forEach(function (card) {
+    card.addEventListener('click', function () {
+      document.querySelectorAll('#msf-step3 .msf-opt').forEach(function (c) { c.classList.remove('selected'); });
+      card.classList.add('selected');
+      if (card.querySelector('input').value === 'Otro') {
+        cargoOtroW.style.display = 'block';
+        cargoOtroInp.focus();
+        validateCargo();
+      } else {
+        cargoOtroW.style.display = 'none';
+        btnS3.disabled = false;
+      }
+    });
+  });
+
+  cargoOtroInp.addEventListener('input', validateCargo);
+
+  function validateCargo() {
+    var sel = document.querySelector('#msf-step3 .msf-opt.selected');
+    if (!sel) { btnS3.disabled = true; return; }
+    btnS3.disabled = sel.querySelector('input').value === 'Otro'
+      ? cargoOtroInp.value.trim().length === 0
+      : false;
+  }
+
+  btnS3.addEventListener('click', function () {
+    var sel = document.querySelector('#msf-step3 .msf-opt.selected');
+    var val = sel.querySelector('input').value;
+    formData.cargo = val === 'Otro' ? cargoOtroInp.value.trim() : val;
+    goToStep(4);
+  });
+
+  /* ── Paso 4: industria ── */
+  var btnS4 = document.getElementById('btn-s4');
+  document.querySelectorAll('#msf-step4 .msf-opt').forEach(function (card) {
+    card.addEventListener('click', function () {
+      document.querySelectorAll('#msf-step4 .msf-opt').forEach(function (c) { c.classList.remove('selected'); });
+      card.classList.add('selected');
+      btnS4.disabled = false;
+    });
+  });
+  btnS4.addEventListener('click', function () {
+    formData.industria = document.querySelector('#msf-step4 .msf-opt.selected').querySelector('input').value;
+    goToStep(5);
+  });
+
+  /* ── Paso 5: contacto + envío ── */
+  var s5email    = document.getElementById('msf-email');
+  var s5nombre   = document.getElementById('msf-nombre');
+  var s5telefono = document.getElementById('msf-telefono');
+  var btnS5      = document.getElementById('btn-s5');
+  var globalErr  = document.getElementById('msf-global-err');
+
+  function validateS5() {
+    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s5email.value.trim());
+    btnS5.disabled = !(emailOk && s5nombre.value.trim() && s5telefono.value.trim());
+  }
+
+  [s5email, s5nombre, s5telefono].forEach(function (el) {
+    el.addEventListener('input', validateS5);
+  });
+
+  btnS5.addEventListener('click', async function () {
+    formData.email    = s5email.value.trim().toLowerCase();
+    formData.nombre   = s5nombre.value.trim();
+    formData.telefono = s5telefono.value.trim();
+
+    console.log(JSON.stringify(formData, null, 2));
+
+    var turnstileInput = document.querySelector('[name="cf-turnstile-response"]');
+    var turnstile_token = turnstileInput ? turnstileInput.value : '';
+
+    btnS5.disabled = true;
+    btnS5.textContent = 'Enviando…';
+    if (globalErr) globalErr.textContent = '';
+
+    try {
+      var payload = Object.assign({}, formData, { turnstile_token: turnstile_token });
+      var res = await fetch('/api/contacto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        var step5El = document.getElementById('msf-step5');
+        step5El.style.transition = 'opacity 200ms ease';
+        step5El.style.opacity = '0';
+        setTimeout(function () {
+          step5El.style.display = 'none';
+          mainEl.style.display = 'none';
+          okEl.style.opacity = '0';
+          okEl.style.display = 'block';
+          setTimeout(function () {
+            okEl.style.transition = 'opacity 400ms ease';
+            okEl.style.opacity = '1';
+          }, 30);
+        }, 200);
+      } else {
+        var json = await res.json();
+        var errMsg = 'Error al enviar. Por favor, intente de nuevo.';
+        if (res.status === 403) {
+          errMsg = 'Error de verificación. Recargue la página e intente de nuevo.';
+        } else if (res.status === 422 && json.fieldErrors) {
+          var first = Object.values(json.fieldErrors).flat()[0];
+          if (first) errMsg = first;
+        }
+        if (globalErr) globalErr.textContent = errMsg;
+        btnS5.disabled = false;
+        btnS5.textContent = 'Enviar formulario';
+      }
+    } catch (_) {
+      if (globalErr) globalErr.textContent = 'Error de conexión. Verifique su conexión e intente de nuevo.';
+      btnS5.disabled = false;
+      btnS5.textContent = 'Enviar formulario';
+    }
+  });
+})();
 </script>

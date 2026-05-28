@@ -4,7 +4,7 @@
    + vista detalle de ejemplo.
    "Ficha técnica" y "Solicitar muestra" dirigen al brief técnico (/contacto). */
 
-const sectores = ["Todos", "Cerámicas", "Construcción", "Pinturas", "Feed", "Industrial", "Aminoácidos"];
+const sectores = ["Todos", "General", "Cerámicas", "Hidrocarburos", "Pinturas", "Alimento animal"];
 const marcas = ["Todas", "Addcon", "Yipin Pigmentos", "Minerales Industriales"];
 
 const productos = [
@@ -20,28 +20,28 @@ const productos = [
     name: "RDP TY503",
     desc: "Polvo redispersable de alta cohesión para pego, morteros secos e impermeabilizantes.",
     marca: "Addcon",
-    sector: "Construcción",
+    sector: "Hidrocarburos",
   },
   {
     n: "03",
     name: "HPMC KPM 150000C",
     desc: "Hidroxipropilmetilcelulosa de alta viscosidad. Retención de agua y trabajabilidad en morteros.",
     marca: "Addcon",
-    sector: "Construcción",
+    sector: "Hidrocarburos",
   },
   {
     n: "04",
     name: "Grafito 285 Silvershine",
     desc: "Grafito micronizado para frenos, lubricantes sólidos y manufactura de lápices.",
     marca: "Minerales Industriales",
-    sector: "Industrial",
+    sector: "General",
   },
   {
     n: "05",
     name: "Óxido de Magnesio",
     desc: "Suplemento mineral grado alimenticio para nutrición animal y alimento balanceado.",
     marca: "Minerales Industriales",
-    sector: "Feed",
+    sector: "Alimento animal",
   },
 ];
 
@@ -67,7 +67,7 @@ const especificacion = [
 <section class="pc-filters">
   <div class="wrap">
     <div class="pc-filter-grid">
-      <span class="pc-filter-label">Sector</span>
+      <span class="pc-filter-label">Industria</span>
       <div class="pc-chips" data-group="sector">
         {sectores.map((s, i) => (
           <button type="button" class="chip" data-value={s} aria-pressed={i === 0 ? "true" : "false"}>{s}</button>
@@ -91,7 +91,7 @@ const especificacion = [
         <span>#</span>
         <span>Producto / Aplicación</span>
         <span>Marca</span>
-        <span>Sector</span>
+        <span>Industria</span>
         <span></span>
       </div>
       <div id="pcRows">

@@ -2,38 +2,32 @@
 import sectorPintura from "../assets/Sector - pintura.webp";
 import sectorCeramicas from "../assets/Sector-ceramicas.webp";
 import sectorFeed from "../assets/SECTOR-FEED.webp";
-import sectorConstruccion from "../assets/SECTOR-CONSTRUCCION.webp";
 
 const sectores = [
   {
     name: "Cerámicas",
     photo: sectorCeramicas.src,
-    alt: "Sector cerámicas — producción industrial",
+    alt: "Industria cerámicas — producción industrial",
   },
   {
-    name: "Construcción",
-    photo: sectorConstruccion.src,
-    alt: "Sector construcción — materiales industriales",
+    name: "Hidrocarburos",
+    photo: "https://images.unsplash.com/photo-1513828583688-c52646db42da?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0",
+    alt: "Industria hidrocarburos — refinería y petroquímica",
   },
   {
     name: "Pinturas",
     photo: sectorPintura.src,
-    alt: "Sector pinturas — pigmentos industriales",
+    alt: "Industria pinturas — pigmentos industriales",
   },
   {
-    name: "Feed",
+    name: "Alimento animal",
     photo: sectorFeed.src,
-    alt: "Sector feed — alimento balanceado industrial",
+    alt: "Industria alimento animal — nutrición y feed",
   },
   {
-    name: "Industrial",
-    photo: "https://images.unsplash.com/photo-1660448059127-c332105d7a29?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y2hlbWljYWwlMjBpbmR1c3RyeXxlbnwwfHwwfHx8MA%3D%3D",
-    alt: "Planta química industrial",
-  },
-  {
-    name: "Aminoácidos",
-    photo: "https://images.unsplash.com/photo-1707944745860-4615eb585a41?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bGFib3JhdG9yeSUyMHJlc2VhcmNofGVufDB8fDB8fHww",
-    alt: "Laboratorio de análisis industrial",
+    name: "General",
+    photo: "https://images.unsplash.com/photo-1660448059127-c332105d7a29?fm=jpg&q=60&w=1400&auto=format&fit=crop&ixlib=rb-4.1.0",
+    alt: "Industria general — planta química industrial",
   },
 ];
 ---
@@ -48,7 +42,7 @@ const sectores = [
         <span>Servicios que ofrecemos · cobertura nacional</span>
       </p>
       <h2 class="sectores__title">
-        6 sectores donde nuestra materia prima
+        5 industrias donde nuestra materia prima
         <span class="g">ya está en planta.</span>
       </h2>
     </header>
@@ -61,7 +55,7 @@ const sectores = [
             <img src={s.photo} alt={s.alt} loading="lazy" />
           </div>
           <div class="sector__overlay">
-            <span class="sector__overline">Sector</span>
+            <span class="sector__overline">Industria</span>
             <h3 class="sector__name">
               {s.name}
               <span class="sector__accent"></span>
@@ -138,18 +132,16 @@ const sectores = [
   .sector:nth-child(1) { grid-column: span 5; min-height: 380px; }
   .sector:nth-child(2) { grid-column: span 4; min-height: 380px; }
   .sector:nth-child(3) { grid-column: span 3; min-height: 380px; }
-  /* Fila 2: 3 + 5 + 4 */
-  .sector:nth-child(4) { grid-column: span 3; min-height: 340px; }
-  .sector:nth-child(5) { grid-column: span 5; min-height: 340px; }
-  .sector:nth-child(6) { grid-column: span 4; min-height: 340px; }
+  /* Fila 2: 6 + 6 */
+  .sector:nth-child(4) { grid-column: span 6; min-height: 340px; }
+  .sector:nth-child(5) { grid-column: span 6; min-height: 340px; }
 
   /* Nombre escala con el ancho de la tarjeta */
-  .sector:nth-child(1) .sector__name,
-  .sector:nth-child(5) .sector__name { font-size: 26px; }
-  .sector:nth-child(2) .sector__name,
-  .sector:nth-child(6) .sector__name { font-size: 22px; }
-  .sector:nth-child(3) .sector__name,
-  .sector:nth-child(4) .sector__name { font-size: 20px; }
+  .sector:nth-child(1) .sector__name { font-size: 26px; }
+  .sector:nth-child(2) .sector__name { font-size: 22px; }
+  .sector:nth-child(3) .sector__name { font-size: 20px; }
+  .sector:nth-child(4) .sector__name,
+  .sector:nth-child(5) .sector__name { font-size: 24px; }
 
   /* ── Card de sector ─────────────────────────────────────────── */
   .sector {
@@ -209,7 +201,7 @@ const sectores = [
   /* ── Overline — aparece en hover ─────────────────────────────── */
   .sector__overline {
     font-family: var(--mono);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
