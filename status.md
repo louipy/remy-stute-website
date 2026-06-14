@@ -19,7 +19,30 @@ Se reconstruyó el sitio replicando fielmente los 4 `.html` desktop 1440 de
   `volumen`/`cargo` pasaron a texto libre. `schema/contacto.ts` y el payload JS
   actualizados; `api/contacto.ts` sin cambios. Orden R4, Turnstile, R2 y R3
   intactos y verificados (400/403/405 OK vía curl).
+  - **[Corregido 2026-06-14]** El contrato actual es otro: el form recoge
+    `empresaConstituida, empresa, cargo, industria, email, nombre, telefono`. `industria` SÍ existe
+    (es `z.enum(INDUSTRIAS_VALIDAS)`); NO hay `notas` ni `volumen`. Ver la NOTA de auditoría abajo.
 - Pendiente (cambios quirúrgicos): copy definitivo, cifras reales de "pedido promedio". Fotos aprobadas por cliente. RIF y dirección confirmados.
+
+---
+
+## NOTA — Auditoría de código "vibe coding" + vulnerabilidades (2026-06-14)
+
+Revisión exhaustiva transversal a las fases (no es una fase nueva). Se cerraron 22 ítems de
+seguridad, accesibilidad, coherencia doc↔código e infra. **Detalle completo y trazable en
+`AUDIT-FIXES.md` (raíz)** y resumen en `WHILECHANGES.md → Hecho`. Impacto en el estado del roadmap:
+
+- **Fase 2/3 (formulario + Airtable):** `ContactSection.astro` es ahora un `<form>` accesible
+  (teclado, ARIA, Enter, reset Turnstile); validación server-side reforzada (`z.enum` para
+  industria/empresaConstituida, teléfono normalizado a E.164); columnas Airtable documentadas según
+  lo que escribe `createProspecto`. `INDUSTRIAS_VALIDAS` es la fuente de verdad única de industrias.
+- **Fase 5 (analytics):** documentadas `META_PIXEL_ID`/`META_ACCESS_TOKEN`; aclarada la relación
+  entre `dataLayer.ts` (contrato tipado) y el `dataLayer.push` inline del form.
+- **Fase 6/7 (SEO/lanzamiento):** generado `public/og-default.jpg`; añadido `public/_headers` con
+  cabeceras de seguridad. **Pendiente operativo de lanzamiento:** activar la CSP (comentada en
+  `_headers`) primero en Report-Only y luego enforce.
+- Decisiones del cliente registradas: lista oficial de industrias = las 5 del formulario; el
+  teléfono acepta fijos VE además de móviles (+ prefijo 422).
 
 ---
 
@@ -70,7 +93,7 @@ Se reconstruyó el sitio replicando fielmente los 4 `.html` desktop 1440 de
 - Whatsapp: el schema (`ContactoSchema.telefono`) normaliza a E.164 `+58XXXXXXXXXX` vía transform de Zod. Acepta móviles VE (412/414/416/422/424/426) y fijos VE (02XX); rechaza prefijos/longitudes inválidos
 - Email: normalizado con `.trim().toLowerCase()` antes de Zod (preparado para R6 / SHA256 en n8n)
 - API route forward a n8n incluye `X-Webhook-Secret` (R2) y se activa solo cuando ambos env vars están definidos
-- `volumen` es opcional (no rompe si no se selecciona)
+- ~~`volumen` es opcional~~ **[Obsoleto 2026-06-14]** el campo `volumen` ya no existe en el formulario (ver NOTA de auditoría arriba)
 - Logging por consola en errores; persistencia en "Cola de Errores" Airtable es Fase 4 (R8)
 - ⚠️ `astro build` requiere instalar un adapter SSR (`@astrojs/node`, `@astrojs/vercel`, etc.) — decisión queda para Fase 7. `astro dev` funciona sin adapter.
 

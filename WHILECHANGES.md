@@ -234,3 +234,32 @@ Si se cambian campos del formulario, actualizar EN CONJUNTO: `ContactSection.ast
   4. **Filtros (chips):** `min-height: 40px` para mejor toque.
 - **Archivos afectados:** `src/components/ProductosCatalogo.astro`
 - **Notas:** Desktop verificado idéntico (tabla con columnas de número full-bleed sin cambios). La vista detalle de ejemplo (`.pc-detail-card`) conserva su colapso a 1 columna ya existente.
+
+### ✅ — Auditoría "vibe coding" + vulnerabilidades (sesión 2026-06-14)
+- **Categoría:** deuda técnica · seguridad · copy
+- **Agregado:** 2026-06-14 · **Cerrado:** 2026-06-14
+- **Contexto:** Revisión exhaustiva (2 pasadas) para que el código se lea como escrito por un
+  desarrollador, sin deuda volátil ni contradicciones doc↔código. Lista completa y trazable (22
+  ítems, severidad + estado) en **`AUDIT-FIXES.md`** (raíz) — consultar ahí el detalle por grupo.
+- **Cambios aplicados (resumen; detalle en AUDIT-FIXES.md):**
+  1. **Seguridad/datos (A):** eliminado `console.log` con PII del form; `escapeHtml()` en el email
+     de notificación; `empresaConstituida` e `industria` como `z.enum` (validación server-side);
+     teléfono normalizado a E.164 (`normalizarTelefonoVE`, móvil 412/414/416/422/424/426 + fijo 02XX);
+     `AbortSignal.timeout(10s)` en todos los fetch externos; `logError` con retry; `from` de Resend
+     seguro en prod; TOCTOU de idempotencia documentado en R3 (límite aceptado del MVP).
+  2. **Accesibilidad (B):** `ContactSection` ahora es `<form>` accesible — radios `.sr-only`
+     enfocables, selección por `change` (teclado+ratón), `role="radiogroup"`, Enter avanza/envía,
+     error con `role="alert"`, reset de Turnstile tras error. Verificado con smoke test Playwright 13/13.
+  3. **Coherencia doc↔código (C):** `SECTORES_VALIDOS` (muerto) eliminado → `INDUSTRIAS_VALIDAS`
+     como fuente de verdad única (schema + form + catálogo + home); `status.md`, `CLAUDE.md` y este
+     archivo alineados con el código real (columnas Airtable, teléfono, campos del form, vars Meta,
+     relación dataLayer↔push inline).
+  4. **Infra (D):** generado `public/og-default.jpg` (1200×630, marca) + `public/_headers` con
+     cabeceras de seguridad (CSP como plantilla comentada, activar en Report-Only primero).
+- **Archivos afectados:** `ContactSection.astro`, `lib/schemas/contacto.ts`, `lib/airtable.ts`,
+  `lib/email.ts`, `lib/meta.ts`, `lib/analytics/dataLayer.ts`, `api/contacto.ts`, `BaseLayout.astro`,
+  `public/_headers`, `public/og-default.jpg`, `.gitignore`, `CLAUDE.md`, `status.md`, `WHILECHANGES.md`, `AUDIT-FIXES.md`
+- **Decisiones del usuario:** lista oficial de industrias = las 5 del formulario; teléfono acepta
+  fijos VE además de móviles (+ prefijo 422). 
+- **Notas:** `npm run type-check` → 0/0/0; `npm run build` → OK. Pendiente operativo: activar la CSP
+  de `public/_headers` (primero Report-Only) antes de endurecerla en el deploy.
