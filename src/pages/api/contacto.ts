@@ -26,6 +26,7 @@ import type { APIRoute } from 'astro';
 import { ContactoSchema } from '@lib/schemas/contacto';
 import { checkIdempotency, createProspecto, logError } from '@lib/airtable';
 import { notifyNewLead } from '@lib/email';
+import { sendMetaCAPI } from '@lib/meta';
 
 export const prerender = false;
 
@@ -63,6 +64,7 @@ async function verifyTurnstile(token: string, remoteIp: string | null): Promise<
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: params.toString(),
+      signal: AbortSignal.timeout(10_000),
     });
     const data = (await res.json()) as TurnstileSiteverifyResponse;
     if (!data.success) {
@@ -140,6 +142,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     notifyNewLead(parsed.data).catch((err: unknown) => {
       console.error('[contacto] Error enviando notificación email', err);
       logError(parsed.data, String(err), 'Email').catch(() => {});
+    });
+
+    // 6. Meta CAPI — best-effort, deduplicado con el Pixel por event_id (Fase 5)
+    sendMetaCAPI(parsed.data, parsed.data.idempotencyKey, {
+      ip: remoteIp,
+      userAgent: request.headers.get('user-agent'),
+      eventSourceUrl: request.headers.get('referer'),
+    }).catch((err: unknown) => {
+      console.error('[contacto] Error enviando evento a Meta CAPI', err);
+      logError(parsed.data, String(err), 'MetaCAPI').catch(() => {});
     });
 
     return jsonResponse(200, { ok: true });

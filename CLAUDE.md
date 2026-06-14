@@ -10,7 +10,7 @@ Sistema de captación y calificación de prospectos B2B industriales venezolanos
 Valor por lead: $5,000–$27,000 USD. Tolerancia a errores lógicos: cero.
 Prioridad absoluta: precisión > velocidad en toda operación automatizada.
 
-Stack: Astro 5 + TypeScript + Tailwind + Zod + Airtable + Resend + Netlify + GTM + GA4 + Meta Pixel + Cloudflare Turnstile
+Stack: Astro 5 + TypeScript + Tailwind + Zod + Airtable + Resend + Cloudflare Pages + GTM + GA4 + Meta Pixel + Cloudflare Turnstile
 Stack (fase automatizaciones, no activo aún): n8n + Sanity CMS + WhatsApp Business API
 
 ---
@@ -72,11 +72,17 @@ AIRTABLE_BASE_PRODUCTION=appXXXXXXXXXXXXXX   # configurar al duplicar SANDBOX pa
 # Resend — notificaciones email al equipo (Fase 3)
 RESEND_API_KEY=re_XXXXXXXXXXXXXXXX
 NOTIFY_EMAIL=equipo@empresa.com
-RESEND_FROM_EMAIL=noreply@remyvenezuela.com   # opcional; requiere dominio verificado en Resend
+RESEND_FROM_EMAIL=noreply@remyvenezuela.com   # OBLIGATORIO en producción (dominio verificado en Resend).
+                                              # Si falta: en DEV cae a onboarding@resend.dev (solo entrega
+                                              # al dueño de la cuenta); en PROD se omite el envío y se loguea.
 
 # Cloudflare Turnstile
 PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAA...
 TURNSTILE_SECRET_KEY=0x4AAAAAAA...
+
+# Meta Conversions API (CAPI) — Fase 5 (best-effort; si faltan, sendMetaCAPI() se omite)
+META_PIXEL_ID=XXXXXXXXXXXXXXX
+META_ACCESS_TOKEN=EAAxxxxxxx                   # System User token; nunca commitear
 
 # Fase automatizaciones (no activas aún — se configuran cuando llegue n8n)
 # N8N_API_URL=https://TU-INSTANCIA.app.n8n.cloud/api/v1
@@ -132,6 +138,16 @@ Este mismo UUID es el `event_id` para Meta CAPI (Fase 5). Un solo UUID sirve a l
 `checkIdempotency()` en `src/lib/airtable.ts` busca en Airtable por `idempotency_key` antes de crear.
 Si existe → API devuelve `{ ok: true, duplicate: true }` → no se crea registro.
 La columna `idempotency_key` en Airtable NUNCA se renombra.
+
+**Límite conocido (aceptado para el MVP):** el check no es atómico — hay una ventana TOCTOU entre
+`checkIdempotency()` y `createProspecto()`. Dos requests con el MISMO UUID llegando casi a la vez
+podrían pasar ambas el check y crear dos registros (Airtable no ofrece un upsert atómico por campo).
+En la práctica el riesgo es mínimo: el UUID se genera una sola vez por carga de página y el token
+de Turnstile es de un solo uso, así que un doble-submit real reusa el mismo UUID de forma secuencial
+(el segundo ve el registro ya creado). La nota de "concurrencia = 1" de R7 describe que el API route
+procesa un lead por invocación, NO un lock global entre invocaciones concurrentes. Si en el futuro se
+necesita garantía estricta, mover el dedupe a una capa con unicidad atómica (p.ej. KV de Cloudflare
+con `put` condicional, o una columna única en una BD relacional) antes de escribir en Airtable.
 
 ### R4 — FORMULARIO: Orden de validación fijo
 
@@ -270,6 +286,14 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 - `box-shadow: inset` multicapa en borde superior (simula peso del hero encima): `0 2px 6px rgba(0,0,0,0.88)` + `0 10px 28px rgba(0,0,0,0.65)` + `0 28px 64px rgba(0,0,0,0.38)`
 - `padding: 56px var(--pad)` simétrico (top = bottom)
 
+**RESPONSIVE — MÓVIL (mayoría del tráfico; primeros ajustes 2026-06-13):**
+- Diseño desktop-first con `@media (max-width: ...)`. Breakpoints en uso: 1100 · 980 · 960 · 920 · 900 · 880 · 860 · 640 · 560 · 520. El más usado: **980px** (colapso de layouts) y **560px** (ajustes finos).
+- **Navbar móvil (`<860px`):** se oculta el CTA "Solicitar cotización" del header (`display:none`) — vive solo en el drawer; así no choca con el logo/nombre al hacer scroll. Burger 44×44.
+- **Drawer = menú lateral:** enlaces de sección como filas táctiles de 48px con separador, página activa en verde, CTA verde abajo, botón cerrar 44×44.
+- **Touch targets:** mínimo 44px en elementos interactivos (norma de accesibilidad). Enlaces de footer con padding táctil.
+- **Catálogo (`/productos`, `<920px`):** la tabla colapsa a **tarjetas** — número como badge contenido 44×44 (NO usar el `margin` negativo full-bleed del desktop: solapaba el nombre), meta etiquetada "Marca/Industria" vía `::before`, acciones en fila `min-height:44px`.
+- Las "secciones vacías" en capturas full-page son falsos positivos del `.reveal` (opacity:0 hasta scroll), no bugs.
+
 ---
 
 ## ARQUITECTURA DE ARCHIVOS
@@ -285,14 +309,13 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 │   │   ├── airtable.ts               ← cliente REST Airtable: checkIdempotency, createProspecto, logError (R3+R7+R8)
 │   │   ├── email.ts                  ← notificación Resend al equipo vía fetch nativo
 │   │   └── analytics/
-│   │       └── dataLayer.ts          ← DataLayerEvents + trackEvent() — INMUTABLE (Fase 5)
+│   │       └── dataLayer.ts          ← contrato tipado de eventos (GenerateLeadEvent) + trackEvent(). NOTA: el form usa un dataLayer.push inline (script is:inline no puede importar módulos); este archivo es la referencia que ese push DEBE respetar — mantener en sync
 │   ├── pages/
-│   │   ├── index.astro               ← navVariant="home" → Hero + IndustriasServidas + VentajaCompetitiva + ContactoCTA
+│   │   ├── index.astro               ← Hero + IndustriasServidas + VentajaCompetitiva + ContactoCTA
 │   │   ├── productos.astro           ← ProductosCatalogo (filtro sector+marca, tabla 5 SKU)
 │   │   ├── nosotros.astro            ← theme="dark" → NosotrosSection (4 cards expandibles)
 │   │   ├── contacto.astro            ← ContactSection; idempotencyKey = crypto.randomUUID() aquí
-│   │   ├── casos.astro               ← PageInConstruction (placeholder)
-│   │   ├── recursos.astro            ← PageInConstruction (placeholder)
+│   │   ├── privacidad.astro          ← Política de privacidad (9 secciones); enlace en Footer
 │   │   └── api/
 │   │       └── contacto.ts           ← Turnstile → Zod → Airtable → Resend (R4); prerender=false ACTIVO; bypass Turnstile en DEV
 │   └── components/
@@ -300,12 +323,15 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 │       ├── FlagRibbon.astro          ← fixed 4px, z-index 101
 │       ├── Footer.astro              ← 4 columnas verde oscuro; logo SVG + brand-navbar-text siempre visible; firma Ixanity Studios; sin horario, sin segundo teléfono
 │       ├── Hero.astro                ← grid 2col (1.2fr/1fr), stats hijo directo del grid (row:2), slideshow 4 fotos locales webp (carrusel-inicio-01–04), fade 5s, counter 01/04
-│       ├── IndustriasServidas.astro  ← sectores__head CONGELADO; 6 tarjetas foto-cover hover animado (overline+acento+flecha); tarjetas son `<a href="/productos?sector=X">` para filtro cross-page; 4 fotos locales webp, 2 Unsplash
+│       ├── IndustriasServidas.astro  ← sectores__head CONGELADO; 5 tarjetas foto-cover hover animado (overline+acento+flecha); tarjetas son `<a href="/productos?sector=X">` para filtro cross-page; 3 fotos locales webp, 2 Unsplash. Sectores = INDUSTRIAS_VALIDAS
 │       ├── VentajaCompetitiva.astro  ← banda verde oscuro, 4 cards blancas con hover (lift + línea mustard), iconos SVG en círculo verde, números Oswald, dot+label accent bar inferior
 │       ├── ContactoCTA.astro         ← flujo 3 pasos + botón WhatsApp
 │       ├── ProductosCatalogo.astro   ← filtro dual sector+marca; lee ?sector= de URL params al cargar para activar chip correspondiente
 │       ├── NosotrosSection.astro     ← tema oscuro #0A0F0D, acento lima; hero Candy-1920.webp con box-shadow elevation; sección nos-statement (#0A2418) con copy grande
-│       └── ContactSection.astro     ← formulario brief técnico (provisional); submit real al API; campos: nombre, empresa, email, whatsapp, cargo, producto, volumen, notas
+│       └── ContactSection.astro     ← formulario multipaso (5 pasos) en <form> accesible; submit real al API; campos: empresaConstituida, empresa, cargo, industria, email, nombre, telefono. industria se renderiza desde INDUSTRIAS_VALIDAS (fuente de verdad en schemas/contacto.ts)
+├── public/
+│   ├── robots.txt                    ← Allow: /, Sitemap: https://remyvenezuela.com/sitemap-index.xml
+│   └── favicon.svg                   ← Ícono temporal (verde #006633 + inicial "R") — reemplazar con SVG oficial
 ├── design-reference/
 │   └── *.png                         ← capturas de diseño (desktop 1440) — fuente de verdad visual
 ├── .mcp.json                         ← MCP servers (este archivo)
@@ -333,7 +359,7 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 ### Checklist: Sitio Astro listo para producción
 ```
 □ Turnstile rechaza submissions de bots (probar con token inválido, esperar HTTP 403)
-□ Zod rechaza: empresa < 3 chars, teléfono fijo, email inválido (esperar HTTP 422)
+□ Zod rechaza: empresa < 3 chars, teléfono inválido (no móvil VE ni fijo VE), email inválido, industria/empresaConstituida fuera de catálogo (esperar HTTP 422)
 □ GTM snippet presente en <head> con is:inline, sin Partytown
 □ Lighthouse mobile score > 90 (LCP < 2.5s, CLS = 0, INP < 200ms)
 □ idempotencyKey se genera al cargar la página, no al hacer submit
@@ -353,20 +379,22 @@ Las variables de diseño viven en `src/styles/global.css`. No usar Tailwind util
 
 ---
 
-## SECTORES VÁLIDOS (referencia para validación Zod y n8n)
+## INDUSTRIAS VÁLIDAS (fuente de verdad: `src/lib/schemas/contacto.ts`)
 
 ```typescript
-const SECTORES_VALIDOS = [
-  'Petróleo', 'Gas', 'Manufactura', 'Construcción',
-  'Energía', 'Minería', 'Transporte industrial'
+export const INDUSTRIAS_VALIDAS = [
+  'General', 'Cerámicas', 'Hidrocarburos', 'Pinturas', 'Alimento animal',
 ] as const;
 ```
 
-**⚠ CONFLICTO PENDIENTE (resolver con el cliente antes de Fase 3):**
-El array de arriba viene del brief original y define los sectores B2B del CRM/n8n.
-El diseño aprobado en `design-reference/` muestra 6 sectores distintos en `IndustriasServidas.astro`:
-Cerámicas · Construcción · Pinturas · Feed · Industrial · Aminoácidos.
-Antes de activar el flujo n8n, el cliente debe confirmar cuál lista es la oficial.
+Estos 5 literales son la lista oficial (decisión del cliente, 2026-06-14) y se usan en TODOS
+los puntos: `z.enum` del `ContactoSchema`, las opciones del formulario (`ContactSection.astro`
+las renderiza desde esta constante), el catálogo (`ProductosCatalogo.astro`) y el home
+(`IndustriasServidas.astro`). El casing es canónico — no duplicar literales sueltos.
+
+**Resuelto:** el antiguo array `SECTORES_VALIDOS` (Petróleo/Gas/Manufactura/… del brief original)
+era código muerto que no validaba nada y contradecía el formulario. Eliminado. Si la fase n8n
+necesita otra taxonomía B2B, mapear desde `INDUSTRIAS_VALIDAS`, no reintroducir una lista paralela.
 
 ---
 

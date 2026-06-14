@@ -30,6 +30,8 @@ Thumbs.db
 
 # Claude Code
 .claude/
+.agents/
+skills-lock.json
 
 # Logs
 npm-debug.log*

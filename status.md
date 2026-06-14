@@ -11,7 +11,7 @@ Se reconstruyó el sitio replicando fielmente los 4 `.html` desktop 1440 de
 `WHILECHANGES.md` → Hecho. Resumen del impacto en Fases 1 y 2:
 
 - **Fase 1:** IA de páginas — `/soluciones` eliminada; `/productos` y `/nosotros`
-  son páginas reales; `/casos` y `/recursos` siguen en construcción. Sistema
+  son páginas reales; `/casos` y `/recursos` eliminadas (decisión 2026-06-02). Sistema
   visual nuevo: tema claro crema `#FAF9F5`, tipografías Plus Jakarta Sans / Inter
   / Oswald / JetBrains Mono, verde `#006633`. La página Nosotros es tema oscuro
   (así está en el mockup). Placeholders GTM (R5) intactos en BaseLayout.
@@ -19,8 +19,7 @@ Se reconstruyó el sitio replicando fielmente los 4 `.html` desktop 1440 de
   `volumen`/`cargo` pasaron a texto libre. `schema/contacto.ts` y el payload JS
   actualizados; `api/contacto.ts` sin cambios. Orden R4, Turnstile, R2 y R3
   intactos y verificados (400/403/405 OK vía curl).
-- Pendiente (cambios quirúrgicos): copy definitivo, datos reales (RIF, dirección,
-  cifras de "pedido promedio"), fotos reales (hoy placeholders de rayas).
+- Pendiente (cambios quirúrgicos): copy definitivo, cifras reales de "pedido promedio". Fotos aprobadas por cliente. RIF y dirección confirmados.
 
 ---
 
@@ -33,7 +32,7 @@ Se reconstruyó el sitio replicando fielmente los 4 `.html` desktop 1440 de
 2. ✅ Crear astro.config.mjs con los integrations necesarios (Tailwind v4, Sitemap)
 3. ✅ Migrar index.html a src/pages/index.astro y descomponerlo en componentes reutilizables en src/components/
 4. ✅ Crear BaseLayout.astro con el slot para GTM (placeholder is:inline, Main Thread — R5)
-5. ✅ Crear las páginas estáticas vacías: /soluciones, /casos, /recursos, /contacto
+5. ✅ Crear las páginas estáticas vacías: /soluciones, /contacto (/casos y /recursos eliminadas)
 6. ✅ Validar que el sitio corra localmente en astro dev con paridad visual exacta al HTML actual
 7. ✅ Actualizar .gitignore con dist/, .astro/, credentials.json
 
@@ -55,7 +54,7 @@ Se reconstruyó el sitio replicando fielmente los 4 `.html` desktop 1440 de
 **Objetivo:** El formulario de contacto conecta a un backend seguro y valida datos correctamente.
 
 **Puntos de trabajo:**
-1. ✅ `src/lib/schemas/contacto.ts` con `ContactoSchema` Zod (SECTORES_VALIDOS, móvil VE 412/414/416/424/426, email normalizado, empresa ≥ 3 chars, idempotency_key UUID)
+1. ✅ `src/lib/schemas/contacto.ts` con `ContactoSchema` Zod (`INDUSTRIAS_VALIDAS` + `empresaConstituida` como `z.enum`, teléfono normalizado a E.164 — móvil/fijo VE, email normalizado, empresa ≥ 3 chars, idempotency_key UUID). [Actualizado 2026-06-14: antes usaba el array muerto `SECTORES_VALIDOS`.]
 2. ✅ `src/pages/contacto.astro` reutiliza `ContactSection`; idempotencyKey generado al montar via `crypto.randomUUID()` (R3)
 3. ✅ `src/pages/api/contacto.ts` con orden fijo Turnstile → Zod → n8n (R4); `prerender = false`
 4. ✅ Cloudflare Turnstile integrado (widget client-side + siteverify server-side; HTTP 403 si falla)
@@ -67,7 +66,8 @@ Se reconstruyó el sitio replicando fielmente los 4 `.html` desktop 1440 de
 
 **Notas de implementación:**
 - Industrias del form alineadas a `SECTORES_VALIDOS` (CLAUDE.md): se quitaron "Petróleo y Gas" combinado, "Agroalimentario" y "Otro"; se agregaron "Petróleo", "Gas", "Energía", "Transporte industrial"
-- Whatsapp: el schema acepta cualquier formato y normaliza a `+58XXXXXXXXXX` (rechaza fijos)
+  - **[Superado 2026-06-14]** La lista oficial pasó a ser las 5 industrias reales del formulario en `INDUSTRIAS_VALIDAS` (General/Cerámicas/Hidrocarburos/Pinturas/Alimento animal). `SECTORES_VALIDOS` fue eliminado.
+- Whatsapp: el schema (`ContactoSchema.telefono`) normaliza a E.164 `+58XXXXXXXXXX` vía transform de Zod. Acepta móviles VE (412/414/416/422/424/426) y fijos VE (02XX); rechaza prefijos/longitudes inválidos
 - Email: normalizado con `.trim().toLowerCase()` antes de Zod (preparado para R6 / SHA256 en n8n)
 - API route forward a n8n incluye `X-Webhook-Secret` (R2) y se activa solo cuando ambos env vars están definidos
 - `volumen` es opcional (no rompe si no se selecciona)
@@ -90,14 +90,16 @@ en el API route para enviar a n8n en lugar de Airtable directo — el payload ya
 3. ✅ `src/lib/airtable.ts` — cliente REST nativo: checkIdempotency, createProspecto, logError (R3+R7+R8)
 4. ✅ `src/lib/email.ts` — notificación HTML al equipo vía Resend (fetch nativo, sin SDK)
 5. ✅ `src/pages/api/contacto.ts` — `prerender = false` activo; flujo: Turnstile → Zod → dedup → Airtable → Resend
-6. ✅ `ContactSection.astro` — submit real al API (stub MVP eliminado); campo `industria` → `producto`; agrega `volumen` y `notas`
+6. ✅ `ContactSection.astro` — submit real al API (stub MVP eliminado); formulario multipaso con campos: empresaConstituida, empresa, cargo, industria, email, nombre, telefono
 7. ✅ Variables de entorno configuradas en `.env`
 8. ✅ Prueba end-to-end: lead llega a Airtable SANDBOX correctamente
 9. ✅ Prueba de idempotencia: doble submit con mismo UUID → 1 solo registro en Airtable
 
-**Schema Airtable SANDBOX — tabla PROSPECTOS (nombres exactos de columnas):**
-  Nombre · Empresa · Email · Whatsapp · Cargo · Producto · Volumen · Notas
-  idempotency_key · Estado · Fuente · Fecha
+**Schema Airtable SANDBOX — tabla PROSPECTOS (columnas que ESCRIBE `createProspecto` en airtable.ts):**
+  Nombre · Empresa · Email · Whatsapp · Cargo · Industria · Empresa_Constituida
+  idempotency_key · Estado · Fuente
+  (la base debe tener estas columnas con estos nombres exactos; `Fecha` puede existir como
+  "Created time" automático. Las columnas Producto/Volumen/Notas del brief original ya no se usan.)
 
 **Schema Airtable SANDBOX — tabla Cola de Errores:**
   payload_raw · error_mensaje · error_tipo · resuelto · timestamp (Created time)
@@ -106,77 +108,129 @@ en el API route para enviar a n8n en lugar de Airtable directo — el payload ya
   AIRTABLE_API_KEY · AIRTABLE_BASE_SANDBOX · RESEND_API_KEY · NOTIFY_EMAIL
   (AIRTABLE_BASE_PRODUCTION se configura cuando se duplique la base para producción)
 
-**Nota — formulario provisional:** los campos actuales (Producto, Volumen, Notas, Cargo)
-cambiarán en una iteración futura. Al cambiar: actualizar ContactSection.astro +
-ContactoSchema en contacto.ts + objeto fields en airtable.ts + columnas en Airtable.
-La columna `idempotency_key` NUNCA se renombra.
+**Nota — contrato del formulario:** si se cambian los campos, actualizar EN CONJUNTO:
+ContactSection.astro (UI) + ContactoSchema en contacto.ts (validación) + objeto `fields` en
+airtable.ts (escritura) + columnas en la base Airtable. La columna `idempotency_key` NUNCA se
+renombra. La lista de industrias vive en `INDUSTRIAS_VALIDAS` (contacto.ts) — fuente de verdad única.
 
 **Entregable:** 10 leads de prueba en SANDBOX sin duplicados, sin errores silenciosos.
 
 ---
 
-## ⬜ FASE 4 — Automatización de Notificaciones
+## ⬜ FASE 4 — Notificación WhatsApp (Meta Cloud API directa)
 
-**Objetivo:** El equipo es notificado inmediatamente cuando llega un lead calificado.
+**Objetivo:** El equipo recibe un mensaje de WhatsApp inmediatamente cuando llega un lead válido.
+
+**Decisión de arquitectura (2026-05-30):** n8n queda fuera de esta fase del desarrollo.
+n8n forma parte de las **automatizaciones empresariales** que se ofrecerán a Remy & Stute como
+servicio independiente una vez que el sitio esté 100% estable en producción. No se integrará
+en la página porque: (a) tiene costo mensual de suscripción separado, y (b) su complejidad
+es innecesaria para el flujo actual, donde email vía Resend ya cubre las notificaciones básicas.
+
+La notificación WhatsApp se implementará con una llamada directa a la **Meta WhatsApp Business
+Cloud API** (Graph API) desde `src/lib/whatsapp.ts`, igual que Resend — sin intermediarios.
 
 **Requiere antes de empezar:**
-- Fase 3 completada
-- WhatsApp Business API activa + template pre-aprobado en Meta Business Manager
+- Fase 3 completada ✅
+- WhatsApp Business App creada en Meta Developers Portal (el cliente ya tiene cuenta Meta)
+- Phone Number ID del número de negocio
+- System User con token permanente (no token temporal de 24h)
+- Template de mensaje pre-aprobado por Meta (proceso: 24–72h)
 
 **Puntos de trabajo:**
-1. ⬜ Extender el workflow n8n con nodo de calificación básica (¿sectores válidos? ¿volumen mínimo?)
-2. ⬜ Integrar WhatsApp Business API para notificación al equipo (template pre-aprobado en Meta Business Manager)
-3. ⬜ Integrar email de notificación al equipo vía n8n
-4. ⬜ Crear el Error Trigger obligatorio en todos los workflows: fallo → guardar en "Cola de Errores" + email de alerta (R8)
-5. ⬜ Probar el path de error: desconectar Airtable temporalmente → verificar que "Cola de Errores" captura el payload
-6. ⬜ Probar los 8 edge cases de automation-n8n.md: teléfono fijo, empresa vacía, presupuesto no-numérico, sector inválido, duplicados, Airtable fail, WhatsApp API fail, etc.
+1. ⬜ Crear `src/lib/whatsapp.ts` — función `notifyWhatsApp(lead)` con fetch directo a Graph API v21
+2. ⬜ Agregar `WHATSAPP_ACCESS_TOKEN` y `WHATSAPP_PHONE_NUMBER_ID` a `.env`
+3. ⬜ Llamar `notifyWhatsApp()` desde `api/contacto.ts` después de Airtable (best-effort, como Resend)
+4. ⬜ Probar con template aprobado: lead real → WhatsApp llega al equipo en < 2 min
+5. ⬜ Probar path de error: token inválido → logError() captura el fallo, no bloquea el 200 al cliente
 
-**Entregable:** Ningún lead se pierde silenciosamente. El equipo recibe WhatsApp + email en < 2 minutos.
+**Variables de entorno necesarias:**
+```bash
+WHATSAPP_ACCESS_TOKEN=EAAxxxxxxx      # System User token permanente (nunca el temporal de 24h)
+WHATSAPP_PHONE_NUMBER_ID=123456789    # ID del número en Meta Business
+WHATSAPP_TEMPLATE_NAME=nuevo_lead     # nombre exacto del template aprobado
+WHATSAPP_RECIPIENT_PHONE=+58412...    # teléfono del equipo que recibe la notificación
+```
+
+**Entregable:** Lead válido → email (Resend) + WhatsApp (Meta Cloud API) al equipo en < 2 minutos.
 
 ---
 
-## ⬜ FASE 5 — Analytics y Tracking
+## 🟡 FASE 5 — Analytics y Tracking (EN CURSO — 2026-05-31)
 
 **Objetivo:** Cada conversión es medible y deduplicada entre Pixel y CAPI.
 
-**Requiere antes de empezar:**
-- Fase 2 completada
-- Contenedor GTM creado
-- Cuenta Meta Business con Pixel y acceso a CAPI
+**Progreso sesión 2026-05-31:**
+- GTM `GTM-M9WVFZ9M` instalado en `BaseLayout.astro` (Main Thread, `is:inline` — R5)
+- `src/lib/analytics/dataLayer.ts` creado con `GenerateLeadEvent` + `trackEvent()` — INMUTABLE
+- `ContactSection.astro` → `dataLayer.push({ event: 'generate_lead', event_id, form_id, lead_empresa, lead_industria })` antes del fetch (R checklist)
+- En GTM: Variables DLV (event_id, form_id) + Activador generate_lead + Tag GA4 Configuración (G-VLNBY9FHV8, All Pages) + Tag GA4 Evento generate_lead → publicado
+- Meta Pixel: tag Custom HTML creado en GTM pero **PAUSADO** — no activo, pendiente Pixel ID real
+- Verificado con GTM Preview + GA4 Tiempo Real: datos fluyendo correctamente
+- Tracking de clics WhatsApp: pendiente (ver WHILECHANGES.md)
 
 **Puntos de trabajo:**
-1. ⬜ Crear contenedor GTM, instalar el snippet en BaseLayout.astro con is:inline (Main Thread, NO Partytown — R5)
-2. ⬜ Crear src/lib/analytics/dataLayer.ts con DataLayerEvents y trackEvent() — marcar como INMUTABLE
-3. ⬜ Configurar GA4 tag en GTM con evento generate_lead
-4. ⬜ Configurar Meta Pixel en GTM con evento Lead
-5. ⬜ Pasar el idempotencyKey como event_id en el dataLayer.push antes del submit (el mismo UUID que va a n8n)
-6. ⬜ Extender el workflow n8n para enviar el evento Lead a Meta CAPI con los datos SHA256-normalizados (.trim().toLowerCase() — R6)
-7. ⬜ Configurar consent mode en GTM: ad_storage y analytics_storage = 'denied' por defecto
-8. ⬜ Verificar deduplicación: mismo event_id en Pixel y CAPI → Meta Events Manager muestra 1 evento, no 2
-9. ⬜ Crear página de Privacy Policy en /privacidad, enlace visible en footer
+1. ✅ Instalar snippet GTM en BaseLayout.astro con is:inline (Main Thread, NO Partytown — R5)
+2. ✅ Crear src/lib/analytics/dataLayer.ts con DataLayerEvents y trackEvent() — INMUTABLE
+3. ✅ Tag GA4 Configuración en GTM + evento generate_lead con event_id
+4. 🟡 Meta Pixel en GTM — tag creado y pausado; activar cuando haya campañas de Meta Ads activas
+5. ✅ idempotencyKey como event_id en dataLayer.push antes del submit
+6. ⬜ Meta CAPI — pendiente activación del Pixel; sin n8n (ver decisión Fase 4)
+7. ⬜ Consent mode en GTM: ad_storage y analytics_storage = 'denied' por defecto
+8. ⬜ Verificar deduplicación Pixel + CAPI (depende de activar Meta Pixel)
+9. ✅ Página /privacidad con enlace en footer
 
-**Entregable:** GTM Preview muestra generate_lead con event_id. Meta Events Manager confirma CAPI deduplica correctamente.
+**Entregable:** GTM Preview muestra generate_lead con event_id ✅. Meta Events Manager deduplica correctamente ⬜ (pendiente activar Pixel).
 
 ---
 
-## ⬜ FASE 6 — SEO y Contenido
+## 🟡 FASE 6 — SEO y Contenido (EN CURSO — 2026-06-02)
 
-**Objetivo:** El sitio atrae tráfico orgánico calificado de Google Venezuela.
+**Objetivo:** El sitio atrae tráfico orgánico calificado de Google Venezuela. Cada página tiene metadata SEO precisa, schema.org que activa rich results, imágenes optimizadas para Core Web Vitals y estructura rastreable e indexable por Google para búsquedas B2B industriales venezolanas.
 
-**Requiere antes de empezar:**
-- Fase 1 completada
-- Cuenta Sanity CMS creada
+**Progreso sesión 2026-06-02:**
+- `public/robots.txt` y `public/favicon.svg` creados
+- `imageService: "compile"` activado en adapter Cloudflare — imágenes procesadas en build time
+- Metadata SEO completa en las 5 páginas (title, description, canonical auto, ogImage con fallback, og:locale es_VE, Twitter Card)
+- Schema.org `@graph` global en `BaseLayout.astro`: `LocalBusiness`+`WholesaleStore` (`#business`) + `WebSite` (`#website`) con `SearchAction`
+- Schemas por página vía `slot="head"`: `CollectionPage` + `AboutPage` + `ContactPage` + `BreadcrumbList` en las 3 páginas interiores
+- `<Image />` de `astro:assets` en Hero (4 slides) y NosotrosSection — `srcset` automático, sin CLS
+- Lucide Icons: `defer is:inline` — deja de bloquear LCP
+- Google Fonts: `display=swap` + `preconnect` a `fonts.googleapis.com` y `fonts.gstatic.com`
+- `/privacidad` creada (9 secciones legales completas), enlace visible en footer
+- `/casos`, `/recursos` y `PageInConstruction.astro` eliminados definitivamente del proyecto
 
 **Puntos de trabajo:**
-1. ⬜ Integrar Sanity CMS para gestión de contenido dinámico (casos de éxito, blog, fichas de productos)
-2. ⬜ Completar las páginas con contenido real: /soluciones (por sector), /casos (casos de éxito), /recursos (artículos SEO)
-3. ⬜ Implementar metadata SEO en cada página: title, description, OG tags, schema.org LocalBusiness
-4. ⬜ Configurar @astrojs/sitemap y robots.txt
-5. ⬜ Optimizar imágenes con Image de Astro (WebP, lazy loading)
-6. ⬜ Keywords target por página según web-astro.md: "servicios [industria] Venezuela", "[sector] B2B Venezuela"
-7. ⬜ Configurar dominio en Cloudflare con HTTPS forzado
+1. ✅ `public/robots.txt` — `Allow: /` + referencia al sitemap generado por Astro
+2. ✅ `public/favicon.svg` — ícono temporal (verde `#006633` + "R") hasta SVG oficial del cliente
+3. ✅ `imageService: "compile"` en `astro.config.mjs` — compatible con Cloudflare Workers
+4. ✅ Metadata SEO completa en `BaseLayout.astro` con props `title`, `description`, `canonical`, `ogImage`, `noindex`
+5. ✅ Schema.org `@graph` global: `LocalBusiness`+`WholesaleStore` + `WebSite` con `SearchAction` — RIF `J-30298111-5`, `foundingDate: 1995`, dirección Caracas/DC/VE, `knowsAbout` 8 sectores
+6. ✅ Schemas por página: `CollectionPage` en `/productos`, `AboutPage` en `/nosotros`, `ContactPage` en `/contacto`, `BreadcrumbList` en las 3
+7. ✅ `<Image />` con `widths={[768, 1280, 1920]}` en Hero (4 slides, primer `eager`, resto `lazy`) y NosotrosSection (`eager`)
+8. ✅ Lucide Icons CDN con `defer is:inline` — LCP no bloqueado
+9. ✅ Google Fonts con `display=swap` + `preconnect` activos
+10. ✅ `/privacidad` creada (Responsable · Datos · Finalidad · Base jurídica · Proveedores · Cookies · Conservación · Derechos · Cambios)
+11. ⬜ Google Rich Results Test — pendiente de deploy en dominio real
+12. ⬜ Google Search Console — pendiente de deploy y verificación de dominio
+13. ⬜ Lighthouse mobile > 90 — pendiente de audit post-deploy (Fase 7)
+14. ⬜ Keywords objetivo por página — pendiente definición con el cliente
+15. ⬜ `public/og-default.jpg` (1200×630px) — pendiente asset de diseño del cliente
+16. ⬜ Google Business Profile — requiere que el cliente cree/reclame el perfil
+17. ⬜ `sameAs` en schema — pendiente URLs LinkedIn y perfiles sociales del cliente
+18. ⬜ `FAQPage` schema — requiere definir preguntas con el cliente
+19. ⬜ `Product` schema en `/productos` — requiere SKUs y especificaciones reales
+20. ⬜ Bing Webmaster Tools — pendiente submit post-deploy
 
-**Entregable:** Lighthouse mobile > 90 en todas las páginas. Sitemap enviado a Google Search Console.
+**Notas de implementación:**
+- RIF `J-30298111-5` confirmado y consistente en Footer, schema.org y `/privacidad`
+- Ubicación: `Caracas, Distrito Capital` — cliente no desea mayor precisión
+- Fotos actuales (incluidas 2 de Unsplash en sectores Industrial y Aminoácidos) aprobadas por el cliente hasta tener fotos reales
+- `IndustriasServidas.astro` sin migrar a `<Image />` — contenedores con `min-height` explícita eliminan riesgo de CLS; fotos Unsplash provisionales aprobadas
+- Sanity CMS diferido — no bloquea lanzamiento; decisión arquitectónica abierta
+- `astro check` → 0 errores, 0 warnings, 0 hints en 23 archivos
+
+**Entregable:** Metadata SEO, schema.org `@graph`, imágenes con `srcset` y `/privacidad` activos en todas las páginas. Pendiente: Rich Results Test + GSC + Lighthouse post-deploy (Fase 7).
 
 ---
 
@@ -184,20 +238,28 @@ La columna `idempotency_key` NUNCA se renombra.
 
 **Objetivo:** Todos los checklists de CLAUDE.md en verde antes de cambiar a PRODUCCIÓN.
 
+**Decisión de infraestructura (2026-05-31):**
+El cliente tiene hosting y dominio activo en **Bluehost** (hosting compartido — no soporta Node.js SSR).
+El sitio tiene un servidor SSR activo (`/api/contacto`), por lo que no puede ir directo a Bluehost.
+**Estrategia elegida:** Cloudflare Pages como hosting SSR + cambio de DNS en Bluehost para apuntar al dominio al sitio en Cloudflare. El cliente conserva su dominio. Adapter migrado de `@astrojs/netlify` → `@astrojs/cloudflare` (v12, compatible con Astro 5). Build verificado ✅.
+
 **Requiere antes de empezar:**
-- Fases 1–6 completadas
+- Fases 1–5 completadas
+- Cuenta de Cloudflare creada (gratuita)
+- Acceso al panel de Bluehost para cambiar DNS
 
 **Puntos de trabajo:**
-1. ⬜ Ejecutar el Checklist: Webhook n8n listo para producción (7 ítems de CLAUDE.md)
-2. ⬜ Ejecutar el Checklist: Sitio Astro listo para producción (6 ítems de CLAUDE.md)
-3. ⬜ Ejecutar el Checklist: Analytics listo para producción (6 ítems de CLAUDE.md)
-4. ⬜ Lighthouse audit completo: LCP < 2.5s, CLS = 0, INP < 200ms
-5. ⬜ Deploy a Vercel (o Cloudflare Pages) con variables de entorno en producción
-6. ⬜ Dry-run final en SANDBOX: 10 leads de prueba sin errores en 48 horas
-7. ⬜ Confirmación explícita en el chat → cambiar AIRTABLE_TARGET_BASE a PRODUCTION
-8. ⬜ Monitoreo post-lanzamiento: 48h observando "Cola de Errores" antes de considerar estable
+1. ⬜ Ejecutar Checklist: Sitio Astro listo para producción (6 ítems de CLAUDE.md)
+2. ⬜ Ejecutar Checklist: Analytics listo para producción (ítems aplicables — n8n excluido, CAPI pendiente)
+3. ⬜ Lighthouse audit completo: LCP < 2.5s, CLS = 0, INP < 200ms
+4. ⬜ Crear proyecto en Cloudflare Pages + conectar repositorio git
+5. ⬜ Configurar variables de entorno de producción en el panel de Cloudflare Pages
+6. ⬜ Añadir dominio del cliente a Cloudflare → cambiar nameservers en Bluehost → apuntar dominio a Cloudflare Pages
+7. ⬜ Dry-run final: duplicar base Airtable SANDBOX → crear AIRTABLE_BASE_PRODUCTION + 10 leads de prueba sin errores
+8. ⬜ Confirmación explícita en el chat → cambiar base target a PRODUCTION en airtable.ts
+9. ⬜ Monitoreo post-lanzamiento: 48h observando "Cola de Errores" antes de declarar estable
 
-**Entregable:** MVP en producción recibiendo leads reales en Airtable PRODUCCIÓN.
+**Entregable:** MVP en producción en el dominio del cliente, recibiendo leads reales en Airtable PRODUCCIÓN.
 
 ---
 
@@ -208,7 +270,7 @@ La columna `idempotency_key` NUNCA se renombra.
 | 1    | Fundación Astro     | Ninguna                               | ✅ Completa |
 | 2    | Formulario validado | Fase 1 + Cloudflare Turnstile         | ✅ Completa  |
 | 3    | CRM Airtable        | Fase 2 + Airtable                     | ✅ Completa  |
-| 4    | Notificaciones      | Fase 3 + WhatsApp Business API        | ⬜ Pendiente |
-| 5    | Analytics           | Fase 2 + GTM + Meta CAPI              | ⬜ Pendiente |
-| 6    | SEO y Contenido     | Fase 1 + Sanity CMS                   | ⬜ Pendiente |
-| 7    | QA y Lanzamiento    | Fases 1–6 completas                   | ⬜ Pendiente |
+| 4    | WhatsApp (Meta API) | Fase 3 + Meta WhatsApp Cloud API      | ⬜ Pendiente |
+| 5    | Analytics           | Fase 2 + GTM + GA4 + Meta Pixel       | 🟡 En curso  |
+| 6    | SEO y Contenido     | Fase 1 + Sanity CMS                   | 🟡 En curso  |
+| 7    | QA y Lanzamiento    | Fases 1–5 + dominio                   | ⬜ Pendiente |

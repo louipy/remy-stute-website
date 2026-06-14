@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import slide1 from "../assets/carrusel-inicio-01-1920.webp";
 import slide2 from "../assets/carrusel-inicio-02-1920.webp";
 import slide3 from "../assets/carrusel-inicio-03-1920.webp";
@@ -12,10 +13,10 @@ const stats = [
 ];
 
 const heroSlides = [
-  { src: slide1.src, alt: "Instalaciones Remy & Stute" },
-  { src: slide2.src, alt: "Materia prima industrial en almacén" },
-  { src: slide3.src, alt: "Operaciones de despacho Remy & Stute" },
-  { src: slide4.src, alt: "Materia prima industrial Remy & Stute" },
+  { src: slide1, alt: "Instalaciones Remy & Stute" },
+  { src: slide2, alt: "Materia prima industrial en almacén" },
+  { src: slide3, alt: "Operaciones de despacho Remy & Stute" },
+  { src: slide4, alt: "Materia prima industrial Remy & Stute" },
 ];
 ---
 
@@ -66,10 +67,12 @@ const heroSlides = [
   <div class="hero__media">
     <div class="hero__slides" id="heroSlides">
       {heroSlides.map((slide, i) => (
-        <img
+        <Image
           class:list={["hero__slide", { "is-active": i === 0 }]}
           src={slide.src}
           alt={slide.alt}
+          widths={[768, 1280, 1920]}
+          sizes="(max-width: 980px) 100vw, 50vw"
           loading={i === 0 ? "eager" : "lazy"}
           decoding="async"
         />

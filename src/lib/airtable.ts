@@ -13,6 +13,7 @@
 import type { ContactoData } from './schemas/contacto';
 
 const AIRTABLE_API = 'https://api.airtable.com/v0';
+const REQUEST_TIMEOUT_MS = 10_000; // corta requests colgadas antes del límite del Worker
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -26,6 +27,7 @@ async function airtableFetch(
 ): Promise<Response> {
   const res = await fetch(url, {
     ...options,
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
@@ -120,29 +122,31 @@ export async function createProspecto(data: ContactoData): Promise<void> {
 export async function logError(
   payload: unknown,
   errorMensaje: string,
-  errorTipo: 'Airtable' | 'Email' | 'Interno',
+  errorTipo: 'Airtable' | 'Email' | 'MetaCAPI' | 'Interno',
 ): Promise<void> {
   try {
     const { apiKey, baseId } = getCredentials();
-    await fetch(`${AIRTABLE_API}/${baseId}/Cola%20de%20Errores`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        records: [
-          {
-            fields: {
-              payload_raw: JSON.stringify(payload),
-              error_mensaje: errorMensaje.slice(0, 255),
-              error_tipo: errorTipo,
-              resuelto: false,
+    // R7: pasa por airtableFetch para heredar el retry con backoff en 429 —
+    // los errores suelen llegar justo cuando Airtable está rate-limiteando.
+    await airtableFetch(
+      `${AIRTABLE_API}/${baseId}/Cola%20de%20Errores`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          records: [
+            {
+              fields: {
+                payload_raw: JSON.stringify(payload),
+                error_mensaje: errorMensaje.slice(0, 255),
+                error_tipo: errorTipo,
+                resuelto: false,
+              },
             },
-          },
-        ],
-      }),
-    });
+          ],
+        }),
+      },
+      apiKey,
+    );
     await sleep(250); // R7
   } catch {
     // Silencioso intencionalmente: el log de error no debe enmascarar el error original.

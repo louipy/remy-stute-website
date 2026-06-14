@@ -2,11 +2,33 @@
 import BaseLayout from "@layouts/BaseLayout.astro";
 import NosotrosSection from "@components/NosotrosSection.astro";
 
-const title = "Nosotros — Remy & Stute C.A.";
+const title = "30 Años en Materia Prima Industrial Venezuela | Remy & Stute C.A.";
 const description =
   "30 años importando materia prima industrial en Venezuela. Representante exclusivo de Addcon, Yipin Pigmentos y Minerales Industriales, con stock local y despacho nacional.";
 ---
 
 <BaseLayout title={title} description={description} theme="dark" active="nosotros">
+  <Fragment slot="head">
+    <script type="application/ld+json" is:inline set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "AboutPage",
+          "@id": "https://remyvenezuela.com/nosotros#webpage",
+          "url": "https://remyvenezuela.com/nosotros",
+          "name": "30 Años en Materia Prima Industrial Venezuela | Remy & Stute C.A.",
+          "isPartOf": { "@id": "https://remyvenezuela.com/#website" },
+          "about": { "@id": "https://remyvenezuela.com/#business" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://remyvenezuela.com" },
+            { "@type": "ListItem", "position": 2, "name": "Nosotros", "item": "https://remyvenezuela.com/nosotros" }
+          ]
+        }
+      ]
+    })} />
+  </Fragment>
   <NosotrosSection />
 </BaseLayout>

@@ -295,9 +295,24 @@ a { color: inherit; }
 @media (max-width: 860px) {
   :root { --pad: 20px; }
   .nav, .header-phone { display: none; }
-  .burger { display: flex; }
+  /* En móvil el CTA vive dentro del menú lateral (drawer): evita que el botón
+     "Solicitar cotización" choque con el logo/nombre al hacer scroll. */
+  .site-header .header-right .btn--primary { display: none; }
+  .header-right { gap: 0; }
+  /* Touch target accesible para la hamburguesa (mín. 44×44). */
+  .burger {
+    display: flex;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px 24px; }
   .footer-bottom { flex-direction: column; gap: 8px; }
+  /* Área táctil más cómoda para enlaces del footer (sin afectar el logo). */
+  .footer-links a,
+  .footer-col p a { display: inline-block; padding: 8px 0; }
   .pic h1 { font-size: 44px; }
 }
 @media (max-width: 560px) {
@@ -315,21 +330,54 @@ a { color: inherit; }
 .drawer-overlay.open { display: block; }
 .drawer {
   position: fixed;
-  top: 0; right: -300px; bottom: 0;
-  width: 280px;
+  top: 0; right: -320px; bottom: 0;
+  width: 300px;
+  max-width: 84vw;
   background: var(--white);
   z-index: 120;
-  padding: 28px 24px;
+  padding: 16px 24px 28px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 0;
   transition: right 240ms ease;
   border-left: 1px solid var(--border);
 }
 body[data-theme="dark"] .drawer { background: var(--ink); border-left-color: rgba(255,255,255,0.1); }
 .drawer.open { right: 0; }
 .drawer a { font-size: 16px; font-weight: 500; color: inherit; text-decoration: none; }
-.drawer-close { align-self: flex-end; background: none; border: 0; cursor: pointer; font-size: 24px; color: inherit; }
+
+/* Enlaces de sección — fila táctil de 48px con separador */
+.drawer-link:not(.btn) {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  transition: color 160ms;
+}
+body[data-theme="dark"] .drawer-link:not(.btn) { border-bottom-color: rgba(255,255,255,0.1); }
+.drawer-link:not(.btn):hover { color: var(--green); }
+.drawer-link[aria-current="page"] { color: var(--green); font-weight: 600; }
+/* CTA dentro del menú — separado del listado */
+.drawer-link.btn { margin-top: 20px; }
+
+/* Botón cerrar — área táctil 44×44, alineado a la esquina */
+.drawer-close {
+  align-self: flex-end;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: 30px;
+  line-height: 1;
+  color: inherit;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: -8px;
+  margin-bottom: 4px;
+}
 
 /* utilidades de animación */
 .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }

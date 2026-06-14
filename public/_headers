@@ -1,0 +1,22 @@
+# Cloudflare Pages — cabeceras HTTP.
+# Astro copia public/ a la raíz del build, así que este archivo termina en dist/_headers.
+# Formato: una línea con el patrón de ruta, luego cabeceras indentadas.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=31536000
+
+# ── Content-Security-Policy (PLANTILLA — validar antes de activar) ──────────────
+# NO habilitar a ciegas: una CSP mal ajustada bloquea Turnstile/GTM/GA4/Meta y, con
+# Turnstile bloqueado, se cae el envío de leads (función crítica del sitio).
+# Pasos recomendados:
+#   1. Servir primero como Content-Security-Policy-Report-Only y revisar la consola.
+#   2. Ajustar orígenes según lo que reporte (analytics, fuentes, imágenes, etc.).
+#   3. Recién entonces cambiar a Content-Security-Policy (enforce).
+# Nota: hay scripts inline (snippet GTM, JSON-LD, wizard del formulario) sin nonce,
+# por eso script-src requiere 'unsafe-inline' salvo que se migre a nonces/hashes.
+#
+#  Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src https://challenges.cloudflare.com https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://challenges.cloudflare.com; base-uri 'self'; form-action 'self'

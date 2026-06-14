@@ -1,5 +1,6 @@
 ---
 import LogoNavbar from '../assets/logo-navbar-2.svg?raw';
+import { INDUSTRIAS_VALIDAS } from '../lib/schemas/contacto';
 const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? '';
 const hasTurnstile = Boolean(siteKey);
 ---
@@ -47,18 +48,18 @@ const hasTurnstile = Boolean(siteKey);
 
     <!-- Columna derecha: formulario multi-paso -->
     <div class="ct-formwrap">
-      <div id="msfContainer" class="msf-card">
+      <form id="msfContainer" class="msf-card" novalidate>
 
         <!-- ── PASO 1: Filtro de calificación ── -->
         <div id="msf-step1" class="msf-step">
-          <p class="msf-q">¿Es su empresa una industria constituida?</p>
-          <div class="msf-opts">
+          <p class="msf-q" id="msf-step1-q">¿Es su empresa una industria constituida?</p>
+          <div class="msf-opts" role="radiogroup" aria-labelledby="msf-step1-q">
             <label class="msf-opt">
-              <input type="radio" name="step1" value="Sí, somos empresa industrial con RIF activo" hidden>
+              <input type="radio" name="step1" value="Sí, somos empresa industrial con RIF activo" class="sr-only">
               Sí, somos empresa industrial con RIF activo
             </label>
             <label class="msf-opt">
-              <input type="radio" name="step1" value="No" hidden>
+              <input type="radio" name="step1" value="No" class="sr-only">
               No
             </label>
           </div>
@@ -104,31 +105,30 @@ const hasTurnstile = Boolean(siteKey);
 
           <!-- Paso 3: Cargo -->
           <div id="msf-step3" class="msf-panel" style="display:none;">
-            <p class="msf-q">¿Cuál es su cargo?</p>
-            <div class="msf-opts">
-              <label class="msf-opt"><input type="radio" name="cargo" value="Jefe/Gerente de Compras" hidden>Jefe/Gerente de Compras</label>
-              <label class="msf-opt"><input type="radio" name="cargo" value="Gerente de Planta" hidden>Gerente de Planta</label>
-              <label class="msf-opt"><input type="radio" name="cargo" value="Ingeniero de Procesos" hidden>Ingeniero de Procesos</label>
-              <label class="msf-opt"><input type="radio" name="cargo" value="Formulador / Laboratorio" hidden>Formulador / Laboratorio</label>
-              <label class="msf-opt"><input type="radio" name="cargo" value="Director General / Dueño" hidden>Director General / Dueño</label>
-              <label class="msf-opt"><input type="radio" name="cargo" value="Nutricionista / Formulador Feed" hidden>Nutricionista / Formulador Feed</label>
-              <label class="msf-opt"><input type="radio" name="cargo" value="Otro" hidden>Otro</label>
+            <p class="msf-q" id="msf-step3-q">¿Cuál es su cargo?</p>
+            <div class="msf-opts" role="radiogroup" aria-labelledby="msf-step3-q">
+              <label class="msf-opt"><input type="radio" name="cargo" value="Jefe/Gerente de Compras" class="sr-only">Jefe/Gerente de Compras</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Gerente de Planta" class="sr-only">Gerente de Planta</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Ingeniero de Procesos" class="sr-only">Ingeniero de Procesos</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Formulador / Laboratorio" class="sr-only">Formulador / Laboratorio</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Director General / Dueño" class="sr-only">Director General / Dueño</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Nutricionista / Formulador Feed" class="sr-only">Nutricionista / Formulador Feed</label>
+              <label class="msf-opt"><input type="radio" name="cargo" value="Otro" class="sr-only">Otro</label>
             </div>
             <div id="cargo-otro-wrap" style="display:none; margin-top:10px;">
-              <input type="text" id="cargo-otro-input" class="msf-input">
+              <label class="sr-only" for="cargo-otro-input">Especifique su cargo</label>
+              <input type="text" id="cargo-otro-input" class="msf-input" placeholder="Especifique su cargo">
             </div>
             <button type="button" class="msf-btn" id="btn-s3" disabled>Continuar</button>
           </div>
 
           <!-- Paso 4: Industria -->
           <div id="msf-step4" class="msf-panel" style="display:none;">
-            <p class="msf-q">¿En qué industria opera su empresa?</p>
-            <div class="msf-opts">
-              <label class="msf-opt"><input type="radio" name="industria" value="General" hidden>General</label>
-              <label class="msf-opt"><input type="radio" name="industria" value="Cerámicas" hidden>Cerámicas</label>
-              <label class="msf-opt"><input type="radio" name="industria" value="Hidrocarburos" hidden>Hidrocarburos</label>
-              <label class="msf-opt"><input type="radio" name="industria" value="Pinturas" hidden>Pinturas</label>
-              <label class="msf-opt"><input type="radio" name="industria" value="Alimento Animal" hidden>Alimento Animal</label>
+            <p class="msf-q" id="msf-step4-q">¿En qué industria opera su empresa?</p>
+            <div class="msf-opts" role="radiogroup" aria-labelledby="msf-step4-q">
+              {INDUSTRIAS_VALIDAS.map((ind) => (
+                <label class="msf-opt"><input type="radio" name="industria" value={ind} class="sr-only" />{ind}</label>
+              ))}
             </div>
             <button type="button" class="msf-btn" id="btn-s4" disabled>Continuar</button>
           </div>
@@ -156,8 +156,8 @@ const hasTurnstile = Boolean(siteKey);
             {hasTurnstile && (
               <div class="cf-turnstile" data-sitekey={siteKey} data-theme="dark" style="margin-top:1rem;"></div>
             )}
-            <p class="msf-err" id="msf-global-err"></p>
-            <button type="button" class="msf-btn" id="btn-s5" disabled>Enviar formulario</button>
+            <p class="msf-err" id="msf-global-err" role="alert" aria-live="assertive"></p>
+            <button type="submit" class="msf-btn" id="btn-s5" disabled>Enviar formulario</button>
             <p class="msf-footer-note">
               Tu información es confidencial. Solo la usa el equipo de Remy &amp; Stute.
             </p>
@@ -190,7 +190,7 @@ const hasTurnstile = Boolean(siteKey);
           </p>
         </div>
 
-      </div><!-- end msf-card -->
+      </form><!-- end msf-card -->
     </div>
 
   </div>
@@ -390,9 +390,28 @@ const hasTurnstile = Boolean(siteKey);
   }
   .msf-opt:last-child { margin-bottom: 0; }
   .msf-opt:hover { border-color: rgba(200,240,77,0.4); }
-  .msf-opt.selected {
+  .msf-opt:has(input:checked) {
     border-color: #C8F04D;
     background: rgba(200,240,77,0.08);
+  }
+  /* Foco de teclado visible en la opción (el radio real está sr-only) */
+  .msf-opt:focus-within {
+    border-color: rgba(200,240,77,0.6);
+    outline: 2px solid rgba(200,240,77,0.5);
+    outline-offset: 2px;
+  }
+
+  /* Visualmente oculto pero accesible y enfocable (no display:none) */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   /* Input de texto */
@@ -695,14 +714,11 @@ const hasTurnstile = Boolean(siteKey);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  /* ── Paso 1 ── */
-  document.querySelectorAll('#msf-step1 .msf-opt').forEach(function (card) {
-    card.addEventListener('click', function () {
-      document.querySelectorAll('#msf-step1 .msf-opt').forEach(function (c) { c.classList.remove('selected'); });
-      card.classList.add('selected');
-      var val = card.querySelector('input').value;
-      formData.empresaConstituida = val;
-      if (val === 'No') {
+  /* ── Paso 1 ── (change = funciona con click de ratón y con teclado) */
+  document.querySelectorAll('#msf-step1 input[name="step1"]').forEach(function (input) {
+    input.addEventListener('change', function () {
+      formData.empresaConstituida = input.value;
+      if (input.value === 'No') {
         setTimeout(function () {
           step1El.style.display = 'none';
           closeEl.style.display = 'block';
@@ -713,22 +729,32 @@ const hasTurnstile = Boolean(siteKey);
     });
   });
 
+  // Enter en un campo de texto intermedio activa su botón "Continuar" (si está
+  // habilitado). El paso 5 ya envía por submisión implícita del <form>.
+  function enterAvanza(input, btn) {
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!btn.disabled) btn.click();
+      }
+    });
+  }
+
   /* ── Paso 2: empresa ── */
   var s2input = document.getElementById('msf-empresa');
   var btnS2   = document.getElementById('btn-s2');
   s2input.addEventListener('input', function () { btnS2.disabled = s2input.value.trim().length < 3; });
   btnS2.addEventListener('click', function () { formData.empresa = s2input.value.trim(); goToStep(3); });
+  enterAvanza(s2input, btnS2);
 
   /* ── Paso 3: cargo ── */
   var btnS3        = document.getElementById('btn-s3');
   var cargoOtroW   = document.getElementById('cargo-otro-wrap');
   var cargoOtroInp = document.getElementById('cargo-otro-input');
 
-  document.querySelectorAll('#msf-step3 .msf-opt').forEach(function (card) {
-    card.addEventListener('click', function () {
-      document.querySelectorAll('#msf-step3 .msf-opt').forEach(function (c) { c.classList.remove('selected'); });
-      card.classList.add('selected');
-      if (card.querySelector('input').value === 'Otro') {
+  document.querySelectorAll('#msf-step3 input[name="cargo"]').forEach(function (input) {
+    input.addEventListener('change', function () {
+      if (input.value === 'Otro') {
         cargoOtroW.style.display = 'block';
         cargoOtroInp.focus();
         validateCargo();
@@ -740,33 +766,32 @@ const hasTurnstile = Boolean(siteKey);
   });
 
   cargoOtroInp.addEventListener('input', validateCargo);
+  enterAvanza(cargoOtroInp, btnS3);
 
   function validateCargo() {
-    var sel = document.querySelector('#msf-step3 .msf-opt.selected');
-    if (!sel) { btnS3.disabled = true; return; }
-    btnS3.disabled = sel.querySelector('input').value === 'Otro'
+    var checked = document.querySelector('#msf-step3 input[name="cargo"]:checked');
+    if (!checked) { btnS3.disabled = true; return; }
+    btnS3.disabled = checked.value === 'Otro'
       ? cargoOtroInp.value.trim().length === 0
       : false;
   }
 
   btnS3.addEventListener('click', function () {
-    var sel = document.querySelector('#msf-step3 .msf-opt.selected');
-    var val = sel.querySelector('input').value;
-    formData.cargo = val === 'Otro' ? cargoOtroInp.value.trim() : val;
+    var checked = document.querySelector('#msf-step3 input[name="cargo"]:checked');
+    if (!checked) return;
+    formData.cargo = checked.value === 'Otro' ? cargoOtroInp.value.trim() : checked.value;
     goToStep(4);
   });
 
   /* ── Paso 4: industria ── */
   var btnS4 = document.getElementById('btn-s4');
-  document.querySelectorAll('#msf-step4 .msf-opt').forEach(function (card) {
-    card.addEventListener('click', function () {
-      document.querySelectorAll('#msf-step4 .msf-opt').forEach(function (c) { c.classList.remove('selected'); });
-      card.classList.add('selected');
-      btnS4.disabled = false;
-    });
+  document.querySelectorAll('#msf-step4 input[name="industria"]').forEach(function (input) {
+    input.addEventListener('change', function () { btnS4.disabled = false; });
   });
   btnS4.addEventListener('click', function () {
-    formData.industria = document.querySelector('#msf-step4 .msf-opt.selected').querySelector('input').value;
+    var checked = document.querySelector('#msf-step4 input[name="industria"]:checked');
+    if (!checked) return;
+    formData.industria = checked.value;
     goToStep(5);
   });
 
@@ -786,12 +811,25 @@ const hasTurnstile = Boolean(siteKey);
     el.addEventListener('input', validateS5);
   });
 
-  btnS5.addEventListener('click', async function () {
+  // B2: tras un error, el token de Turnstile ya se consumió (single-use);
+  // resetearlo evita que el reintento falle con 403 por token gastado.
+  function resetTurnstile() {
+    if (window.turnstile && typeof window.turnstile.reset === 'function') {
+      try { window.turnstile.reset(); } catch (_) {}
+    }
+  }
+
+  function submitError(msg) {
+    if (globalErr) globalErr.textContent = msg;
+    resetTurnstile();
+    btnS5.disabled = false;
+    btnS5.textContent = 'Enviar formulario';
+  }
+
+  async function submitForm() {
     formData.email    = s5email.value.trim().toLowerCase();
     formData.nombre   = s5nombre.value.trim();
     formData.telefono = s5telefono.value.trim();
-
-    console.log(JSON.stringify(formData, null, 2));
 
     var turnstileInput = document.querySelector('[name="cf-turnstile-response"]');
     var turnstile_token = turnstileInput ? turnstileInput.value : '';
@@ -799,6 +837,17 @@ const hasTurnstile = Boolean(siteKey);
     btnS5.disabled = true;
     btnS5.textContent = 'Enviando…';
     if (globalErr) globalErr.textContent = '';
+
+    // Shape acoplado a GenerateLeadEvent en src/lib/analytics/dataLayer.ts.
+    // (push inline: este script es is:inline y no puede importar el módulo tipado.)
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'generate_lead',
+      event_id: formData.idempotencyKey,
+      form_id: 'contacto',
+      lead_empresa: formData.empresa,
+      lead_industria: formData.industria,
+    });
 
     try {
       var payload = Object.assign({}, formData, { turnstile_token: turnstile_token });
@@ -823,7 +872,7 @@ const hasTurnstile = Boolean(siteKey);
           }, 30);
         }, 200);
       } else {
-        var json = await res.json();
+        var json = await res.json().catch(function () { return {}; });
         var errMsg = 'Error al enviar. Por favor, intente de nuevo.';
         if (res.status === 403) {
           errMsg = 'Error de verificación. Recargue la página e intente de nuevo.';
@@ -831,15 +880,22 @@ const hasTurnstile = Boolean(siteKey);
           var first = Object.values(json.fieldErrors).flat()[0];
           if (first) errMsg = first;
         }
-        if (globalErr) globalErr.textContent = errMsg;
-        btnS5.disabled = false;
-        btnS5.textContent = 'Enviar formulario';
+        submitError(errMsg);
       }
     } catch (_) {
-      if (globalErr) globalErr.textContent = 'Error de conexión. Verifique su conexión e intente de nuevo.';
-      btnS5.disabled = false;
-      btnS5.textContent = 'Enviar formulario';
+      submitError('Error de conexión. Verifique su conexión e intente de nuevo.');
     }
+  }
+
+  // El form es semántico: Enter envía. Según el paso, avanza o ejecuta el submit final.
+  document.getElementById('msfContainer').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (currentStep === 5) {
+      if (!btnS5.disabled) submitForm();
+      return;
+    }
+    var stepBtn = document.getElementById('btn-s' + currentStep);
+    if (stepBtn && !stepBtn.disabled) stepBtn.click();
   });
 })();
 </script>

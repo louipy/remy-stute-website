@@ -27,6 +27,20 @@ Estados: `⬜ pendiente` | `🟡 en curso` | `✅ hecho`
 
 ## Pendientes
 
+### ⬜ Tracking de clics de WhatsApp en GTM
+- **Categoría:** analytics
+- **Agregado:** 2026-05-31
+- **Bloqueado por:** nada — se hace 100% desde la interfaz de GTM, sin tocar código
+- **Riesgo de romper código:** ninguno
+- **Contexto:** Los clics al botón flotante de WhatsApp y a los enlaces wa.me del sitio no están siendo registrados en GA4. Se identificó en sesión 2026-05-31 pero se dejó pendiente para no retrasar el deploy.
+- **Pasos (todos en GTM, sin código):**
+  1. Variables → Activar variables integradas → activar `Click URL`
+  2. Activadores → Nuevo → Clic en solo enlaces → condición: `Click URL contiene wa.me` → nombre: `Activador - WhatsApp Click`
+  3. Etiquetas → Nueva → GA4 Evento → nombre del evento: `whatsapp_click` → activador del paso anterior → nombre: `GA4 - WhatsApp Click`
+  4. Publicar
+- **Archivos afectados:** ninguno (solo GTM web interface)
+- **Notas:** Después de activar, GA4 Informes → Participación → Eventos mostrará `whatsapp_click` con el desglose por página de origen.
+
 ### ⬜ Rediseño visual — aplicar manual de imagen de la empresa
 - **Categoría:** diseño
 - **Agregado:** 2026-05-14
@@ -57,23 +71,31 @@ Ubicación destino: `public/brand/`
 #### Cambios CON CUIDADO (no romper Fase 2)
 Los siguientes contratos del formulario no pueden cambiar sin actualizar también el JS y la API:
 
+> Contrato real actualizado tras el refactor de accesibilidad (2026-06-14). El formulario es un
+> wizard multipaso manejado por JS, no un `<form>` con inputs `name` enviados como FormData.
+
 ```
 src/components/ContactSection.astro
-  ├─ <form id="contactoForm">                           ← JS hook
-  ├─ id="formSuccess", id="contactoSubmit", id="idempotencyKey"
-  ├─ <input name="nombre|empresa|email|whatsapp|cargo|producto|volumen|notas">
-  │                                                    ← API espera estos nombres exactos
-  │                                                    ← (rediseño 2026-05-19: se quitó 'industria', se agregó 'notas')
-  ├─ <input name="idempotency_key">                    ← R3
-  ├─ <div class="cf-turnstile" data-sitekey={siteKey}> ← Turnstile auto-mount, NO renombrar la clase
-  └─ data-error="<campo>"                              ← donde se pintan errores Zod
+  ├─ <form id="msfContainer" novalidate>               ← contenedor; submit handler (Enter)
+  ├─ pasos: #msf-step1..#msf-step5, #msf-close, #msf-success, #msf-main
+  ├─ objeto JS `formData` con las claves que el API espera (= ContactoSchema):
+  │     empresaConstituida, empresa, cargo, industria, email, nombre, telefono, idempotencyKey
+  ├─ idempotencyKey = crypto.randomUUID() al montar                         ← R3
+  ├─ industria: opciones renderizadas desde INDUSTRIAS_VALIDAS (schemas/contacto.ts)
+  ├─ radios .sr-only + selección por evento `change` (accesible por teclado)
+  ├─ <div class="cf-turnstile" data-sitekey={siteKey}>  ← Turnstile auto-mount, NO renombrar la clase
+  │     el token se lee de [name="cf-turnstile-response"] y se envía como turnstile_token
+  └─ errores: #msf-global-err (role="alert"); el API responde 422 con fieldErrors
 
+src/pages/api/contacto.ts  ← valida con ContactoSchema; el payload JSON debe traer esas claves
+src/lib/airtable.ts        ← objeto `fields` de createProspecto (columnas Airtable)
 src/layouts/BaseLayout.astro
-  ├─ <!-- GTM_HEAD_PLACEHOLDER -->                     ← Fase 5
-  └─ <!-- GTM_BODY_PLACEHOLDER -->                     ← Fase 5
+  └─ GTM is:inline en <head> (Main Thread, R5) — ya instalado (Fase 5)
 ```
 
-Si el rediseño exige cambiar nombres de campo (ej: separar nombre y apellido en dos inputs), avisar para actualizar también `src/lib/schemas/contacto.ts` y `src/pages/api/contacto.ts`.
+Si se cambian campos del formulario, actualizar EN CONJUNTO: `ContactSection.astro` (UI + `formData`),
+`src/lib/schemas/contacto.ts` (ContactoSchema), `src/pages/api/contacto.ts` y `src/lib/airtable.ts`
+(objeto `fields` + columnas en Airtable). `idempotencyKey` nunca se renombra.
 
 #### Pasos sugeridos cuando lleguen los activos
 1. Colocar logos en `public/brand/` y manual en `public/brand/manual.pdf`
@@ -100,6 +122,7 @@ Si el rediseño exige cambiar nombres de campo (ej: separar nombre y apellido en
   5. Componentes eliminados: `ProductsGrid.astro`, `IndustriasBlocks.astro`, `TrustBar.astro` (no aparecen en el diseño).
 - **Pendiente (cambios quirúrgicos posteriores):** colores oficiales, tipografía del manual de marca, copy definitivo, datos reales (RIF, dirección, cifras de "pedido promedio" de los sectores son marcador), modal de ficha técnica y banner de cookies (Fase 5).
 - **Notas:** `astro check` sin errores; las 6 rutas responden 200. `SECTORES_VALIDOS` (CLAUDE.md) ya no valida el formulario pero el catálogo usa 6 sectores distintos (Cerámicas, Construcción, Pinturas, Feed, Industrial, Aminoácidos) — conflicto de datos a resolver con el cliente.
+  - **[Resuelto 2026-06-14]** Conflicto cerrado: la lista oficial son las 5 industrias en `INDUSTRIAS_VALIDAS` (General/Cerámicas/Hidrocarburos/Pinturas/Alimento animal), usada por schema, formulario, catálogo y home. `SECTORES_VALIDOS` eliminado.
 
 ### ✅ — Cambios quirúrgicos post-réplica (sesión 2026-05-19)
 - **Categoría:** diseño
@@ -187,3 +210,27 @@ Si el rediseño exige cambiar nombres de campo (ej: separar nombre y apellido en
   11. **Primera build y deploy Netlify:** `npm run build` exitoso (build estático). Deploy vía `netlify-cli` como preview. API endpoint de contacto no funcional en este deploy (requiere server adapter — Fase 3).
 - **Archivos afectados:** `Navbar.astro`, `Footer.astro`, `Hero.astro`, `IndustriasServidas.astro`, `ProductosCatalogo.astro`, `ContactoCTA.astro`, `VentajaCompetitiva.astro`, `NosotrosSection.astro`, `src/pages/api/contacto.ts`, `src/layouts/BaseLayout.astro`, `src/styles/global.css`, `CLAUDE.md`
 - **Pendiente (Fase 3):** Restaurar `prerender = false` en `api/contacto.ts` + instalar server adapter (`@astrojs/node` o `@astrojs/cloudflare`) para activar el formulario en producción.
+
+### ✅ — Fixes mobile: navbar + menú lateral + touch targets (sesión 2026-06-13)
+- **Categoría:** diseño
+- **Agregado:** 2026-06-13 · **Cerrado:** 2026-06-13
+- **Contexto:** La mayoría del tráfico será móvil. El usuario reportó que en mobile el botón "Solicitar cotización" del navbar chocaba con el logo/nombre "Remy & Stute" al hacer scroll (navbar saturado), y pidió un menú lateral claro con las secciones + touch targets cómodos. Auditoría mobile (Playwright, iPhone 390×844) confirmó que las supuestas "secciones vacías" eran falsos positivos: animaciones `.reveal` (opacity:0 hasta scroll) + el Astro Dev Toolbar tapando contenido en dev — no bugs reales.
+- **Cambios aplicados (todos en `src/styles/global.css`, scoped a mobile — desktop intacto y verificado):**
+  1. **Navbar declutter (`@media max-width: 860px`):** `.site-header .header-right .btn--primary { display: none }` — el CTA "Solicitar cotización" se oculta del navbar en móvil (ya vive dentro del drawer). Elimina la colisión con el logo/nombre al hacer scroll. En móvil el navbar queda solo: logo + hamburguesa.
+  2. **Touch target hamburguesa:** `.burger` ahora 44×44px (era ~34×28).
+  3. **Menú lateral (drawer) mejorado:** ancho 300px / `max-width: 84vw`. Enlaces de sección como filas táctiles de `min-height: 48px` con separador inferior. Página activa en verde (`aria-current`). CTA verde separado abajo (`margin-top: 20px`). Botón cerrar `×` ahora 44×44px alineado a la esquina.
+  4. **Touch target enlaces footer (`@media max-width: 860px`):** `.footer-links a, .footer-col p a { padding: 8px 0 }` para área táctil más cómoda (sin afectar el logo del footer).
+- **Archivos afectados:** `src/styles/global.css`
+- **Notas:** Desktop verificado sin cambios (CTA navbar 201×51 visible, nav links flex). Burger 44×44, drawer-close 44×44, drawer-links 48px de alto — confirmado por medición. El botón flotante de WhatsApp se superpone levemente con algún badge en mobile — pendiente menor, no abordado. El usuario indicó que comentará más cambios mobile en próximas sesiones.
+
+### ✅ — Catálogo de productos optimizado en mobile + fix colisión número/nombre (sesión 2026-06-13)
+- **Categoría:** diseño
+- **Agregado:** 2026-06-13 · **Cerrado:** 2026-06-13
+- **Contexto:** En `/productos`, en mobile el nombre del producto se solapaba con la barra oscura del número del catálogo. Causa raíz: `.pc-num` usa `margin: -24px 0 -24px -24px` para sangrar full-bleed en la columna izquierda del desktop; al colapsar el grid a 1 columna en móvil, el `margin-bottom: -24px` jalaba el nombre hacia arriba, dentro de la barra. Además el usuario pidió una forma más optimizada de mostrar el catálogo en móvil.
+- **Cambios aplicados (solo bloque `@media max-width: 920px` de `ProductosCatalogo.astro` — desktop intacto y verificado):**
+  1. **Rediseño a tarjetas:** `.pc-row` pasa a grid `44px 1fr`. El número `.pc-num` se convierte en badge contenido (44×44, `border-radius: 6px`, `margin: 0`, sin sangrado) junto al nombre → fin de la colisión.
+  2. **Meta etiquetada:** `.pc-prod-marca` / `.pc-prod-sector` muestran etiquetas "Marca" / "Industria" vía `::before` (antes eran texto suelto sin contexto al ocultarse la fila de cabecera).
+  3. **Acciones táctiles:** botones "Ficha" / "Solicitar muestra" en fila, `flex: 1; min-height: 44px` (medido 149×44).
+  4. **Filtros (chips):** `min-height: 40px` para mejor toque.
+- **Archivos afectados:** `src/components/ProductosCatalogo.astro`
+- **Notas:** Desktop verificado idéntico (tabla con columnas de número full-bleed sin cambios). La vista detalle de ejemplo (`.pc-detail-card`) conserva su colapso a 1 columna ya existente.
