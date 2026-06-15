@@ -8,6 +8,7 @@
  */
 
 import type { ContactoData } from './schemas/contacto';
+import { META_PIXEL_ID, META_ACCESS_TOKEN } from 'astro:env/server';
 
 const GRAPH_API_VERSION = 'v21.0';
 const GRAPH_API_BASE = 'https://graph.facebook.com';
@@ -31,8 +32,8 @@ export async function sendMetaCAPI(
   eventId: string,
   options: MetaCAPIOptions = {},
 ): Promise<void> {
-  const pixelId = import.meta.env.META_PIXEL_ID;
-  const accessToken = import.meta.env.META_ACCESS_TOKEN;
+  const pixelId = META_PIXEL_ID;
+  const accessToken = META_ACCESS_TOKEN;
 
   if (!pixelId || !accessToken) {
     console.info('[meta-capi] Credenciales no configuradas — omitiendo');

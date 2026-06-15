@@ -11,6 +11,7 @@
  */
 
 import type { ContactoData } from './schemas/contacto';
+import { AIRTABLE_API_KEY, AIRTABLE_BASE_PRODUCTION } from 'astro:env/server';
 
 const AIRTABLE_API = 'https://api.airtable.com/v0';
 const REQUEST_TIMEOUT_MS = 10_000; // corta requests colgadas antes del límite del Worker
@@ -46,10 +47,10 @@ async function airtableFetch(
 }
 
 function getCredentials(): { apiKey: string; baseId: string } {
-  const apiKey = import.meta.env.AIRTABLE_API_KEY;
-  const baseId = import.meta.env.AIRTABLE_BASE_PRODUCTION;
+  const apiKey = AIRTABLE_API_KEY;
+  const baseId = AIRTABLE_BASE_PRODUCTION;
   if (!apiKey || !baseId) {
-    throw new Error('Airtable no configurado — AIRTABLE_API_KEY o AIRTABLE_BASE_SANDBOX faltantes');
+    throw new Error('Airtable no configurado — AIRTABLE_API_KEY o AIRTABLE_BASE_PRODUCTION faltantes');
   }
   return { apiKey, baseId };
 }

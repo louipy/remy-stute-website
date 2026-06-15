@@ -10,6 +10,7 @@
  */
 
 import type { ContactoData } from './schemas/contacto';
+import { RESEND_API_KEY, NOTIFY_EMAIL, RESEND_FROM_EMAIL } from 'astro:env/server';
 
 /**
  * Escapa caracteres con significado en HTML. Los datos del lead son texto libre
@@ -26,8 +27,8 @@ function escapeHtml(value: string): string {
 }
 
 export async function notifyNewLead(data: ContactoData): Promise<void> {
-  const apiKey = import.meta.env.RESEND_API_KEY;
-  const to = import.meta.env.NOTIFY_EMAIL;
+  const apiKey = RESEND_API_KEY;
+  const to = NOTIFY_EMAIL;
 
   if (!apiKey || !to) {
     console.info('[email] RESEND_API_KEY o NOTIFY_EMAIL no configurados — notificación omitida');
@@ -37,7 +38,7 @@ export async function notifyNewLead(data: ContactoData): Promise<void> {
   // `onboarding@resend.dev` solo entrega al dueño de la cuenta (modo test de Resend):
   // útil en dev, inaceptable en producción. En prod exigir un remitente verificado.
   const from =
-    import.meta.env.RESEND_FROM_EMAIL || (import.meta.env.DEV ? 'onboarding@resend.dev' : '');
+    RESEND_FROM_EMAIL || (import.meta.env.DEV ? 'onboarding@resend.dev' : '');
   if (!from) {
     console.error('[email] RESEND_FROM_EMAIL no configurado — notificación omitida en producción');
     return;

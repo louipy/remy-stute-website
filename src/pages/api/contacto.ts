@@ -27,6 +27,7 @@ import { ContactoSchema } from '@lib/schemas/contacto';
 import { checkIdempotency, createProspecto, logError } from '@lib/airtable';
 import { notifyNewLead } from '@lib/email';
 import { sendMetaCAPI } from '@lib/meta';
+import { TURNSTILE_SECRET_KEY, AIRTABLE_API_KEY, AIRTABLE_BASE_PRODUCTION } from 'astro:env/server';
 
 export const prerender = false;
 
@@ -48,9 +49,9 @@ function jsonResponse(status: number, body: unknown): Response {
 }
 
 async function verifyTurnstile(token: string, remoteIp: string | null): Promise<boolean> {
-  const secret = import.meta.env.TURNSTILE_SECRET_KEY;
+  const secret = TURNSTILE_SECRET_KEY;
   if (!secret) {
-    console.error('[contacto] TURNSTILE_SECRET_KEY no definida en .env');
+    console.error('[contacto] TURNSTILE_SECRET_KEY no definida (revisar variables del entorno)');
     return false;
   }
 
@@ -116,8 +117,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
   // Si Airtable no está configurado (sin credenciales), se acepta el lead de todas formas
   // para no bloquear el formulario durante el onboarding.
-  const airtableReady =
-    !!import.meta.env.AIRTABLE_API_KEY && !!import.meta.env.AIRTABLE_BASE_PRODUCTION;
+  const airtableReady = !!AIRTABLE_API_KEY && !!AIRTABLE_BASE_PRODUCTION;
 
   if (!airtableReady) {
     console.info(
