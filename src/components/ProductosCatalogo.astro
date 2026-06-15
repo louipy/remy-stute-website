@@ -1,57 +1,434 @@
 ---
-/* Catálogo de productos — página /productos. Réplica de design-reference
-   (04 Productos desktop 1440): cabecera + filtros (sector/marca) + tabla
-   + vista detalle de ejemplo.
-   "Ficha técnica" y "Solicitar muestra" dirigen al brief técnico (/contacto). */
+/* Catálogo de productos — página /productos. Data-driven: el array `productos`
+   alimenta la tabla, los filtros y un modal de ficha técnica por producto.
+   Toda la info proviene de las fichas oficiales (design-reference/FICHA TECNICA).
+   El botón "Ficha" abre el modal del producto; "Solicitar muestra" y "Solicitar
+   cotización" dirigen al brief técnico (/contacto); "Descargar ficha" baja el PDF. */
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+// Fotos de producto recortadas de las fichas técnicas oficiales del cliente.
+import sackXfSuperfine from "../assets/productos/addcon-xf-superfine.webp";
+import sackDrillamyl from "../assets/productos/almidon-drillamyl-wp.webp";
+import sackBentonita from "../assets/productos/bentonita-activada.webp";
+import sackCromita from "../assets/productos/cromita-glass-grade.webp";
+import sackGrafito from "../assets/productos/grafito-silvershine-285.webp";
+import sackKimicell from "../assets/productos/kimicell-hpmc-kmp150000c.webp";
+import sackOxidoCromo from "../assets/productos/oxido-de-cromo-verde-gm7602.webp";
+import sackAmarillo from "../assets/productos/amarillo-cromo-medio-803.webp";
+import sackKimicellHec from "../assets/productos/kimicell-hec-kec.webp";
+import sackAzulUltramar from "../assets/productos/azul-ultramar.webp";
+import sackPthalo from "../assets/productos/pthalocyanina-azul-d-7079.webp";
+import sackOxidoCromoSgn from "../assets/productos/oxido-de-cromo-verde-sgn.webp";
+import sackHierroAzul from "../assets/productos/oxido-de-hierro-azul-s463.webp";
+import sackHierroMarron from "../assets/productos/oxido-de-hierro-marron-s686.webp";
+import sackHierroSeries from "../assets/productos/oxidos-de-hierro-series-s.webp";
 
+// Filtros. Industrias = INDUSTRIAS_VALIDAS (fuente de verdad del sitio).
+// Marcas = solo las que tienen producto en catálogo (derivadas de las fichas).
 const sectores = ["Todos", "General", "Cerámicas", "Hidrocarburos", "Pinturas", "Alimento animal"];
-const marcas = ["Todas", "Addcon", "Yipin Pigmentos", "Minerales Industriales"];
+const marcas = ["Todas", "Addcon", "Novidon", "Minerales Industriales", "Skaland Graphite", "Kimicell", "Yipin Pigmentos"];
 
-const productos = [
+interface Producto {
+  id: string;
+  name: string;
+  marca: string | null; // null = sin marca de fabricante (solo filtra por industria)
+  sector: string;
+  rowDesc: string; // descripción corta en la fila de la tabla
+  badge: string; // caption sobre la foto del modal
+  subtitle: string; // denominación química / CAS bajo el título
+  desc: string; // descripción en la ficha (modal)
+  specs: [string, string][]; // tabla de especificaciones (clave, valor)
+  photo: ImageMetadata;
+  alt: string;
+  pdf: { href: string; size: string };
+}
+
+// Datos extraídos textualmente de las fichas técnicas oficiales (carpeta
+// design-reference/FICHA TECNICA). No modificar valores sin la ficha a la vista.
+const productos: Producto[] = [
   {
-    n: "01",
-    name: "Óxido de Hierro Naranja S960",
-    desc: "Coloración de alta resistencia para pinturas industriales, concreto pigmentado y recubrimientos.",
+    id: "addcon-xf-superfine",
+    name: "ADDCON XF Superfine",
+    marca: "Addcon",
+    sector: "Alimento animal",
+    rowDesc:
+      "Conservante sólido para alimento balanceado: premezcla no corrosiva, inhibidor de hongos y bacterias a base de sales de ácidos orgánicos.",
+    badge: "XF Superfine · Alimento animal",
+    subtitle: "Denominación química · Sales de ácidos orgánicos",
+    desc:
+      "Conservante para alimento balanceado. Premezcla sólida y no corrosiva, inhibidor de hongos y bacterias para la conservación del alimento balanceado. Fórmula: propionato de calcio 60.5%, formiato de calcio 32.5%, benzoato de sodio 5.0%.",
+    specs: [
+      ["Estado físico", "Sólido, en polvo"],
+      ["Color", "Blanco – amarillento"],
+      ["pH (10%)", "6.0 – 10.0"],
+      ["Densidad aparente", "0.5 – 0.7 g/cm³"],
+      ["Tamaño de partícula", "99% < 300 micras"],
+      ["Humedad", "< 4%"],
+      ["Partículas insolubles en agua", "< 1%"],
+      ["Arsénico (As)", "< 3 ppm"],
+      ["Plomo (Pb)", "< 5 ppm"],
+      ["Mercurio (Hg)", "< 0,1 ppm"],
+    ],
+    photo: sackXfSuperfine,
+    alt: "Saco de ADDCON XF Superfine",
+    pdf: { href: "/fichas/addcon-xf-superfine-ficha-tecnica.pdf", size: "3.13 MB" },
+  },
+  {
+    id: "almidon-drillamyl-wp",
+    name: "Almidón Drillamyl WP",
+    marca: "Novidon",
+    sector: "Hidrocarburos",
+    rowDesc:
+      "Almidón de patata pregelatinizado modificado. Aditivo reductor de pérdida de fluido para sistemas de lodo de perforación base agua.",
+    badge: "Drillamyl WP · Hidrocarburos",
+    subtitle: "Almidón de patata modificado · CAS 9005-84-9",
+    desc:
+      "Fécula de patata pregelatinizada modificada (contiene conservante). Drillamyl WP es un aditivo para su uso en sistemas de lodo de perforación; reductor de pérdida de fluido en lodos base agua.",
+    specs: [
+      ["Apariencia", "Polvo granular blanco de flujo libre"],
+      ["Olor", "Casi inodoro"],
+      ["pH", "5.0 – 8.0"],
+      ["Solubilidad", "Soluble en agua a temperatura ambiente"],
+      ["Densidad aparente", "550 – 700 kg/m³"],
+      ["Punto de inflamabilidad", "> 125 °C"],
+      ["Constitución química", "Almidón de patata modificado soluble en agua en frío"],
+    ],
+    photo: sackDrillamyl,
+    alt: "Saco de Almidón Drillamyl WP",
+    pdf: { href: "/fichas/almidon-drillamyl-wp-ficha-tecnica.pdf", size: "1.18 MB" },
+  },
+  {
+    id: "bentonita-activada",
+    name: "Bentonita Activada",
+    marca: "Minerales Industriales",
+    sector: "Hidrocarburos",
+    rowDesc:
+      "Bentonita sódica activada (Supergel). Viscosificante y control de filtración para lodos de perforación base agua dulce.",
+    badge: "Supergel · Hidrocarburos",
+    subtitle: "Sodio montmorillonita · API Spec 13A",
+    desc:
+      "Bentonita premium de calcio montmorillonita, activada con ceniza de soda para obtener sodio montmorillonita. Usada para la viscosidad y el control de filtración en sistemas de lodo de agua dulce; debe pre-hidratarse 24 horas. Conforme a API Spec 13A, sección 9.",
+    specs: [
+      ["Aspecto", "Polvo fino"],
+      ["Color", "Beige / marrón / gris o blanco"],
+      ["Mineral", "Sodio montmorillonita"],
+      ["Gravedad específica", "2.4 – 2.76 kg/L"],
+      ["Densidad de bulto", "880 kg/m³"],
+      ["pH (suspensión 5%)", "9.5 – 9.9"],
+      ["Solubilidad", "No soluble (suspensión coloidal)"],
+      ["Punto de fusión", "1.000 – 1.250 °C"],
+      ["Empaque", "Saco papel kraft 100 lb (45,359 kg)"],
+    ],
+    photo: sackBentonita,
+    alt: "Saco de Bentonita Activada Supergel",
+    pdf: { href: "/fichas/bentonita-activada-ficha-tecnica.pdf", size: "1.05 MB" },
+  },
+  {
+    id: "cromita-glass-grade",
+    name: "Cromita Glass Grade",
+    marca: null,
+    sector: "Cerámicas",
+    rowDesc:
+      "Cromita grado vidrio. Colorante para vidrios y cerámicas; refractarios monolíticos y bloques.",
+    badge: "Glass Grade · Cerámicas",
+    subtitle: "Mineral de cromita (óxido de cromo-hierro)",
+    desc:
+      "Colorante para vidrios y cerámicas. Aplicación en refractarios monolíticos y bloques.",
+    specs: [
+      ["Forma", "Polvo"],
+      ["Color", "Verde khaki"],
+      ["Olor", "Inodoro"],
+      ["Punto de fusión", "1480 – 1580 °C"],
+      ["Densidad", "1800 kg/m³"],
+      ["Solubilidad en agua", "Insoluble"],
+      ["pH", "5 – 8"],
+      ["Cr₂O₃", "44 – 46 %"],
+      ["FeO", "25 – 26 %"],
+      ["MgO", "10 – 11 %"],
+      ["SiO₂", "3 – 4 %"],
+      ["Tamaño de partícula", "45 µm (2 – 3 %)"],
+      ["Humedad", "0.2 % máx"],
+    ],
+    photo: sackCromita,
+    alt: "Saco de Cromita Glass Grade",
+    pdf: { href: "/fichas/cromita-glass-grade-ficha-tecnica.pdf", size: "564 KB" },
+  },
+  {
+    id: "grafito-silvershine-285",
+    name: "Grafito Silvershine - 285",
+    marca: "Skaland Graphite",
+    sector: "General",
+    rowDesc:
+      "Grafito natural en polvo. Lubricante sólido, recubrimientos anticorrosión, fabricación de lápices y aditivo para acero.",
+    badge: "Silvershine · General",
+    subtitle: "Grafito natural · CAS 7440-44-0",
+    desc:
+      "Grafito natural en polvo. Aplicaciones: lápices (mezcla para las minas), lubricante industrial en seco o en fórmulas líquidas, recubrimientos protectores contra la corrosión y fabricación de acero (aditivo para modificar el contenido de carbón).",
+    specs: [
+      ["Estado", "Polvo"],
+      ["Color", "Gris oscuro"],
+      ["Olor", "Inodoro"],
+      ["Carbono fijo", "85 % mín"],
+      ["Cenizas", "15 % máx"],
+      ["Humedad", "1 % máx"],
+      ["Grado", "80 % mín pasa 75 micrones (200 mesh)"],
+      ["Solubilidad en agua", "Insoluble"],
+      ["Densidad relativa", "450 – 600 kg/m³"],
+    ],
+    photo: sackGrafito,
+    alt: "Saco de Grafito Silvershine 285",
+    pdf: { href: "/fichas/grafito-silvershine-285-ficha-tecnica.pdf", size: "1.11 MB" },
+  },
+  {
+    id: "kimicell-hpmc-kmp150000c",
+    name: "Kímicell HPMC KMP150000C",
+    marca: "Kimicell",
+    sector: "General",
+    rowDesc:
+      "Éteres de celulosa HPMC. Espesante, retenedor de agua y estabilizador para morteros, pinturas, cerámicas y detergentes.",
+    badge: "HPMC KMP150000C · General",
+    subtitle: "Hidroxipropil metilcelulosa (HPMC)",
+    desc:
+      "Éteres de celulosa HPMC. Protector coloidal, espesante, estabilizador y modificador reológico para pinturas y barnices, materiales de construcción, adhesivos, tintas de impresión, cosméticos, detergentes, industria papelera, textil y alimentaria.",
+    specs: [
+      ["Contenido de metoxilo", "19.0 – 24.0 % (real 21.1)"],
+      ["Contenido de hidroxipropilo", "4.0 – 12.0 % (real 10.5)"],
+      ["Pérdida por secado", "6.0 % máx (real 5.2)"],
+      ["Valor de pH", "5.0 – 8.0 (real 7.9)"],
+      ["Viscosidad (sol. 2%, mPa·s, Brookfield)", "60000 – 70000 (real 64800)"],
+      ["Residuos en ignición", "5.0 % máx (real 3.5)"],
+    ],
+    photo: sackKimicell,
+    alt: "Saco de Kímicell HPMC KMP150000C",
+    pdf: { href: "/fichas/kimicell-hpmc-kmp150000c-ficha-tecnica.pdf", size: "1.26 MB" },
+  },
+  {
+    id: "oxido-de-cromo-verde-gm7602",
+    name: "Óxido de Cromo Verde GM7602",
+    marca: null,
+    sector: "Pinturas",
+    rowDesc:
+      "Óxido de cromo (III) verde, grado GM7602. Pigmento para cerámica, esmaltes, plástico, pinturas y construcción.",
+    badge: "GM7602 · Pinturas",
+    subtitle: "Óxido de cromo (III) · Cr₂O₃ · PM 151.99",
+    desc:
+      "Pigmento verde de óxido de cromo (III). Aplicación en cerámica, esmaltes, plástico, pinturas y materiales para la construcción. Código de producto 1616.",
+    specs: [
+      ["Contenido de Cr₂O₃", "98.29 %"],
+      ["Fuerza de tintado", "98 %"],
+      ["Sombra", "DE = 0.4"],
+      ["Humedad", "0.20 %"],
+      ["Materia soluble en agua", "0.33 %"],
+      ["Absorción de aceite", "13.90 %"],
+      ["Residuo Manga Malla 325", "0.04 %"],
+      ["Fineza malla 325", "0.05 % máx"],
+      ["Absorción oléica", "16 máx"],
+    ],
+    photo: sackOxidoCromo,
+    alt: "Saco de Óxido de Cromo Verde GM7602",
+    pdf: { href: "/fichas/oxido-de-cromo-verde-gm7602-ficha-tecnica.pdf", size: "0.97 MB" },
+  },
+  {
+    id: "amarillo-cromo-medio-803",
+    name: "Amarillo Cromo Medio 803",
     marca: "Yipin Pigmentos",
     sector: "Pinturas",
+    rowDesc:
+      "Pigmento amarillo de cromo medio (cromato de plomo). Colorante para coberturas, plásticos e impresiones.",
+    badge: "Chrome Yellow 803 · Pinturas",
+    subtitle: "Pigmento amarillo PbCrO₄ · C.I. Pigment Yellow 34 (77600)",
+    desc:
+      "Pigmento amarillo de cromo medio (cromato de plomo). Aplicación en coberturas, plásticos e impresiones. Índice de color: Pigmento Amarillo 34 (77600).",
+    specs: [
+      ["Forma", "Polvo"],
+      ["Contenido soluble en agua", "1.0 % máx"],
+      ["Residuo de tamiz (0.045 mm)", "0.5 %"],
+      ["Valor de pH", "4.0 – 8.0"],
+      ["Humedad (post producción)", "1.0 % máx"],
+      ["Absorción de aceite", "22 g/100 g"],
+    ],
+    photo: sackAmarillo,
+    alt: "Saco de pigmento Amarillo Cromo Medio 803 (Yipin)",
+    pdf: { href: "/fichas/amarillo-cromo-medio-803-ficha-tecnica.pdf", size: "576 KB" },
   },
   {
-    n: "02",
-    name: "RDP TY503",
-    desc: "Polvo redispersable de alta cohesión para pego, morteros secos e impermeabilizantes.",
-    marca: "Addcon",
-    sector: "Hidrocarburos",
+    id: "azul-ultramar",
+    name: "Azul Ultramar (U02/U08)",
+    marca: "Yipin Pigmentos",
+    sector: "Pinturas",
+    rowDesc:
+      "Pigmento azul ultramar (sulfosilicato sódico de aluminio). Colorante para plásticos, pinturas, tintas, caucho, cosméticos y detergentes.",
+    badge: "Ultramarine Blue · Pinturas",
+    subtitle: "Pigmento azul · C.I. Pigment Blue 29 · sulfosilicato sódico de aluminio",
+    desc:
+      "Pigmento azul ultramar. Aplicación en plásticos, pinturas, revestimientos, tintas, caucho, impresión, cosméticos y detergentes.",
+    specs: [
+      ["Forma", "Polvo"],
+      ["Contenido soluble en agua", "1.5 % máx"],
+      ["Residuo de tamiz (0.045 mm)", "0.1 %"],
+      ["Valor de pH", "7.5 – 10.0"],
+      ["Contenido de S", "0.1 %"],
+      ["Humedad (post producción)", "1.0 %"],
+      ["Densidad", "2.3 – 2.7 g/ml"],
+      ["Absorción de aceite", "25.0 – 45.0 g/100 g"],
+    ],
+    photo: sackAzulUltramar,
+    alt: "Saco de pigmento Azul Ultramar (Yipin)",
+    pdf: { href: "/fichas/azul-ultramar-ficha-tecnica.pdf", size: "1.10 MB" },
   },
   {
-    n: "03",
-    name: "HPMC KPM 150000C",
-    desc: "Hidroxipropilmetilcelulosa de alta viscosidad. Retención de agua y trabajabilidad en morteros.",
-    marca: "Addcon",
-    sector: "Hidrocarburos",
+    id: "pthalocyanina-azul-d-7079",
+    name: "Pthalocyanina Azul D 7079",
+    marca: null,
+    sector: "Pinturas",
+    rowDesc:
+      "Pigmento azul de ftalocianina de cobre (beta). Colorante para tintas, con alta resistencia a solventes.",
+    badge: "Pigment Blue 15:3 · Pinturas",
+    subtitle: "Ftalocianina de cobre (beta) · C.I. Pigment Blue 15:3 (74160)",
+    desc:
+      "Pigmento azul de ftalocianina de cobre, forma beta. Aplicación: pigmento para tinta. Alta resistencia a solventes (agua, white spirit, etanol, MEK, acetato de etilo y tolueno: grado 5).",
+    specs: [
+      ["Forma", "Polvo"],
+      ["Valor de pH", "6.5 – 8"],
+      ["Densidad (20 °C)", "1.59 g/cm³"],
+      ["Superficie específica", "62 m²/g"],
+      ["Absorción de aceite", "35 – 45 g/100 g"],
+      ["Materia volátil (105 °C)", "≤ 1.0 %"],
+      ["Materia soluble en agua", "≤ 1.5 %"],
+      ["Residuo de malla (malla 100)", "≤ 5 %"],
+      ["Conductividad", "≤ 300 µs/cm"],
+    ],
+    photo: sackPthalo,
+    alt: "Pigmento azul de ftalocianina D 7079",
+    pdf: { href: "/fichas/pthalocyanina-azul-d-7079-ficha-tecnica.pdf", size: "558 KB" },
   },
   {
-    n: "04",
-    name: "Grafito 285 Silvershine",
-    desc: "Grafito micronizado para frenos, lubricantes sólidos y manufactura de lápices.",
-    marca: "Minerales Industriales",
+    id: "oxido-de-cromo-verde-sgn",
+    name: "Óxido de Cromo Verde SGN",
+    marca: "Yipin Pigmentos",
+    sector: "Pinturas",
+    rowDesc:
+      "Óxido de cromo (III) verde, grado SGN. Pigmento para cerámica, esmaltes, plástico, pinturas y construcción.",
+    badge: "Type SGN · Pinturas",
+    subtitle: "Óxido de cromo (III) · Cr₂O₃ · PM 151.99",
+    desc:
+      "Pigmento verde de óxido de cromo (III), grado SGN. Aplicación en cerámica, esmaltes, plástico, pinturas y materiales para la construcción.",
+    specs: [
+      ["Contenido de Cr₂O₃", "≥ 98.5 % (98.5)"],
+      ["Fuerza de tintado vs estándar", "95 – 105 (105)"],
+      ["Finura (residuo malla 600)", "≤ 0.1 % (0.05)"],
+      ["Materia soluble en agua", "≤ 1.0 % (0.4)"],
+      ["Humedad (105 °C)", "≤ 0.2 % (0.1)"],
+      ["Absorción de aceite", "15 – 25 % (24)"],
+      ["Valor de pH", "6.0 – 8.0 (7.1)"],
+      ["ΔE", "≤ 1.0"],
+      ["Cr⁶⁺", "≤ 50 ppm (12)"],
+    ],
+    photo: sackOxidoCromoSgn,
+    alt: "Saco de Óxido de Cromo Verde SGN (Yipin)",
+    pdf: { href: "/fichas/oxido-de-cromo-verde-sgn-ficha-tecnica.pdf", size: "612 KB" },
+  },
+  {
+    id: "oxido-de-hierro-azul-s463",
+    name: "Óxido de Hierro Azul S463",
+    marca: "Yipin Pigmentos",
+    sector: "Pinturas",
+    rowDesc:
+      "Pigmento complejo azul (óxido de hierro / ftalocianina de cobre). Colorante de alta intensidad.",
+    badge: "Complex Blue S463 · Pinturas",
+    subtitle: "Azul Complejo S463 · Fe₂O₃·H₂O / C32H16N8Cu / BaSO4",
+    desc:
+      "Pigmento complejo azul a base de óxido de hierro, ftalocianina de cobre y sulfato de bario. Aplicación: colorantes. Sinónimos: Azul Complejo S463 / Complex Blue S463.",
+    specs: [
+      ["Apariencia", "Polvo"],
+      ["Humedad", "≤ 1.0 % (0.4)"],
+      ["Residuo de tamiz (0.045 mm)", "≤ 0.5 % (0.1)"],
+      ["Intensidad de coloración vs estándar", "95 – 105 (98)"],
+      ["ΔE", "≤ 1.0 (0.60)"],
+    ],
+    photo: sackHierroAzul,
+    alt: "Saco de pigmento Azul Complejo S463 (Yipin)",
+    pdf: { href: "/fichas/oxido-de-hierro-azul-s463-ficha-tecnica.pdf", size: "1.01 MB" },
+  },
+  {
+    id: "oxido-de-hierro-marron-s686",
+    name: "Óxido de Hierro Marrón S686",
+    marca: "Yipin Pigmentos",
+    sector: "Pinturas",
+    rowDesc:
+      "Pigmento marrón de óxido de hierro sintético. Materia prima colorante.",
+    badge: "Iron Oxide Brown S686 · Pinturas",
+    subtitle: "Óxido de hierro sintético · C.I. Pigment Red 101 / Pigment Black 11",
+    desc:
+      "Pigmento marrón de óxido de hierro sintético. Aplicación: materia prima (colorante). Índice de color: Pigmento Rojo 101 (77491) y Pigmento Negro 11 (77499).",
+    specs: [
+      ["Forma de partícula", "Esférica"],
+      ["Contenido soluble en agua", "≤ 1.0 %"],
+      ["Residuo de tamiz (0.045 mm)", "0.5 %"],
+      ["Valor de pH", "5.0 – 8.0"],
+      ["Contenido de Fe₂O₃", "90.0 – 94.0 %"],
+      ["Contenido de SiO₂+Al₂O₃", "3.0 %"],
+      ["Humedad (post producción)", "1.0 %"],
+      ["Absorción de aceite", "22.0 g/100 g"],
+      ["Densidad", "4.8 g/ml"],
+    ],
+    photo: sackHierroMarron,
+    alt: "Saco de pigmento Óxido de Hierro Marrón S686 (Yipin)",
+    pdf: { href: "/fichas/oxido-de-hierro-marron-s686-ficha-tecnica.pdf", size: "1.08 MB" },
+  },
+  {
+    id: "oxidos-de-hierro-series-s",
+    name: "Óxidos de Hierro Series S",
+    marca: "Yipin Pigmentos",
+    sector: "Pinturas",
+    rowDesc:
+      "Serie de pigmentos de óxido de hierro sintético: Amarillo S930, Naranja S960, Negro S330/S370 y Rojo S110/S130.",
+    badge: "Series S · Pinturas",
+    subtitle:
+      "Óxido de hierro sintético · Amarillo S930 · Naranja S960 · Negro S330/S370 · Rojo S110/S130",
+    desc:
+      "Serie de pigmentos de óxido de hierro sintético en varias tonalidades: Amarillo S930, Naranja S960, Negro S330, Negro S370, Rojo S110 y Rojo S130. Aplicación: materia prima (colorante).",
+    specs: [
+      ["Forma", "Polvo"],
+      ["Contenido soluble en agua", "≤ 0.5 %"],
+      ["Residuo de tamiz (0.045 mm)", "0.3 %"],
+      ["Valor de pH", "4.0 – 7.0"],
+      ["Contenido de Fe₂O₃", "90.0 – 94.0 %"],
+      ["Contenido de SiO₂+Al₂O₃", "4.0 %"],
+      ["Humedad (post producción)", "1.0 %"],
+      ["Absorción de aceite", "22.0 g/100 g"],
+      ["Densidad", "5.1 g/ml"],
+    ],
+    photo: sackHierroSeries,
+    alt: "Sacos de la serie de pigmentos Óxidos de Hierro Series S (Yipin)",
+    pdf: { href: "/fichas/oxidos-de-hierro-series-s-ficha-tecnica.pdf", size: "1.17 MB" },
+  },
+  {
+    id: "kimicell-hec-kec",
+    name: "Kímicell HEC KEC 100.000BS / 60.000BS",
+    marca: "Kimicell",
     sector: "General",
+    rowDesc:
+      "Éteres de celulosa HEC (hidroxietilcelulosa hidrofóbicamente modificada). Espesante de alta eficacia para pinturas base agua.",
+    badge: "HEC KEC · General",
+    subtitle: "Hidroxietilcelulosa modificada (HEC) · grados 100.000BS y 60.000BS",
+    desc:
+      "Éteres de celulosa HEC: hidroxietilcelulosa hidrofóbicamente modificada, polímero no iónico usado como espesante de alta eficacia en pinturas base agua (texturizadas, mates, satinadas y semibrillantes). Dosis típica 0.2 – 0.7 % sobre el peso total de la pintura.",
+    specs: [
+      ["Tamaño de la partícula", "98 % < 180 µm"],
+      ["Densidad a granel", "0.35 – 0.61 g/cm³"],
+      ["Punto de ablandamiento", "135 – 140 °C"],
+      ["Punto de descomposición", "205 – 210 °C"],
+      ["Solución en agua fría y neutra", "20 – 30 min"],
+      ["Humedad", "5.0 % máx"],
+      ["Valor de pH", "5.0 – 8.0"],
+      ["Residuos en ignición", "5.0 % máx"],
+      ["Viscosidad (sol. 2%, mPa·s, Brookfield)", "25000 – 55000"],
+    ],
+    photo: sackKimicellHec,
+    alt: "Sacos de Kímicell HEC KEC (Kimicell)",
+    pdf: { href: "/fichas/kimicell-hec-kec-ficha-tecnica.pdf", size: "556 KB" },
   },
-  {
-    n: "05",
-    name: "Óxido de Magnesio",
-    desc: "Suplemento mineral grado alimenticio para nutrición animal y alimento balanceado.",
-    marca: "Minerales Industriales",
-    sector: "Alimento animal",
-  },
-];
-
-const especificacion = [
-  ["Contenido Fe₂O₃", "≥ 96.0 %"],
-  ["Humedad", "≤ 1.0 %"],
-  ["Materia soluble en agua", "≤ 0.3 %"],
-  ["Residuo en malla 325", "≤ 0.3 %"],
-  ["pH (suspensión 5%)", "4.0 – 8.0"],
-  ["Presentación", "Saco 25 kg / palé 1 000 kg"],
 ];
 ---
 
@@ -67,19 +444,23 @@ const especificacion = [
 <section class="pc-filters">
   <div class="wrap">
     <div class="pc-filter-grid">
-      <span class="pc-filter-label">Industria</span>
-      <div class="pc-chips" data-group="sector">
-        {sectores.map((s, i) => (
-          <button type="button" class="chip" data-value={s} aria-pressed={i === 0 ? "true" : "false"}>{s}</button>
-        ))}
+      <div class="pc-filter-row">
+        <span class="pc-filter-label">Industria</span>
+        <div class="pc-chips" data-group="sector">
+          {sectores.map((s, i) => (
+            <button type="button" class="chip" data-value={s} aria-pressed={i === 0 ? "true" : "false"}>{s}</button>
+          ))}
+        </div>
       </div>
-      <span class="pc-filter-label">Marca</span>
-      <div class="pc-chips" data-group="marca">
-        {marcas.map((m, i) => (
-          <button type="button" class="chip" data-value={m} aria-pressed={i === 0 ? "true" : "false"}>{m}</button>
-        ))}
+      <div class="pc-filter-row">
+        <span class="pc-filter-label">Marca</span>
+        <div class="pc-chips" data-group="marca">
+          {marcas.map((m, i) => (
+            <button type="button" class="chip" data-value={m} aria-pressed={i === 0 ? "true" : "false"}>{m}</button>
+          ))}
+        </div>
       </div>
-      <span class="pc-count" id="pcCount">5 de 5 resultados</span>
+      <span class="pc-count" id="pcCount">15 de 15 resultados</span>
     </div>
   </div>
 </section>
@@ -95,21 +476,21 @@ const especificacion = [
         <span></span>
       </div>
       <div id="pcRows">
-        {productos.map((p) => (
-          <article class="pc-row pc-prod" data-sector={p.sector} data-marca={p.marca}>
-            <span class="pc-num">{p.n}</span>
+        {productos.map((p, i) => (
+          <article class="pc-row pc-prod" data-sector={p.sector} data-marca={p.marca ?? ""}>
+            <span class="pc-num">{String(i + 1).padStart(2, "0")}</span>
             <div class="pc-prod-main">
               <h3 class="pc-prod-name">{p.name}</h3>
-              <p class="pc-prod-desc">{p.desc}</p>
+              <p class="pc-prod-desc">{p.rowDesc}</p>
             </div>
-            <div class="pc-prod-marca">{p.marca}</div>
+            <div class="pc-prod-marca">{p.marca ?? "—"}</div>
             <div class="pc-prod-sector">
               {p.sector}
             </div>
             <div class="pc-prod-actions">
-              <a href="/contacto" class="btn btn--primary btn--sm btn--block">
+              <button type="button" class="btn btn--primary btn--sm btn--block" data-ficha-open={p.id}>
                 Ficha
-              </a>
+              </button>
               <a href="/contacto" class="btn btn--outline btn--sm btn--block">Solicitar muestra</a>
             </div>
           </article>
@@ -123,50 +504,70 @@ const especificacion = [
   </div>
 </section>
 
-<section class="pc-detail">
-  <div class="wrap">
-    <div class="pc-detail-label">
-      <span>Vista detalle · ejemplo</span>
-      <span class="pc-detail-line"></span>
-    </div>
-    <div class="pc-detail-card">
-      <div class="pc-detail-media" aria-hidden="true">
-        <span class="pc-detail-tag">01 / 02 / 03</span>
-        <span class="pc-detail-badge">[ PIG-S960 · ÓXIDO HIERRO NARANJA ]</span>
-      </div>
-      <div class="pc-detail-body">
-        <p class="pc-detail-brand">Yipin Pigmentos</p>
-        <h2 class="pc-detail-name">Óxido de Hierro Naranja S960</h2>
-        <p class="pc-detail-sku">SKU · PIG-S960 · CAS 1309-37-1</p>
-        <p class="pc-detail-desc">
-          Pigmento sintético de alta resistencia a la luz UV y a la intemperie.
-          Coloración estable en sistemas acuosos, alquídicos y epóxicos.
-          Densidad aparente 0.9–1.1 g/cm³.
-        </p>
-        <div class="pc-spec">
-          <p class="pc-spec-title">Especificación técnica</p>
-          <table>
-            <tbody>
-              {especificacion.map(([k, v]) => (
-                <tr>
-                  <td>{k}</td>
-                  <td>{v}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+<!-- Ficha técnica — un modal por producto. El botón "Ficha" (data-ficha-open=id)
+     abre el modal con id="ficha-<id>". Contenido 100% desde el array `productos`. -->
+{productos.map((p) => (
+  <div class="pc-modal" id={`ficha-${p.id}`} hidden>
+    <div class="pc-modal__scrim" data-ficha-close></div>
+    <div
+      class="pc-modal__dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={`${p.id}-title`}
+      tabindex="-1"
+    >
+      <button type="button" class="pc-modal__close" data-ficha-close aria-label="Cerrar ficha técnica">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M18 6 6 18M6 6l12 12" />
+        </svg>
+      </button>
+      <div class="pc-detail-card">
+        <div class="pc-detail-media">
+          <Image
+            class="pc-detail-photo"
+            src={p.photo}
+            alt={p.alt}
+            widths={[360, 560]}
+            sizes="(max-width: 920px) 100vw, 470px"
+            loading="lazy"
+            decoding="async"
+          />
+          <span class="pc-detail-badge">{p.badge}</span>
         </div>
-        <div class="pc-detail-actions">
-          <a href="/contacto" class="btn btn--primary">
-            Solicitar cotización
-            <i data-lucide="arrow-right"></i>
-          </a>
-          <a href="/contacto" class="btn btn--outline">Descargar ficha (PDF · 320 KB)</a>
+        <div class="pc-detail-body">
+          {p.marca && <p class="pc-detail-brand">{p.marca}</p>}
+          <h2 class="pc-detail-name" id={`${p.id}-title`}>{p.name}</h2>
+          <p class="pc-detail-sku">{p.subtitle}</p>
+          <p class="pc-detail-desc">{p.desc}</p>
+          <div class="pc-spec">
+            <p class="pc-spec-title">Especificación técnica</p>
+            <table>
+              <tbody>
+                {p.specs.map(([k, v]) => (
+                  <tr>
+                    <td>{k}</td>
+                    <td>{v}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div class="pc-detail-actions">
+            <a href="/contacto" class="btn btn--primary">
+              Solicitar cotización
+              <i data-lucide="arrow-right"></i>
+            </a>
+            <a
+              href={p.pdf.href}
+              class="btn btn--outline"
+              download={`${p.id}-ficha-tecnica.pdf`}
+            >Descargar ficha (PDF · {p.pdf.size})</a>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</section>
+))}
 
 <style>
   /* Cabecera */
@@ -193,11 +594,20 @@ const especificacion = [
   .pc-filters { background: var(--cream-2); border-bottom: 1px solid var(--border); padding: 20px 0; }
   .pc-filter-grid {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px 20px;
+    flex-direction: column;
+    gap: 14px;
+  }
+  /* Cada filtro (label + chips) ocupa su propia fila → Industria arriba,
+     Marca debajo, sin que los chips se mezclen al crecer la lista de marcas. */
+  .pc-filter-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
   }
   .pc-filter-label {
+    flex-shrink: 0;
+    min-width: 64px;
+    padding-top: 8px; /* alinea el label con la primera fila de chips */
     font-family: var(--mono);
     font-size: 10px;
     letter-spacing: 0.16em;
@@ -220,7 +630,7 @@ const especificacion = [
   .chip:hover { border-color: var(--ink); }
   .chip[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
   .pc-count {
-    margin-left: auto;
+    align-self: flex-end;
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 0.08em;
@@ -230,6 +640,19 @@ const especificacion = [
   /* Tabla */
   .pc-table-wrap { background: var(--cream); padding: 32px 0 64px; }
   .pc-table { background: var(--white); border: 1px solid var(--border); }
+  /* Solo ~5 productos visibles; el resto se ve deslizando dentro del contenedor.
+     Así el catálogo crece sin alargar la página. La cabecera queda fija arriba. */
+  #pcRows {
+    max-height: 560px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-2) var(--cream-2);
+  }
+  #pcRows::-webkit-scrollbar { width: 8px; }
+  #pcRows::-webkit-scrollbar-track { background: var(--cream-2); }
+  #pcRows::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
+  #pcRows::-webkit-scrollbar-thumb:hover { background: var(--muted); }
   .pc-row {
     display: grid;
     grid-template-columns: 60px minmax(0, 1.7fr) 1fr 1fr 210px;
@@ -280,18 +703,84 @@ const especificacion = [
     font-size: 14px;
   }
 
-  /* Vista detalle */
-  .pc-detail { background: var(--cream); padding: 32px 0 96px; }
-  .pc-detail-label { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
-  .pc-detail-label span:first-child {
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--muted);
-    white-space: nowrap;
+  /* ── Ficha técnica — modal ─────────────────────────────────────
+     Overlay centrado que opaca el fondo para enfocar la ficha.
+     El contenido (.pc-detail-card) es la antigua "Vista detalle".
+     Animación fluida: solo opacity/transform. Entrada ease-out
+     ~300ms; salida ease-in ~180ms (más rápida = más responsiva). */
+  .pc-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 24px;
   }
-  .pc-detail-line { flex: 1; height: 1px; background: var(--border-2); }
+  .pc-modal[hidden] { display: none; }
+  .pc-modal__scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 15, 13, 0.62);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 180ms ease-in;
+  }
+  .pc-modal__dialog {
+    position: relative;
+    width: 100%;
+    max-width: 940px;
+    max-height: min(90vh, 90dvh);
+    overflow-y: auto;
+    background: var(--white);
+    border-radius: 14px;
+    box-shadow: 0 24px 80px rgba(10, 15, 13, 0.45), 0 4px 16px rgba(10, 15, 13, 0.2);
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+    transition: opacity 180ms ease-in, transform 180ms ease-in;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pc-modal__dialog:focus { outline: none; }
+  .pc-modal.is-open .pc-modal__scrim {
+    opacity: 1;
+    transition: opacity 260ms ease-out;
+  }
+  .pc-modal.is-open .pc-modal__dialog {
+    opacity: 1;
+    transform: none;
+    transition: opacity 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .pc-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background 160ms ease, color 160ms ease;
+  }
+  .pc-modal__close:hover { background: var(--ink); color: #fff; }
+  .pc-modal__close:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+  .pc-modal__close svg { width: 20px; height: 20px; }
+  /* Dentro del modal la tarjeta hereda el radio del diálogo, sin borde propio */
+  .pc-modal__dialog .pc-detail-card { border: 0; border-radius: 14px; overflow: hidden; }
+
+  :global(body.pc-modal-open) { overflow: hidden; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pc-modal__scrim,
+    .pc-modal__dialog { transition: none; }
+  }
+
+  /* Tarjeta de la ficha (antigua "Vista detalle") */
   .pc-detail-card {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
@@ -302,34 +791,31 @@ const especificacion = [
     position: relative;
     min-height: 420px;
     border-right: 1px solid var(--border);
-    background-image: repeating-linear-gradient(
-      45deg,
-      var(--ink) 0,
-      var(--ink) 12px,
-      rgba(255, 255, 255, 0.05) 12px,
-      rgba(255, 255, 255, 0.05) 24px
-    );
-    display: grid;
-    place-items: center;
+    background: var(--cream-2);
+    overflow: hidden;
   }
-  .pc-detail-tag {
+  .pc-detail-photo {
     position: absolute;
-    top: 8px;
-    left: 8px;
-    font-family: var(--mono);
-    font-size: 9px;
-    letter-spacing: 0.15em;
-    color: rgba(255, 255, 255, 0.4);
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 38%;
   }
   .pc-detail-badge {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    z-index: 1;
     padding: 6px 10px;
     background: rgba(10, 36, 24, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
     font-family: var(--mono);
     font-size: 10px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.85);
   }
   .pc-detail-body { padding: 40px; }
   .pc-detail-brand {
@@ -453,7 +939,8 @@ const especificacion = [
     /* Filtros más cómodos al tacto */
     .chip { min-height: 40px; padding: 9px 14px; font-size: 13px; }
 
-    /* Vista detalle */
+    /* Ficha técnica — modal + tarjeta en una columna */
+    .pc-modal { padding: 12px; }
     .pc-detail-card { grid-template-columns: 1fr; }
     .pc-detail-media { min-height: 260px; border-right: 0; border-bottom: 1px solid var(--border); }
     .pc-detail-body { padding: 28px; }
@@ -477,10 +964,16 @@ const especificacion = [
         const okMarca = state.marca === "Todas" || row.dataset.marca === state.marca;
         const show = okSector && okMarca;
         row.classList.toggle("is-hidden", !show);
-        if (show) visible++;
+        if (show) {
+          visible++;
+          // El número enumera las opciones visibles (1..N), no es fijo por producto.
+          const num = row.querySelector(".pc-num");
+          if (num) num.textContent = String(visible).padStart(2, "0");
+        }
       });
       empty.hidden = visible > 0;
       count.textContent = visible + " de " + rows.length + " resultados";
+      rowsWrap.scrollTop = 0;
     }
 
     document.querySelectorAll(".pc-chips").forEach((group) => {
@@ -508,5 +1001,91 @@ const especificacion = [
         apply();
       }
     }
+  })();
+</script>
+
+<script is:inline>
+  /* Ficha técnica — controlador de modales (uno por producto).
+     - [data-ficha-open="<id>"] abre #ficha-<id>.
+     - Cierra con la X, el scrim o Escape.
+     - Bloquea el scroll del fondo, atrapa el foco dentro del diálogo
+       y lo devuelve al disparador al cerrar.
+     - Respeta prefers-reduced-motion (cierra sin esperar la animación). */
+  (function () {
+    const modals = Array.prototype.slice.call(document.querySelectorAll(".pc-modal"));
+    if (!modals.length) return;
+    const FOCUSABLE =
+      'a[href], button:not([disabled]), input:not([disabled]), textarea, [tabindex]:not([tabindex="-1"])';
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    let current = null; // modal abierto actualmente
+    let lastFocused = null;
+    let closeTimer = null;
+
+    function open(modal, trigger) {
+      if (!modal) return;
+      clearTimeout(closeTimer);
+      current = modal;
+      lastFocused = trigger || document.activeElement;
+      modal.hidden = false;
+      document.body.classList.add("pc-modal-open");
+      void modal.offsetWidth; // fuerza reflow para que la transición de entrada corra
+      modal.classList.add("is-open");
+      const closeBtn = modal.querySelector(".pc-modal__close");
+      const dialog = modal.querySelector(".pc-modal__dialog");
+      (closeBtn || dialog).focus();
+    }
+
+    function close() {
+      if (!current) return;
+      const modal = current;
+      current = null;
+      modal.classList.remove("is-open");
+      document.body.classList.remove("pc-modal-open");
+      const finish = function () {
+        modal.hidden = true;
+        if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
+      };
+      if (reduceMotion.matches) finish();
+      else closeTimer = setTimeout(finish, 200);
+    }
+
+    document.querySelectorAll("[data-ficha-open]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        open(document.getElementById("ficha-" + btn.getAttribute("data-ficha-open")), btn);
+      });
+    });
+    modals.forEach(function (modal) {
+      modal.querySelectorAll("[data-ficha-close]").forEach(function (el) {
+        el.addEventListener("click", close);
+      });
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (!current) return;
+      if (e.key === "Escape") {
+        e.preventDefault();
+        close();
+        return;
+      }
+      if (e.key === "Tab") {
+        const dialog = current.querySelector(".pc-modal__dialog");
+        const items = Array.prototype.slice
+          .call(dialog.querySelectorAll(FOCUSABLE))
+          .filter(function (el) {
+            return el.offsetParent !== null;
+          });
+        if (!items.length) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
   })();
 </script>
