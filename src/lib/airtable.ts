@@ -47,7 +47,7 @@ async function airtableFetch(
 
 function getCredentials(): { apiKey: string; baseId: string } {
   const apiKey = import.meta.env.AIRTABLE_API_KEY;
-  const baseId = import.meta.env.AIRTABLE_BASE_SANDBOX;
+  const baseId = import.meta.env.AIRTABLE_BASE_PRODUCTION;
   if (!apiKey || !baseId) {
     throw new Error('Airtable no configurado — AIRTABLE_API_KEY o AIRTABLE_BASE_SANDBOX faltantes');
   }

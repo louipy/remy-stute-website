@@ -117,7 +117,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   // Si Airtable no está configurado (sin credenciales), se acepta el lead de todas formas
   // para no bloquear el formulario durante el onboarding.
   const airtableReady =
-    !!import.meta.env.AIRTABLE_API_KEY && !!import.meta.env.AIRTABLE_BASE_SANDBOX;
+    !!import.meta.env.AIRTABLE_API_KEY && !!import.meta.env.AIRTABLE_BASE_PRODUCTION;
 
   if (!airtableReady) {
     console.info(
