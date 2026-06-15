@@ -4,7 +4,8 @@
  *
  * Variables requeridas en .env:
  *  RESEND_API_KEY    — token de Resend (re_...)
- *  NOTIFY_EMAIL      — email del equipo que recibe alertas
+ *  NOTIFY_EMAIL      — email(s) del equipo que recibe alertas. Admite varios
+ *                      separados por coma: "info@remyvenezuela.com,remystuteweb@gmail.com"
  *  RESEND_FROM_EMAIL — remitente verificado. Obligatorio en producción; en dev cae a
  *                      onboarding@resend.dev (solo entrega al dueño de la cuenta Resend).
  */
@@ -28,9 +29,16 @@ function escapeHtml(value: string): string {
 
 export async function notifyNewLead(data: ContactoData): Promise<void> {
   const apiKey = RESEND_API_KEY;
-  const to = NOTIFY_EMAIL;
 
-  if (!apiKey || !to) {
+  // NOTIFY_EMAIL admite uno o varios destinatarios separados por coma
+  // (p.ej. "info@remyvenezuela.com,remystuteweb@gmail.com"). Resend acepta
+  // un array en `to` (hasta 50 destinatarios) y envía un solo correo a todos.
+  const to = (NOTIFY_EMAIL ?? '')
+    .split(',')
+    .map((addr) => addr.trim())
+    .filter(Boolean);
+
+  if (!apiKey || to.length === 0) {
     console.info('[email] RESEND_API_KEY o NOTIFY_EMAIL no configurados — notificación omitida');
     return;
   }
