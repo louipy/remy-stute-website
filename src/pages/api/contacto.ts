@@ -78,7 +78,24 @@ async function verifyTurnstile(token: string, remoteIp: string | null): Promise<
   }
 }
 
-export const POST: APIRoute = async ({ request, clientAddress }) => {
+/**
+ * En Cloudflare Workers/Pages, el runtime puede terminar el Worker en cuanto se
+ * devuelve la Response y cancelar cualquier trabajo async pendiente que NO se haya
+ * registrado con `ctx.waitUntil()`. Las notificaciones best-effort (Resend, Meta CAPI)
+ * se disparan fire-and-forget tras el 200, así que sin esto se cancelan en producción
+ * (en local/Node corren igual porque el proceso sigue vivo). Acceso defensivo: el tipo
+ * de `locals.runtime` no está declarado en el proyecto y en dev no existe.
+ */
+function backgroundRunner(locals: App.Locals): (p: Promise<unknown>) => void {
+  const ctx = (locals as { runtime?: { ctx?: { waitUntil?: (p: Promise<unknown>) => void } } })
+    .runtime?.ctx;
+  return (p: Promise<unknown>): void => {
+    if (ctx?.waitUntil) ctx.waitUntil(p);
+    else void p;
+  };
+}
+
+export const POST: APIRoute = async ({ request, clientAddress, locals }) => {
   // 0. Body parseable
   let payload: Record<string, unknown>;
   try {
@@ -138,21 +155,29 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // 4. Crear prospecto en Airtable SANDBOX
     await createProspecto(parsed.data);
 
+    // Registrar el trabajo best-effort con ctx.waitUntil() para que Cloudflare no
+    // lo cancele al devolver la respuesta (ver backgroundRunner arriba).
+    const runInBackground = backgroundRunner(locals);
+
     // 5. Notificar al equipo — best-effort, no bloquea la respuesta (R8)
-    notifyNewLead(parsed.data).catch((err: unknown) => {
-      console.error('[contacto] Error enviando notificación email', err);
-      logError(parsed.data, String(err), 'Email').catch(() => {});
-    });
+    runInBackground(
+      notifyNewLead(parsed.data).catch((err: unknown) => {
+        console.error('[contacto] Error enviando notificación email', err);
+        return logError(parsed.data, String(err), 'Email').catch(() => {});
+      }),
+    );
 
     // 6. Meta CAPI — best-effort, deduplicado con el Pixel por event_id (Fase 5)
-    sendMetaCAPI(parsed.data, parsed.data.idempotencyKey, {
-      ip: remoteIp,
-      userAgent: request.headers.get('user-agent'),
-      eventSourceUrl: request.headers.get('referer'),
-    }).catch((err: unknown) => {
-      console.error('[contacto] Error enviando evento a Meta CAPI', err);
-      logError(parsed.data, String(err), 'MetaCAPI').catch(() => {});
-    });
+    runInBackground(
+      sendMetaCAPI(parsed.data, parsed.data.idempotencyKey, {
+        ip: remoteIp,
+        userAgent: request.headers.get('user-agent'),
+        eventSourceUrl: request.headers.get('referer'),
+      }).catch((err: unknown) => {
+        console.error('[contacto] Error enviando evento a Meta CAPI', err);
+        return logError(parsed.data, String(err), 'MetaCAPI').catch(() => {});
+      }),
+    );
 
     return jsonResponse(200, { ok: true });
   } catch (err) {
