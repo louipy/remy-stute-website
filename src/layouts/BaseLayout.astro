@@ -62,17 +62,18 @@ const ogImageURL = ogImage ?? new URL("og-default.jpg", Astro.site ?? "https://r
 
     <script src="https://unpkg.com/lucide@latest" defer is:inline></script>
 
-    {/* Consent Mode (definido ANTES de GTM) — analytics_storage 'granted' para medir
-        GA4 desde el primer pageview (audiencia B2B Venezuela, /privacidad publicada);
-        ad_storage/ad_user_data/ad_personalization quedan 'denied' hasta activar Meta Ads. */}
+    {/* Consent Mode (definido ANTES de GTM) — todo 'granted' por defecto: audiencia B2B
+        Venezuela (fuera del EEE, sin requisito de opt-in) y /privacidad publicada. Habilita
+        GA4 y medición/personalización de anuncios (Meta Pixel/CAPI) desde el primer pageview.
+        Si en el futuro se dirige tráfico al EEE/UK, añadir un banner con gtag('consent','update'). */}
     <script is:inline>
 window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments);}
 gtag('consent','default',{
-  ad_storage:'denied',
+  ad_storage:'granted',
   analytics_storage:'granted',
-  ad_user_data:'denied',
-  ad_personalization:'denied'
+  ad_user_data:'granted',
+  ad_personalization:'granted'
 });
     </script>
 
