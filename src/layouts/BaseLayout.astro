@@ -62,16 +62,17 @@ const ogImageURL = ogImage ?? new URL("og-default.jpg", Astro.site ?? "https://r
 
     <script src="https://unpkg.com/lucide@latest" defer is:inline></script>
 
-    {/* Consent Mode — defaults denegados ANTES de que GTM cargue (Fase 5) */}
+    {/* Consent Mode (definido ANTES de GTM) — analytics_storage 'granted' para medir
+        GA4 desde el primer pageview (audiencia B2B Venezuela, /privacidad publicada);
+        ad_storage/ad_user_data/ad_personalization quedan 'denied' hasta activar Meta Ads. */}
     <script is:inline>
 window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments);}
 gtag('consent','default',{
   ad_storage:'denied',
-  analytics_storage:'denied',
+  analytics_storage:'granted',
   ad_user_data:'denied',
-  ad_personalization:'denied',
-  wait_for_update:500
+  ad_personalization:'denied'
 });
     </script>
 
