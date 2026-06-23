@@ -22,6 +22,13 @@ import sackOxidoCromoSgn from "../assets/productos/oxido-de-cromo-verde-sgn.webp
 import sackHierroAzul from "../assets/productos/oxido-de-hierro-azul-s463.webp";
 import sackHierroMarron from "../assets/productos/oxido-de-hierro-marron-s686.webp";
 import sackHierroSeries from "../assets/productos/oxidos-de-hierro-series-s.webp";
+import sackAmarilloLimon from "../assets/productos/amarillo-cromo-limon-561.jpg";
+import sackNaranjaMolibdeno from "../assets/productos/naranja-molibdeno-207.jpg";
+import sackPthalocyaninaK6850 from "../assets/productos/pthalocyanina-azul-k6850.jpg";
+import sackFerroAmarilloSty409 from "../assets/productos/oxido-de-hierro-transparente-amarillo-sty409.jpg";
+import sackFerroRojoStr518 from "../assets/productos/oxido-de-hierro-transparente-rojo-str518.jpg";
+import sackFerroVerdeS5605 from "../assets/productos/oxido-de-hierro-verde-s5605.jpg";
+import sackPr146Pink from "../assets/productos/pr146-permanent-pink-hr100.jpg";
 
 // Filtros. Industrias = INDUSTRIAS_VALIDAS (fuente de verdad del sitio).
 // Marcas = solo las que tienen producto en catálogo (derivadas de las fichas).
@@ -40,7 +47,7 @@ interface Producto {
   specs: [string, string][]; // tabla de especificaciones (clave, valor)
   photo: ImageMetadata;
   alt: string;
-  pdf: { href: string; size: string };
+  pdf: { href: string; size: string; label?: string }; // label: "PDF" (default) | "JPG"
 }
 
 // Datos extraídos textualmente de las fichas técnicas oficiales (carpeta
@@ -48,7 +55,7 @@ interface Producto {
 const productos: Producto[] = [
   {
     id: "addcon-xf-superfine",
-    name: "ADDCON XF Superfine",
+    name: "ADDCON XF SUPERFINE",
     marca: "Addcon",
     sector: "Alimento animal",
     rowDesc:
@@ -75,7 +82,7 @@ const productos: Producto[] = [
   },
   {
     id: "almidon-drillamyl-wp",
-    name: "Almidón Drillamyl WP",
+    name: "ALMIDÓN DRILLAMYL WP",
     marca: "Novidon",
     sector: "Hidrocarburos",
     rowDesc:
@@ -99,7 +106,7 @@ const productos: Producto[] = [
   },
   {
     id: "bentonita-activada",
-    name: "Bentonita Activada",
+    name: "BENTONITA ACTIVADA",
     marca: "Minerales Industriales",
     sector: "Hidrocarburos",
     rowDesc:
@@ -121,11 +128,11 @@ const productos: Producto[] = [
     ],
     photo: sackBentonita,
     alt: "Saco de Bentonita Activada Supergel",
-    pdf: { href: "/fichas/bentonita-activada-ficha-tecnica.pdf", size: "1.05 MB" },
+    pdf: { href: "/fichas/bentonita-activada-ficha-tecnica.pdf", size: "1.04 MB" },
   },
   {
     id: "cromita-glass-grade",
-    name: "Cromita Glass Grade",
+    name: "CROMITA GLASS GRADE",
     marca: null,
     sector: "Cerámicas",
     rowDesc:
@@ -155,7 +162,7 @@ const productos: Producto[] = [
   },
   {
     id: "grafito-silvershine-285",
-    name: "Grafito Silvershine - 285",
+    name: "GRAFITO SILVERSHINE - 285",
     marca: "Skaland Graphite",
     sector: "General",
     rowDesc:
@@ -181,7 +188,7 @@ const productos: Producto[] = [
   },
   {
     id: "kimicell-hpmc-kmp150000c",
-    name: "Kímicell HPMC KMP150000C",
+    name: "KÍMICELL HPMC KMP150000C",
     marca: "Kimicell",
     sector: "General",
     rowDesc:
@@ -200,11 +207,11 @@ const productos: Producto[] = [
     ],
     photo: sackKimicell,
     alt: "Saco de Kímicell HPMC KMP150000C",
-    pdf: { href: "/fichas/kimicell-hpmc-kmp150000c-ficha-tecnica.pdf", size: "1.26 MB" },
+    pdf: { href: "/fichas/kimicell-hpmc-kmp150000c-ficha-tecnica.pdf", size: "1.94 MB" },
   },
   {
     id: "oxido-de-cromo-verde-gm7602",
-    name: "Óxido de Cromo Verde GM7602",
+    name: "ÓXIDO DE CROMO VERDE GM7602",
     marca: null,
     sector: "Pinturas",
     rowDesc:
@@ -230,7 +237,7 @@ const productos: Producto[] = [
   },
   {
     id: "amarillo-cromo-medio-803",
-    name: "Amarillo Cromo Medio 803",
+    name: "AMARILLO CROMO MEDIO 803",
     marca: "Yipin Pigmentos",
     sector: "Pinturas",
     rowDesc:
@@ -253,7 +260,7 @@ const productos: Producto[] = [
   },
   {
     id: "azul-ultramar",
-    name: "Azul Ultramar (U02/U08)",
+    name: "AZUL ULTRAMAR (U02/U08)",
     marca: "Yipin Pigmentos",
     sector: "Pinturas",
     rowDesc:
@@ -274,11 +281,11 @@ const productos: Producto[] = [
     ],
     photo: sackAzulUltramar,
     alt: "Saco de pigmento Azul Ultramar (Yipin)",
-    pdf: { href: "/fichas/azul-ultramar-ficha-tecnica.pdf", size: "1.10 MB" },
+    pdf: { href: "/fichas/azul-ultramar-ficha-tecnica.pdf", size: "1.09 MB" },
   },
   {
     id: "pthalocyanina-azul-d-7079",
-    name: "Pthalocyanina Azul D 7079",
+    name: "PTHALOCYANINA AZUL D 7079",
     marca: null,
     sector: "Pinturas",
     rowDesc:
@@ -304,7 +311,7 @@ const productos: Producto[] = [
   },
   {
     id: "oxido-de-cromo-verde-sgn",
-    name: "Óxido de Cromo Verde SGN",
+    name: "ÓXIDO DE CROMO VERDE SGN",
     marca: "Yipin Pigmentos",
     sector: "Pinturas",
     rowDesc:
@@ -330,7 +337,7 @@ const productos: Producto[] = [
   },
   {
     id: "oxido-de-hierro-azul-s463",
-    name: "Óxido de Hierro Azul S463",
+    name: "ÓXIDO DE HIERRO AZUL S463",
     marca: "Yipin Pigmentos",
     sector: "Pinturas",
     rowDesc:
@@ -352,7 +359,7 @@ const productos: Producto[] = [
   },
   {
     id: "oxido-de-hierro-marron-s686",
-    name: "Óxido de Hierro Marrón S686",
+    name: "ÓXIDO DE HIERRO MARRÓN S686",
     marca: "Yipin Pigmentos",
     sector: "Pinturas",
     rowDesc:
@@ -378,7 +385,7 @@ const productos: Producto[] = [
   },
   {
     id: "oxidos-de-hierro-series-s",
-    name: "Óxidos de Hierro Series S",
+    name: "ÓXIDOS DE HIERRO SERIES S",
     marca: "Yipin Pigmentos",
     sector: "Pinturas",
     rowDesc:
@@ -405,7 +412,7 @@ const productos: Producto[] = [
   },
   {
     id: "kimicell-hec-kec",
-    name: "Kímicell HEC KEC 100.000BS / 60.000BS",
+    name: "KÍMICELL HEC KEC 100.000BS / 60.000BS",
     marca: "Kimicell",
     sector: "General",
     rowDesc:
@@ -428,6 +435,180 @@ const productos: Producto[] = [
     photo: sackKimicellHec,
     alt: "Sacos de Kímicell HEC KEC (Kimicell)",
     pdf: { href: "/fichas/kimicell-hec-kec-ficha-tecnica.pdf", size: "556 KB" },
+  },
+  // ── Productos nuevos (incorporados 2026-06-22) ────────────────────
+  {
+    id: "amarillo-cromo-limon-561",
+    name: "AMARILLO CROMO LIMÓN 561",
+    marca: "Yipin Pigmentos",
+    sector: "Pinturas",
+    rowDesc:
+      "Pigmento amarillo cromo limón (cromato-sulfato de plomo, Pigmento Amarillo 34). Colorante para coberturas, papel e impresión.",
+    badge: "Chrome Yellow Lemon 561 · Pinturas",
+    subtitle: "C.I. Pigmento Amarillo 34 (77603) · PbCrO₄·PbSO₄",
+    desc:
+      "Pigmento amarillo cromo limón. Sinónimo: Amarillo 561. Clase química: cromato de plomo / sulfato de plomo (3.2 PbCrO₄·PbSO₄). Índice de Color: Pigmento Amarillo 34 (77603). Aplicación: coberturas, papel e impresión.",
+    specs: [
+      ["Forma", "Polvo"],
+      ["Forma de partícula", "Esférica"],
+      ["Contenido soluble en agua", "≤ 1.0 %"],
+      ["Valor de pH", "4.0 – 8.0"],
+      ["Humedad (post producción)", "≤ 3.0 %"],
+      ["Tamaño de partícula predominante", "0.4 µm máx"],
+      ["Densidad compactada", "1.0 – 1.4 g/ml"],
+      ["Absorción de aceite", "22 g/100g"],
+      ["Densidad", "5.1 g/ml"],
+    ],
+    photo: sackAmarilloLimon,
+    alt: "Saco de pigmento Amarillo Cromo Limón 561 (Yipin)",
+    pdf: { href: "/fichas/amarillo-cromo-limon-561-ficha-tecnica.pdf", size: "570 KB" },
+  },
+  {
+    id: "naranja-molibdeno-207",
+    name: "NARANJA MOLIBDENO 207",
+    marca: "Yipin Pigmentos",
+    sector: "Pinturas",
+    rowDesc:
+      "Pigmento naranja de cromato de plomo y molibdato (Pigmento Rojo 104). Colorante para preparación de pigmentos y tintes inorgánicos.",
+    badge: "Pigment Red 104 · Pinturas",
+    subtitle: "25PbCrO₄·4PbMoO₄·PbSO₄ · C.I. Pigment Red 104",
+    desc:
+      "Pigmento naranja molibdeno. Sinónimo: Pigmento rojo 104. Fórmula química: sulfato de molibdeno de cromato de plomo rojo (25PbCrO₄·4PbMoO₄·PbSO₄). Aplicación: preparación de colorantes (pigmentos y tintes), inorgánicos.",
+    specs: [
+      ["Forma", "Polvo"],
+      ["Fuerza de tinte relativa", "95 – 105 %"],
+      ["ΔL*", "±0.7"],
+      ["Δa*", "±0.7"],
+      ["Δb*", "±0.7"],
+      ["ΔE*ab", "≤ 1.0"],
+    ],
+    photo: sackNaranjaMolibdeno,
+    alt: "Saco de pigmento Naranja Molibdeno 207 (Yipin)",
+    pdf: { href: "/fichas/naranja-molibdeno-207-ficha-tecnica.pdf", size: "1.07 MB" },
+  },
+  {
+    id: "pthalocyanina-azul-k6850",
+    name: "PTHALOCYANINA AZUL K6850",
+    marca: null,
+    sector: "Pinturas",
+    rowDesc:
+      "Pigmento azul de ftalocianina de cobre (forma beta), grado K6850. Alta solidez a luz y solventes para pigmentos de tinta.",
+    badge: "Pigment Blue 15:0 · Pinturas",
+    subtitle: "Ftalocianina de cobre (beta) · C.I. Pigment Blue 15:0 (74160)",
+    desc:
+      "Pigmento azul de ftalocianina de cobre, forma beta, grado K6850. Índice de color: Pigmento Azul 15:0 (74160). Aplicación: pigmentos para tinta. Solidez a luz: 8; solidez a tiempo: 5; solidez a ácido: 5; solidez a álcali: 5.",
+    specs: [
+      ["Forma física", "Polvo"],
+      ["Valor de pH", "5.8 – 8"],
+      ["Densidad (20 °C)", "1.6 g/cm³"],
+      ["Superficie específica", "65 m²/g"],
+      ["Absorción de aceite", "35 – 45 g/100g"],
+      ["Material volátil (105 °C)", "≤ 1.0 %"],
+      ["Material soluble en agua", "≤ 1.5 %"],
+      ["Residuo de malla (100 mesh)", "≤ 5 %"],
+      ["Conductividad", "≤ 300 µs/cm"],
+      ["Resistencia al calor", "200 °C"],
+      ["Solidez a luz", "8"],
+    ],
+    photo: sackPthalocyaninaK6850,
+    alt: "Saco de Pthalocyanina Azul K6850",
+    pdf: { href: "/fichas/pthalocyanina-azul-k6850-ficha-tecnica.pdf", size: "573 KB" },
+  },
+  {
+    id: "oxido-de-hierro-transparente-amarillo-sty409",
+    name: "ÓXIDO DE HIERRO TRANSPARENTE AMARILLO STY409",
+    marca: null,
+    sector: "Pinturas",
+    rowDesc:
+      "Pigmento de óxido de hierro transparente amarillo sintético (Fe₂O₃ 82%). Colorante para pigmentos y tintas.",
+    badge: "Transparent Yellow STY409 · Pinturas",
+    subtitle: "Óxido de hierro sintético transparente · Fe₂O₃ amarillo 82%",
+    desc:
+      "Pigmento de óxido de hierro transparente amarillo, grado STY-409. Fórmula: tetraóxido de trihierro / óxido de hierro amarillo sintético 82%. Sinónimos: óxido de hidróxido de hierro, óxido de hierro sintético. Aplicación: preparación de colorantes (pigmentos y tintas), inorgánicos.",
+    specs: [
+      ["Forma", "Polvo"],
+      ["Contenido soluble en agua", "≤ 0.5 %"],
+      ["Residuo de tamiz (0.045 mm)", "≤ 0.1 %"],
+      ["Valor de pH", "4.0 – 6.0"],
+      ["Contenido de Fe₂O₃", "82.0 %"],
+      ["Materia volátil (105 °C)", "3.0 %"],
+      ["Absorción de UV", "95 %"],
+      ["Absorción de aceite", "30 – 40 g/100g"],
+      ["Fuerza de tinte relativa", "95 – 105 %"],
+    ],
+    photo: sackFerroAmarilloSty409,
+    alt: "Saco de Óxido de Hierro Transparente Amarillo STY409",
+    pdf: { href: "/fichas/oxido-de-hierro-transparente-amarillo-sty409-ficha-tecnica.pdf", size: "1.06 MB" },
+  },
+  {
+    id: "oxido-de-hierro-transparente-rojo-str518",
+    name: "ÓXIDO DE HIERRO TRANSPARENTE ROJO STR518",
+    marca: null,
+    sector: "Pinturas",
+    rowDesc:
+      "Pigmento de óxido de hierro transparente rojo sintético (alfa-Fe₂O₃ 90%). Colorante para pigmentos y tintes.",
+    badge: "Transparent Red STR518 · Pinturas",
+    subtitle: "Óxido de hierro sintético transparente · alfa-Fe₂O₃ 90–100%",
+    desc:
+      "Pigmento de óxido de hierro transparente rojo, grado STR-518. Fórmula: óxido de hierro sintético alfa-Fe₂O₃ 90–100%. Sinónimos: óxido de hierro sintético. Aplicación: preparación de colorantes (pigmentos y tintes), inorgánicos.",
+    specs: [
+      ["Forma", "Polvo"],
+      ["Contenido soluble en agua", "≤ 0.3 %"],
+      ["Residuo de tamiz (0.045 mm)", "≤ 0.05 %"],
+      ["Valor de pH", "5.0 – 8.0"],
+      ["Contenido de Fe₂O₃", "90.0 %"],
+      ["Materia volátil (105 °C)", "3.0 %"],
+      ["Absorción de UV", "95 %"],
+      ["Absorción de aceite", "30 – 40 g/100g"],
+      ["Fuerza de tinte relativa", "98 – 105 %"],
+    ],
+    photo: sackFerroRojoStr518,
+    alt: "Saco de Óxido de Hierro Transparente Rojo STR518",
+    pdf: { href: "/fichas/oxido-de-hierro-transparente-rojo-str518-ficha-tecnica.pdf", size: "1.07 MB" },
+  },
+  {
+    id: "oxido-de-hierro-verde-s5605",
+    name: "ÓXIDO DE HIERRO VERDE S5605",
+    marca: "Yipin Pigmentos",
+    sector: "Pinturas",
+    rowDesc:
+      "Pigmento Complex Green de óxido de hierro verde (FeO/Cr₂O₃/Fe₂O₄). Colorante para pintura, recubrimiento, cerámica y abrasivos.",
+    badge: "Complex Green S5605 · Pinturas",
+    subtitle: "FeO / Cr₂O₃ / Fe₂O₄ · Sinónimo: Complex Green",
+    desc:
+      "Pigmento de óxido de hierro verde Complex Green, grado S5605. Fórmula: FeO/Cr₂O₃/Fe₂O₄. Sinónimo: Complex Green / Óxido de Hierro Verde. Aplicación: pintura, recubrimiento, cerámica, colorante y abrasivos.",
+    specs: [
+      ["Apariencia", "Polvo"],
+      ["Fuerza de tinte vs estándar", "95 – 105 %"],
+      ["ΔE", "≤ 1.0"],
+    ],
+    photo: sackFerroVerdeS5605,
+    alt: "Saco de Óxido de Hierro Verde Complex Green S5605 (Yipin)",
+    pdf: { href: "/fichas/oxido-de-hierro-verde-s5605-ficha-tecnica.pdf", size: "1.00 MB" },
+  },
+  {
+    id: "pr146-permanent-pink-hr100",
+    name: "PR146 PERMANENT PINK HR-100",
+    marca: null,
+    sector: "Pinturas",
+    rowDesc:
+      "Pigmento rojo 146 (monoazo). Colorante para impresión textil, tintas base agua, pinturas y revestimientos a solvente.",
+    badge: "Pigment Red 146 · Pinturas",
+    subtitle: "Pigmento Rojo 146 · CAS 5280-68-2 · Monoazo",
+    desc:
+      "Pigmento rojo 146 (PR146), Permanent Pink HR-100. Nombre: Pigmento rojo 146. Número CAS: 5280-68-2. Grupo químico: Monoazo. Aplicación: impresión textil, tinta a base de agua, pinturas y revestimiento al disolvente. Pigmento rojo con buenas propiedades en base de agua y a base de solvente.",
+    specs: [
+      ["Forma", "Polvo"],
+      ["Humedad", "2.1 %"],
+      ["Densidad", "1.47 – 1.49 g/cm³"],
+      ["Solidez a luz", "4"],
+      ["Resistencia al agua", "4"],
+      ["Resistencia al disolvente", "4"],
+      ["Temperatura de secado", "80 °C"],
+    ],
+    photo: sackPr146Pink,
+    alt: "PR146 Permanent Pink HR-100 — pigmento rojo monoazo",
+    pdf: { href: "/fichas/pr146-permanent-pink-hr100-ficha-tecnica.pdf", size: "1.24 MB" },
   },
 ];
 ---
@@ -460,7 +641,7 @@ const productos: Producto[] = [
           ))}
         </div>
       </div>
-      <span class="pc-count" id="pcCount">15 de 15 resultados</span>
+      <span class="pc-count" id="pcCount">22 de 22 resultados</span>
     </div>
   </div>
 </section>
@@ -560,8 +741,8 @@ const productos: Producto[] = [
             <a
               href={p.pdf.href}
               class="btn btn--outline"
-              download={`${p.id}-ficha-tecnica.pdf`}
-            >Descargar ficha (PDF · {p.pdf.size})</a>
+              download={p.pdf.href.split('/').pop()}
+            >Descargar ficha ({p.pdf.label ?? 'PDF'} · {p.pdf.size})</a>
           </div>
         </div>
       </div>
@@ -689,7 +870,8 @@ const productos: Producto[] = [
     font-family: var(--display);
     font-size: 17px;
     font-weight: 700;
-    letter-spacing: -0.005em;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
     color: var(--ink);
   }
   .pc-prod-desc { margin-top: 4px; font-size: 12.5px; line-height: 1.5; color: var(--text); }
@@ -830,7 +1012,8 @@ const productos: Producto[] = [
     font-family: var(--display);
     font-size: 36px;
     font-weight: 800;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
     color: var(--ink);
     margin-bottom: 8px;
   }
