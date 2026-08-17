@@ -611,7 +611,38 @@ const productos: Producto[] = [
     pdf: { href: "/fichas/pr146-permanent-pink-hr100-ficha-tecnica.pdf", size: "1.24 MB" },
   },
 ];
+
+// Product schema (JSON-LD): un ItemList con un Product por cada ficha del catálogo.
+// Da contexto semántico a Google/IA y habilita rich results de producto. Sin `offers`
+// a propósito — es B2B por cotización, no hay precio público (una Offer sin precio sería
+// engañosa). Las specs de la ficha se exponen como additionalProperty (PropertyValue).
+const SITE = "https://remyvenezuela.com";
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "Catálogo de materia prima industrial — Remy & Stute C.A.",
+  itemListElement: productos.map((p, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    item: {
+      "@type": "Product",
+      name: p.name,
+      description: p.desc,
+      category: p.sector,
+      image: SITE + p.photo.src,
+      url: `${SITE}/productos#${p.id}`,
+      ...(p.marca ? { brand: { "@type": "Brand", name: p.marca } } : {}),
+      additionalProperty: p.specs.map(([name, value]) => ({
+        "@type": "PropertyValue",
+        name,
+        value,
+      })),
+    },
+  })),
+};
 ---
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(productSchema)} />
 
 <section class="pc-head">
   <div class="wrap">
