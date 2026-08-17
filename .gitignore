@@ -39,3 +39,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 *.log
+
+# Documentos internos de contexto (nunca en el repo — solo locales)
+CLAUDE.md
+status.md
+WHILECHANGES.md
+AUDIT-FIXES.md
