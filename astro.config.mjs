@@ -25,6 +25,11 @@ export default defineConfig({
       RESEND_FROM_EMAIL: envField.string({ context: 'server', access: 'secret', optional: true }),
       META_PIXEL_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
       META_ACCESS_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
+      // HubSpot CRM (best-effort). Token de Private App con crm.objects.contacts.write.
+      // PIPELINE_ID opcional: si se setea, además del contacto se crea un deal en ese pipeline.
+      HUBSPOT_ACCESS_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
+      HUBSPOT_PIPELINE_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
+      HUBSPOT_DEALSTAGE_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
     },
   },
   integrations: [sitemap()],

@@ -7,6 +7,8 @@
  *   3. Check idempotencia en Airtable (R3)             → 200 duplicate si ya existe
  *   4. Crear prospecto en Airtable SANDBOX
  *   5. Notificar al equipo por email (Resend) — best-effort
+ *   6. Enviar evento Lead a Meta CAPI — best-effort
+ *   7. Sincronizar lead a HubSpot CRM — best-effort
  *
  * Fase 3: escritura directa a Airtable sin n8n.
  * Migración a n8n en la fase de automatizaciones:
@@ -27,6 +29,7 @@ import { ContactoSchema } from '@lib/schemas/contacto';
 import { checkIdempotency, createProspecto, logError } from '@lib/airtable';
 import { notifyNewLead } from '@lib/email';
 import { sendMetaCAPI } from '@lib/meta';
+import { sendToHubSpot } from '@lib/hubspot';
 import { TURNSTILE_SECRET_KEY, AIRTABLE_API_KEY, AIRTABLE_BASE_PRODUCTION } from 'astro:env/server';
 
 export const prerender = false;
@@ -176,6 +179,14 @@ export const POST: APIRoute = async ({ request, clientAddress, locals }) => {
       }).catch((err: unknown) => {
         console.error('[contacto] Error enviando evento a Meta CAPI', err);
         return logError(parsed.data, String(err), 'MetaCAPI').catch(() => {});
+      }),
+    );
+
+    // 7. HubSpot CRM — best-effort, Airtable sigue siendo la fuente de verdad (R8)
+    runInBackground(
+      sendToHubSpot(parsed.data).catch((err: unknown) => {
+        console.error('[contacto] Error enviando lead a HubSpot', err);
+        return logError(parsed.data, String(err), 'HubSpot').catch(() => {});
       }),
     );
 

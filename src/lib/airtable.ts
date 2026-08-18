@@ -123,7 +123,7 @@ export async function createProspecto(data: ContactoData): Promise<void> {
 export async function logError(
   payload: unknown,
   errorMensaje: string,
-  errorTipo: 'Airtable' | 'Email' | 'MetaCAPI' | 'Interno',
+  errorTipo: 'Airtable' | 'Email' | 'MetaCAPI' | 'HubSpot' | 'Interno',
 ): Promise<void> {
   try {
     const { apiKey, baseId } = getCredentials();
