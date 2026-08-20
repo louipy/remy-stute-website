@@ -74,6 +74,7 @@ const heroSlides = [
           widths={[768, 1280, 1920]}
           sizes="(max-width: 980px) 100vw, 50vw"
           loading={i === 0 ? "eager" : "lazy"}
+          fetchpriority={i === 0 ? "high" : undefined}
           decoding="async"
         />
       ))}

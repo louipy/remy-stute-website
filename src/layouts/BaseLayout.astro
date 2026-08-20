@@ -1,4 +1,19 @@
 ---
+// Fuentes self-hosteadas (@fontsource) — servidas desde el propio dominio y declaradas
+// en el CSS de primera parte, así se elimina el <link> a Google Fonts que bloqueaba el
+// render (~1.5s en Lighthouse mobile). Mismas familias/pesos; font-display: swap por defecto.
+// Subset `latin` únicamente (cubre el español: á é í ó ú ñ ü ¿ ¡) — evita desplegar
+// cirílico/griego/vietnamita. Pesos exactos usados en global.css; nada de más (cada peso = un woff2).
+import "@fontsource/plus-jakarta-sans/latin-700.css";
+import "@fontsource/plus-jakarta-sans/latin-800.css";
+import "@fontsource/inter/latin-400.css";
+import "@fontsource/inter/latin-500.css";
+import "@fontsource/inter/latin-600.css";
+import "@fontsource/inter/latin-700.css";
+import "@fontsource/oswald/latin-400.css";
+import "@fontsource/oswald/latin-500.css";
+import "@fontsource/jetbrains-mono/latin-400.css";
+import "@fontsource/jetbrains-mono/latin-500.css";
 import "@styles/global.css";
 import FlagRibbon from "@components/FlagRibbon.astro";
 import Navbar from "@components/Navbar.astro";
@@ -53,12 +68,8 @@ const ogImageURL = ogImage ?? new URL("og-default.jpg", Astro.site ?? "https://r
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Oswald:wght@400;500&family=Plus+Jakarta+Sans:wght@700;800&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fuentes self-hosteadas vía @fontsource (imports en el frontmatter) — ya no se
+         carga Google Fonts, se elimina el request que bloqueaba el render. -->
 
     <script src="https://unpkg.com/lucide@latest" defer is:inline></script>
 

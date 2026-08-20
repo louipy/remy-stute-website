@@ -9,6 +9,11 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Strict-Transport-Security: max-age=31536000
 
+# Assets con hash en el nombre (JS/CSS/imágenes/fuentes de Astro) → inmutables:
+# el hash cambia si el contenido cambia, por eso es seguro cachear un año.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # ── Content-Security-Policy (PLANTILLA — validar antes de activar) ──────────────
 # NO habilitar a ciegas: una CSP mal ajustada bloquea Turnstile/GTM/GA4/Meta y, con
 # Turnstile bloqueado, se cae el envío de leads (función crítica del sitio).
