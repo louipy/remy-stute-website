@@ -45,3 +45,9 @@ CLAUDE.md
 status.md
 WHILECHANGES.md
 AUDIT-FIXES.md
+TOOLS.md
+
+# package-lock.json: se genera en Windows y omite deps opcionales Linux de sharp/@emnapi
+# (npm ci en el Linux de Cloudflare fallaba). Cloudflare usa npm install sin lock y resuelve
+# correctamente en su plataforma. Regenerar un lock valido requiere entorno Linux (Docker/WSL).
+package-lock.json
