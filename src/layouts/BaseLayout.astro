@@ -88,12 +88,24 @@ gtag('consent','default',{
 });
     </script>
 
-    {/* Google Tag Manager — Main Thread (R5). NO Partytown. */}
+    {/* Google Tag Manager — Main Thread (R5, NO Partytown), carga DIFERIDA.
+        gtm.js se inyecta en la 1ª interacción del usuario (o a los 3.5s por fallback),
+        no en el paint inicial: libera el hilo principal durante la carga (baja TBT/LCP).
+        No rompe tracking: los push a dataLayer se encolan y GTM los procesa al cargar;
+        enviar el form ES una interacción (GTM ya cargado antes del submit) y la conversión
+        de lead va además por Meta CAPI server-side. Consent Mode queda inline ARRIBA, así
+        el 'default' está fijado antes de que GTM lo lea. */}
     <script is:inline>
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+(function(w,d,s,l,i){w[l]=w[l]||[];var loaded=false;
+function loadGTM(){if(loaded)return;loaded=true;
+w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+var f=d.getElementsByTagName(s)[0],j=d.createElement(s),
+dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);}
+var evts=['scroll','mousemove','touchstart','keydown','pointerdown'];
+function onFirst(){evts.forEach(function(e){w.removeEventListener(e,onFirst);});loadGTM();}
+evts.forEach(function(e){w.addEventListener(e,onFirst,{passive:true});});
+setTimeout(loadGTM,3500);
 })(window,document,'script','dataLayer','GTM-M9WVFZ9M');
     </script>
 
